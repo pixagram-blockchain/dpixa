@@ -1,6 +1,6 @@
 {
   "name": "@pixagram/dpixa",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "description": "Pixa blockchain RPC client library",
   "author": "pixa-blockchain",
   "license": "BSD-3-Clause-No-Military-License",
@@ -51,7 +51,7 @@
     "@babel/preset-env": "^7.1.6",
     "@types/bytebuffer": "^5.0.33",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^13.9.2",
+    "@types/node": "^24.10.1",
     "@types/verror": "^1.10.3",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/eslint-plugin-tslint": "^2.24.0",
@@ -78,8 +78,9 @@
     "ts-node": "^8.7.0",
     "tsify": "^4.0.0",
     "tslint": "^5.11.0",
-    "typedoc": "^0.17.1",
-    "typescript": "^3.8.3",
+    "typedoc": "~0.28.15",
+    "typedoc-material-theme": "^1.4.1",
+    "typescript": "^5.9.3",
     "watchify": "^3.11.0"
   }
 }

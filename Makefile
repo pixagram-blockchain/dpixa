@@ -69,7 +69,7 @@ node_modules:
 	yarn install --non-interactive --frozen-lockfile
 
 docs: $(SRC_FILES) node_modules
-	typedoc --gitRevision master --target ES6 --mode file --out docs src
+	typedoc --gitRevision master --out docs src --plugin typedoc-material-theme
 	find docs -name "*.html" | xargs perl -i -pe's~$(shell pwd)~.~g'
 	echo "Served at <https://pixagram-blockchain.github.io/dpixa>" > docs/README.md
 	touch docs

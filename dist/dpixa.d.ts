@@ -310,7 +310,6 @@ declare module 'dpixa/chain/account' {
 
 }
 declare module 'dpixa/chain/misc' {
-	/// <reference types="node" />
 	/**
 	 * @file Misc hive/pixa type definitions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -321,16 +320,16 @@ declare module 'dpixa/chain/misc' {
 	 * Redistribution and use in source and binary forms, with or without modification,
 	 * are permitted provided that the following conditions are met:
 	 *
-	 *  1. Redistribution of source code must retain the above copyright notice, this
-	 *     list of conditions and the following disclaimer.
+	 * 1. Redistribution of source code must retain the above copyright notice, this
+	 * list of conditions and the following disclaimer.
 	 *
-	 *  2. Redistribution in binary form must reproduce the above copyright notice,
-	 *     this list of conditions and the following disclaimer in the documentation
-	 *     and/or other materials provided with the distribution.
+	 * 2. Redistribution in binary form must reproduce the above copyright notice,
+	 * this list of conditions and the following disclaimer in the documentation
+	 * and/or other materials provided with the distribution.
 	 *
-	 *  3. Neither the name of the copyright holder nor the names of its contributors
-	 *     may be used to endorse or promote products derived from this software without
-	 *     specific prior written permission.
+	 * 3. Neither the name of the copyright holder nor the names of its contributors
+	 * may be used to endorse or promote products derived from this software without
+	 * specific prior written permission.
 	 *
 	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 	 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -348,6 +347,7 @@ declare module 'dpixa/chain/misc' {
 	 */
 	import { Account } from 'dpixa/chain/account';
 	import { Asset, Price } from 'dpixa/chain/asset';
+	import { Buffer } from 'buffer';
 	/**
 	 * Large number that may be unsafe to represent natively in JavaScript.
 	 */
@@ -362,7 +362,7 @@ declare module 'dpixa/chain/misc' {
 	     * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
 	     */
 	    static from(value: Buffer | HexBuffer | number[] | string): HexBuffer;
-	    toString(encoding?: string): string;
+	    toString(encoding?: BufferEncoding): string;
 	    toJSON(): string;
 	}
 	/**
@@ -376,7 +376,7 @@ declare module 'dpixa/chain/misc' {
 	     * ability to vote and make transactions.
 	     *
 	     * @note This has to be multiplied by STEEMIT ? `CREATE_ACCOUNT_WITH_PIXA_MODIFIER`
-	     *       (defined as 30 on the main chain) to get the minimum fee needed to create an account.
+	     * (defined as 30 on the main chain) to get the minimum fee needed to create an account.
 	     *
 	     */
 	    account_creation_fee: string | Asset;
@@ -466,12 +466,12 @@ declare module 'dpixa/chain/misc' {
 	    pxs_interest_rate: number;
 	    pxs_print_rate: number;
 	    /**
-	     *  Average block size is updated every block to be:
+	     * Average block size is updated every block to be:
 	     *
-	     *     average_block_size = (99 * average_block_size + new_block_size) / 100
+	     * average_block_size = (99 * average_block_size + new_block_size) / 100
 	     *
-	     *  This property is used to update the current_reserve_ratio to maintain
-	     *  approximately 50% or less utilization of network capacity.
+	     * This property is used to update the current_reserve_ratio to maintain
+	     * approximately 50% or less utilization of network capacity.
 	     */
 	    average_block_size: number;
 	    /**
@@ -498,11 +498,11 @@ declare module 'dpixa/chain/misc' {
 	    /**
 	     * The maximum bandwidth the blockchain can support is:
 	     *
-	     *    max_bandwidth = maximum_block_size * BANDWIDTH_AVERAGE_WINDOW_SECONDS / BLOCK_INTERVAL
+	     * max_bandwidth = maximum_block_size * BANDWIDTH_AVERAGE_WINDOW_SECONDS / BLOCK_INTERVAL
 	     *
 	     * The maximum virtual bandwidth is:
 	     *
-	     *    max_bandwidth * current_reserve_ratio
+	     * max_bandwidth * current_reserve_ratio
 	     */
 	    max_virtual_bandwidth: Bignum;
 	    /**
@@ -565,7 +565,6 @@ declare module 'dpixa/chain/serializer' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import * as ByteBuffer from 'bytebuffer';
 	import { PublicKey } from 'dpixa/crypto';
 	import { Asset } from 'dpixa/chain/asset';
@@ -574,11 +573,11 @@ declare module 'dpixa/chain/serializer' {
 	export type Serializer = (buffer: ByteBuffer, data: any) => void;
 	export const Types: {
 	    Array: (itemSerializer: Serializer) => (buffer: ByteBuffer, data: any[]) => void;
-	    Asset: (buffer: ByteBuffer, data: string | number | Asset) => void;
+	    Asset: (buffer: ByteBuffer, data: Asset | string | number) => void;
 	    Authority: (buffer: ByteBuffer, data: {
 	        [key: string]: any;
 	    }) => void;
-	    Binary: (size?: number | undefined) => (buffer: ByteBuffer, data: HexBuffer | Buffer) => void;
+	    Binary: (size?: number) => (buffer: ByteBuffer, data: Buffer | HexBuffer) => void;
 	    Boolean: (buffer: ByteBuffer, data: boolean) => void;
 	    Date: (buffer: ByteBuffer, data: string) => void;
 	    EncryptedMemo: (buffer: ByteBuffer, data: {
@@ -597,7 +596,7 @@ declare module 'dpixa/chain/serializer' {
 	    Price: (buffer: ByteBuffer, data: {
 	        [key: string]: any;
 	    }) => void;
-	    PublicKey: (buffer: ByteBuffer, data: string | PublicKey | null) => void;
+	    PublicKey: (buffer: ByteBuffer, data: PublicKey | string | null) => void;
 	    StaticVariant: (itemSerializers: Serializer[]) => (buffer: ByteBuffer, data: [number, any]) => void;
 	    String: (buffer: ByteBuffer, data: string) => void;
 	    Transaction: (buffer: ByteBuffer, data: {
@@ -702,13 +701,12 @@ declare module 'dpixa/crypto' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import * as ByteBuffer from '@ecency/bytebuffer';
 	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction';
 	/**
 	 * Network id used in WIF-encoding.
 	 */
-	export const NETWORK_ID: Buffer; function ripemd160(input: Buffer | string): Buffer; function sha256(input: Buffer | string): Buffer; function doubleSha256(input: Buffer | string): Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Buffer): boolean; function isWif(privWif: string | Buffer): boolean;
+	export const NETWORK_ID: Buffer<ArrayBuffer>; function ripemd160(input: Buffer | string): Buffer; function sha256(input: Buffer | string): Buffer; function doubleSha256(input: Buffer | string): Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Buffer): boolean; function isWif(privWif: string | Buffer): boolean;
 	/**
 	 * ECDSA (secp256k1) public key.
 	 */
@@ -718,7 +716,7 @@ declare module 'dpixa/crypto' {
 	    readonly uncompressed: Buffer;
 	    constructor(key: any, prefix?: string);
 	    static fromBuffer(key: ByteBuffer): {
-	        key: any;
+	        key: ByteBuffer;
 	    };
 	    /**
 	     * Create a new instance from a WIF-encoded key.
@@ -809,9 +807,9 @@ declare module 'dpixa/crypto' {
 	     * @param message 32-byte message that was used to create the signature.
 	     */
 	    recover(message: Buffer, prefix?: string): PublicKey;
-	    toBuffer(): Buffer;
+	    toBuffer(): Buffer<ArrayBuffer>;
 	    toString(): string;
-	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): Buffer; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): string;
+	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): Buffer<ArrayBufferLike>; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): string;
 	/** Misc crypto utility functions. */
 	export const cryptoUtils: {
 	    decodePrivate: typeof decodePrivate;
@@ -1025,7 +1023,6 @@ declare module 'dpixa/chain/operation' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import { PublicKey } from 'dpixa/crypto';
 	import { AuthorityType } from 'dpixa/chain/account';
 	import { Asset, PriceType } from 'dpixa/chain/asset';
@@ -1890,7 +1887,6 @@ declare module 'dpixa/utils' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import { EventEmitter } from 'events';
 	/**
 	 * Return a promise that will resove when a specific event is emitted.
@@ -2060,7 +2056,6 @@ declare module 'dpixa/helpers/blockchain' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import { Client } from 'dpixa/client';
 	export enum BlockchainMode {
 	    /**
@@ -2812,7 +2807,6 @@ declare module 'dpixa/client' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	/// <reference types="node" />
 	import { Blockchain } from 'dpixa/helpers/blockchain';
 	import { BroadcastAPI } from 'dpixa/helpers/broadcast';
 	import { DatabaseAPI } from 'dpixa/helpers/database';
@@ -2827,7 +2821,7 @@ declare module 'dpixa/client' {
 	/**
 	 * Main Pixa network chain id.
 	 */
-	export const DEFAULT_CHAIN_ID: Buffer;
+	export const DEFAULT_CHAIN_ID: Buffer<ArrayBuffer>;
 	/**
 	 * Main Pixa network address prefix.
 	 */
@@ -2971,7 +2965,6 @@ declare module 'dpixa/chain/deserializer' {
 
 }
 declare module 'dpixa/helpers/aes' {
-	/// <reference types="node" />
 	import { PrivateKey, PublicKey } from 'dpixa/crypto';
 	export const encrypt: (private_key: PrivateKey, public_key: PublicKey, message: Buffer, nonce?: string) => any;
 	export const decrypt: (private_key: PrivateKey, public_key: PublicKey, nonce: any, message: any, checksum: number) => any;
@@ -2992,8 +2985,8 @@ declare module 'dpixa/helpers/aes' {
 declare module 'dpixa/memo' {
 	import { PrivateKey, PublicKey } from 'dpixa/crypto';
 	export const Memo: {
-	    decode: (private_key: string | PrivateKey, memo: string) => string;
-	    encode: (private_key: string | PrivateKey, public_key: string | PublicKey, memo: string, testNonce?: string | undefined) => string;
+	    decode: (private_key: PrivateKey | string, memo: string) => string;
+	    encode: (private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: string) => string;
 	};
 
 }
