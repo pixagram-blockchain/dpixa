@@ -1,0 +1,132 @@
+[**@pixagram/dpixa**](README.md)
+
+***
+
+# @pixagram/dpixa
+
+## Namespaces
+
+- [utils](@pixagram/namespaces/utils/README.md)
+
+## Enumerations
+
+- [BlockchainMode](enumerations/BlockchainMode.md)
+
+## Classes
+
+- [AccountByKeyAPI](classes/AccountByKeyAPI.md)
+- [Asset](classes/Asset.md)
+- [Authority](classes/Authority.md)
+- [Blockchain](classes/Blockchain.md)
+- [Client](classes/Client.md)
+- [DatabaseAPI](classes/DatabaseAPI.md)
+- [HexBuffer](classes/HexBuffer.md)
+- [PixamindAPI](classes/PixamindAPI.md)
+- [Price](classes/Price.md)
+- [PrivateKey](classes/PrivateKey.md)
+- [PublicKey](classes/PublicKey.md)
+- [RCAPI](classes/RCAPI.md)
+- [Signature](classes/Signature.md)
+
+## Interfaces
+
+- [Account](interfaces/Account.md)
+- [AccountCreateOperation](interfaces/AccountCreateOperation.md)
+- [AccountCreateWithDelegationOperation](interfaces/AccountCreateWithDelegationOperation.md)
+- [AccountsByKey](interfaces/AccountsByKey.md)
+- [AccountUpdate2Operation](interfaces/AccountUpdate2Operation.md)
+- [AccountUpdateOperation](interfaces/AccountUpdateOperation.md)
+- [AccountWitnessProxyOperation](interfaces/AccountWitnessProxyOperation.md)
+- [AccountWitnessVoteOperation](interfaces/AccountWitnessVoteOperation.md)
+- [AppliedOperation](interfaces/AppliedOperation.md)
+- [AuthorityType](interfaces/AuthorityType.md)
+- [BeneficiaryRoute](interfaces/BeneficiaryRoute.md)
+- [BlockchainStreamOptions](interfaces/BlockchainStreamOptions.md)
+- [BlockHeader](interfaces/BlockHeader.md)
+- [CancelTransferFromSavingsOperation](interfaces/CancelTransferFromSavingsOperation.md)
+- [ChainProperties](interfaces/ChainProperties.md)
+- [ChangeRecoveryAccountOperation](interfaces/ChangeRecoveryAccountOperation.md)
+- [ClaimAccountOperation](interfaces/ClaimAccountOperation.md)
+- [ClaimRewardBalanceOperation](interfaces/ClaimRewardBalanceOperation.md)
+- [ClientOptions](interfaces/ClientOptions.md)
+- [CollateralizedConvertOperation](interfaces/CollateralizedConvertOperation.md)
+- [Comment](interfaces/Comment.md)
+- [CommentOperation](interfaces/CommentOperation.md)
+- [CommentOptionsOperation](interfaces/CommentOptionsOperation.md)
+- [CommunityDetail](interfaces/CommunityDetail.md)
+- [ConvertOperation](interfaces/ConvertOperation.md)
+- [CreateClaimedAccountOperation](interfaces/CreateClaimedAccountOperation.md)
+- [CreateProposalOperation](interfaces/CreateProposalOperation.md)
+- [CustomBinaryOperation](interfaces/CustomBinaryOperation.md)
+- [CustomJsonOperation](interfaces/CustomJsonOperation.md)
+- [CustomOperation](interfaces/CustomOperation.md)
+- [DeclineVotingRightsOperation](interfaces/DeclineVotingRightsOperation.md)
+- [DelegateVestingSharesOperation](interfaces/DelegateVestingSharesOperation.md)
+- [DeleteCommentOperation](interfaces/DeleteCommentOperation.md)
+- [Discussion](interfaces/Discussion.md)
+- [DisqussionQuery](interfaces/DisqussionQuery.md)
+- [DynamicGlobalProperties](interfaces/DynamicGlobalProperties.md)
+- [EscrowApproveOperation](interfaces/EscrowApproveOperation.md)
+- [EscrowDisputeOperation](interfaces/EscrowDisputeOperation.md)
+- [EscrowReleaseOperation](interfaces/EscrowReleaseOperation.md)
+- [EscrowTransferOperation](interfaces/EscrowTransferOperation.md)
+- [ExtendedAccount](interfaces/ExtendedAccount.md)
+- [FeedPublishOperation](interfaces/FeedPublishOperation.md)
+- [LimitOrderCancelOperation](interfaces/LimitOrderCancelOperation.md)
+- [LimitOrderCreate2Operation](interfaces/LimitOrderCreate2Operation.md)
+- [LimitOrderCreateOperation](interfaces/LimitOrderCreateOperation.md)
+- [Notifications](interfaces/Notifications.md)
+- [Operation](interfaces/Operation.md)
+- [Pow2Operation](interfaces/Pow2Operation.md)
+- [PowOperation](interfaces/PowOperation.md)
+- [RecoverAccountOperation](interfaces/RecoverAccountOperation.md)
+- [RecurrentTransferOperation](interfaces/RecurrentTransferOperation.md)
+- [RemoveProposalOperation](interfaces/RemoveProposalOperation.md)
+- [ReportOverProductionOperation](interfaces/ReportOverProductionOperation.md)
+- [RequestAccountRecoveryOperation](interfaces/RequestAccountRecoveryOperation.md)
+- [ResetAccountOperation](interfaces/ResetAccountOperation.md)
+- [SetResetAccountOperation](interfaces/SetResetAccountOperation.md)
+- [SetWithdrawVestingRouteOperation](interfaces/SetWithdrawVestingRouteOperation.md)
+- [SignedBlock](interfaces/SignedBlock.md)
+- [SignedBlockHeader](interfaces/SignedBlockHeader.md)
+- [SignedTransaction](interfaces/SignedTransaction.md)
+- [SMTAsset](interfaces/SMTAsset.md)
+- [Transaction](interfaces/Transaction.md)
+- [TransactionConfirmation](interfaces/TransactionConfirmation.md)
+- [TransferFromSavingsOperation](interfaces/TransferFromSavingsOperation.md)
+- [TransferOperation](interfaces/TransferOperation.md)
+- [TransferToSavingsOperation](interfaces/TransferToSavingsOperation.md)
+- [TransferToVestingOperation](interfaces/TransferToVestingOperation.md)
+- [UpdateProposalOperation](interfaces/UpdateProposalOperation.md)
+- [UpdateProposalVotesOperation](interfaces/UpdateProposalVotesOperation.md)
+- [VestingDelegation](interfaces/VestingDelegation.md)
+- [VoteOperation](interfaces/VoteOperation.md)
+- [WithdrawVestingOperation](interfaces/WithdrawVestingOperation.md)
+- [WitnessSetPropertiesOperation](interfaces/WitnessSetPropertiesOperation.md)
+- [WitnessUpdateOperation](interfaces/WitnessUpdateOperation.md)
+
+## Type Aliases
+
+- [AssetSymbol](type-aliases/AssetSymbol.md)
+- [Bignum](type-aliases/Bignum.md)
+- [DiscussionQueryCategory](type-aliases/DiscussionQueryCategory.md)
+- [KeyRole](type-aliases/KeyRole.md)
+- [OperationName](type-aliases/OperationName.md)
+- [PriceType](type-aliases/PriceType.md)
+- [Serializer](type-aliases/Serializer.md)
+- [VirtualOperationName](type-aliases/VirtualOperationName.md)
+
+## Variables
+
+- [cryptoUtils](variables/cryptoUtils.md)
+- [DEFAULT\_ADDRESS\_PREFIX](variables/DEFAULT_ADDRESS_PREFIX.md)
+- [DEFAULT\_CHAIN\_ID](variables/DEFAULT_CHAIN_ID.md)
+- [Memo](variables/Memo.md)
+- [NETWORK\_ID](variables/NETWORK_ID.md)
+- [Types](variables/Types.md)
+- [VERSION](variables/VERSION.md)
+
+## Functions
+
+- [getVestingSharePrice](functions/getVestingSharePrice.md)
+- [getVests](functions/getVests.md)

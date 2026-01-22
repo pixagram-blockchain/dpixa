@@ -1,1 +1,1 @@
-Served at <https://pixagram-blockchain.github.io/dpixa>
+Served at <https://pixagram.io/dpixa>
