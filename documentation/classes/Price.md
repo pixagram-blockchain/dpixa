@@ -6,7 +6,7 @@
 
 # Class: Price
 
-Defined in: chain/asset.ts:237
+Defined in: chain/asset.ts:224
 
 Represents quotation of the relative value of asset against another asset.
 Similar to 'currency pair' used to determine value of currencies.
@@ -24,7 +24,7 @@ Similar to 'currency pair' used to determine value of currencies.
 
 > **new Price**(`base`, `quote`): `Price`
 
-Defined in: chain/asset.ts:246
+Defined in: chain/asset.ts:233
 
 #### Parameters
 
@@ -54,7 +54,7 @@ Both base and quote shall have different symbol defined.
 
 > `readonly` **base**: [`Asset`](Asset.md)
 
-Defined in: chain/asset.ts:246
+Defined in: chain/asset.ts:233
 
 represents a value of the price object to be expressed relatively to quote
                asset. Cannot have amount == 0 if you want to build valid price.
@@ -65,7 +65,7 @@ represents a value of the price object to be expressed relatively to quote
 
 > `readonly` **quote**: [`Asset`](Asset.md)
 
-Defined in: chain/asset.ts:246
+Defined in: chain/asset.ts:233
 
 represents an relative asset. Cannot have amount == 0, otherwise
                asertion fail.
@@ -78,7 +78,7 @@ Both base and quote shall have different symbol defined.
 
 > **convert**(`asset`): [`Asset`](Asset.md)
 
-Defined in: chain/asset.ts:279
+Defined in: chain/asset.ts:266
 
 Return a new Asset with the price converted between the symbols in the pair.
 Throws if passed asset symbol is not base or quote.
@@ -99,7 +99,7 @@ Throws if passed asset symbol is not base or quote.
 
 > **toString**(): `string`
 
-Defined in: chain/asset.ts:271
+Defined in: chain/asset.ts:258
 
 Return a string representation of this price pair.
 
@@ -113,7 +113,7 @@ Return a string representation of this price pair.
 
 > `static` **from**(`value`): `Price`
 
-Defined in: chain/asset.ts:260
+Defined in: chain/asset.ts:247
 
 Convenience to create new Price.
 

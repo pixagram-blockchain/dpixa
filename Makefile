@@ -69,10 +69,11 @@ node_modules:
 	yarn install --non-interactive --frozen-lockfile
 
 docs: $(SRC_FILES) node_modules
-	typedoc --gitRevision master --out docs src --plugin typedoc-material-theme
+	typedoc --gitRevision master --out docs src --plugin typedoc-material-theme --themeColor '#666666'
 	find docs -name "*.html" | xargs perl -i -pe's~$(shell pwd)~.~g'
-	echo "Served at <https://pixagram-blockchain.github.io/dpixa>" > docs/README.md
+	echo "Served at <https://pixagram.io/dpixa>" > docs/README.md
 	touch docs
+	typedoc --gitRevision master --out documentation src --plugin typedoc-plugin-markdown
 
 .PHONY: clean
 clean:

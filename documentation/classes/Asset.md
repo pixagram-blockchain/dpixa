@@ -6,7 +6,7 @@
 
 # Class: Asset
 
-Defined in: chain/asset.ts:60
+Defined in: chain/asset.ts:53
 
 Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
 
@@ -16,7 +16,7 @@ Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
 
 > **new Asset**(`amount`, `symbol`): `Asset`
 
-Defined in: chain/asset.ts:61
+Defined in: chain/asset.ts:54
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: chain/asset.ts:61
 
 > `readonly` **amount**: `number`
 
-Defined in: chain/asset.ts:62
+Defined in: chain/asset.ts:55
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: chain/asset.ts:62
 
 > `readonly` **symbol**: [`AssetSymbol`](../type-aliases/AssetSymbol.md)
 
-Defined in: chain/asset.ts:63
+Defined in: chain/asset.ts:56
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: chain/asset.ts:63
 
 > **add**(`amount`): `Asset`
 
-Defined in: chain/asset.ts:174
+Defined in: chain/asset.ts:161
 
 Return a new Asset instance with amount added.
 
@@ -74,7 +74,7 @@ Return a new Asset instance with amount added.
 
 > **divide**(`divisor`): `Asset`
 
-Defined in: chain/asset.ts:207
+Defined in: chain/asset.ts:194
 
 Return a new Asset with the amount divided.
 
@@ -94,7 +94,7 @@ Return a new Asset with the amount divided.
 
 > **getPrecision**(): `number`
 
-Defined in: chain/asset.ts:135
+Defined in: chain/asset.ts:128
 
 Return asset precision.
 
@@ -108,7 +108,7 @@ Return asset precision.
 
 > **multiply**(`factor`): `Asset`
 
-Defined in: chain/asset.ts:195
+Defined in: chain/asset.ts:182
 
 Return a new Asset with the amount multiplied by factor.
 
@@ -128,7 +128,7 @@ Return a new Asset with the amount multiplied by factor.
 
 > **steem\_symbols**(): `Asset`
 
-Defined in: chain/asset.ts:153
+Defined in: chain/asset.ts:140
 
 returns a representation of this asset using only STEEM SBD for
 legacy purposes
@@ -143,7 +143,7 @@ legacy purposes
 
 > **subtract**(`amount`): `Asset`
 
-Defined in: chain/asset.ts:183
+Defined in: chain/asset.ts:170
 
 Return a new Asset instance with amount subtracted.
 
@@ -163,7 +163,7 @@ Return a new Asset instance with amount subtracted.
 
 > **toJSON**(): `string`
 
-Defined in: chain/asset.ts:219
+Defined in: chain/asset.ts:206
 
 For JSON serialization, same as toString().
 
@@ -177,7 +177,7 @@ For JSON serialization, same as toString().
 
 > **toString**(): `string`
 
-Defined in: chain/asset.ts:167
+Defined in: chain/asset.ts:154
 
 Return a string representation of this asset, e.g. `42.000 PIXA`.
 
@@ -191,7 +191,7 @@ Return a string representation of this asset, e.g. `42.000 PIXA`.
 
 > `static` **from**(`value`, `symbol?`): `Asset`
 
-Defined in: chain/asset.ts:93
+Defined in: chain/asset.ts:86
 
 Convenience to create new Asset.
 
@@ -218,7 +218,7 @@ Symbol to use when created from number. Will also be used to validate
 
 > `static` **fromString**(`string`, `expectedSymbol?`): `Asset`
 
-Defined in: chain/asset.ts:69
+Defined in: chain/asset.ts:62
 
 Create a new Asset instance from a string, e.g. `42.000 PIXA`.
 
@@ -242,7 +242,7 @@ Create a new Asset instance from a string, e.g. `42.000 PIXA`.
 
 > `static` **max**(`a`, `b`): `Asset`
 
-Defined in: chain/asset.ts:124
+Defined in: chain/asset.ts:117
 
 Return the larger of the two assets.
 
@@ -266,7 +266,7 @@ Return the larger of the two assets.
 
 > `static` **min**(`a`, `b`): `Asset`
 
-Defined in: chain/asset.ts:113
+Defined in: chain/asset.ts:106
 
 Return the smaller of the two assets.
 
