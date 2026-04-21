@@ -1,6 +1,6 @@
 {
   "name": "@pixagram/dpixa",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Pixa blockchain RPC client library",
   "author": "pixa-blockchain",
   "license": "BSD-3-Clause-No-Military-License",

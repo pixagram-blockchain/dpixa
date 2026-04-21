@@ -8,6 +8,6 @@
 
 > `const` **NETWORK\_ID**: `any`
 
-Defined in: crypto.ts:78
+Defined in: crypto.ts:85
 
 Network id used in WIF-encoding.

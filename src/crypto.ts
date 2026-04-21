@@ -40,23 +40,30 @@ const bigInteger = require("bigi");
 import * as bs58 from "./base58";
 const ByteBuffer = require("@ecency/bytebuffer");
 // NOTE: Previously this file did `const Buffer = ByteBuffer;` which shadowed
-// Node's real Buffer with the ByteBuffer constructor. ByteBuffer exposes
+// the global Buffer with the ByteBuffer constructor. ByteBuffer exposes
 // .concat (with DIFFERENT semantics — it returns a ByteBuffer instance, not
-// a Node Buffer) but no .from / .alloc. The result was that calls like
-// `Buffer.from(...)` silently resolved to the global Node Buffer while
+// a Buffer) but no .from / .alloc. The result was that calls like
+// `Buffer.from(...)` silently resolved to the global Buffer while
 // `Buffer.concat(...)` went to ByteBuffer.concat, producing a ByteBuffer
-// object that was then handed to sha256(...) — which either coerces it via
+// object that was then handed to sha256(...) — which coerces it via
 // toString() (returning a debug string like "ByteBufferNB(offset=X,limit=Y,
-// capacity=Z)") or throws. Both outcomes are size-dependent because the
-// debug string contains the capacity, and capacity only changes when the
-// serialized transaction outgrows DEFAULT_CAPACITY. Small transactions hash
-// one metadata string, large transactions hash a different one, and neither
-// matches what the node re-serializes — producing the misleading
-// "Missing Posting Authority" error for small comment bodies.
+// capacity=Z)"). That string's content depends on ByteBuffer's capacity,
+// and capacity only changes when the serialized transaction outgrows
+// DEFAULT_CAPACITY. Small transactions hash one metadata string, large
+// transactions hash a different one, and neither matches what the node
+// re-serializes — producing the misleading "Missing Posting Authority"
+// error for small comment bodies.
 //
-// Fix: import Node's real Buffer and use it for all byte manipulation. Only
-// use ByteBuffer for the serialization pass, and copy out of it defensively.
-const NodeBuffer = require("buffer").Buffer;
+// Fix: use the real global Buffer (provided by the `buffer` polyfill in
+// browser builds, or Node's native Buffer in node builds) as `NodeBuffer`,
+// explicitly and without shadowing. ByteBuffer is still used — but only as
+// ByteBuffer, never aliased to Buffer.
+//
+// `Buffer` (capital-B, unqualified) is the runtime global here. Do NOT
+// introduce a local `const Buffer = ...` binding again — it would shadow
+// the global and reintroduce the original bug.
+declare const Buffer: any;
+const NodeBuffer = Buffer;
 const ecurve = require("ecurve");
 const Ripemd160 = require("ripemd160");
 const secp256k1 = require("secp256k1");
