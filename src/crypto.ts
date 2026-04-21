@@ -39,7 +39,24 @@ import { createHash } from 'crypto'
 const bigInteger = require("bigi");
 import * as bs58 from "./base58";
 const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+// NOTE: Previously this file did `const Buffer = ByteBuffer;` which shadowed
+// Node's real Buffer with the ByteBuffer constructor. ByteBuffer exposes
+// .concat (with DIFFERENT semantics — it returns a ByteBuffer instance, not
+// a Node Buffer) but no .from / .alloc. The result was that calls like
+// `Buffer.from(...)` silently resolved to the global Node Buffer while
+// `Buffer.concat(...)` went to ByteBuffer.concat, producing a ByteBuffer
+// object that was then handed to sha256(...) — which either coerces it via
+// toString() (returning a debug string like "ByteBufferNB(offset=X,limit=Y,
+// capacity=Z)") or throws. Both outcomes are size-dependent because the
+// debug string contains the capacity, and capacity only changes when the
+// serialized transaction outgrows DEFAULT_CAPACITY. Small transactions hash
+// one metadata string, large transactions hash a different one, and neither
+// matches what the node re-serializes — producing the misleading
+// "Missing Posting Authority" error for small comment bodies.
+//
+// Fix: import Node's real Buffer and use it for all byte manipulation. Only
+// use ByteBuffer for the serialization pass, and copy out of it defensively.
+const NodeBuffer = require("buffer").Buffer;
 const ecurve = require("ecurve");
 const Ripemd160 = require("ripemd160");
 const secp256k1 = require("secp256k1");
@@ -58,15 +75,15 @@ const secp256k1Curve = ecurve.getCurveByName('secp256k1')
 /**
  * Network id used in WIF-encoding.
  */
-export const NETWORK_ID = Buffer.from([NETWORK_ID_INT])
+export const NETWORK_ID = NodeBuffer.from([NETWORK_ID_INT])
 
 /**
  * Return ripemd160 hash of input.
  */
 function ripemd160(input: any | string): any {
   return new Ripemd160()
-    .update(input)
-    .digest()
+      .update(input)
+      .digest()
 }
 
 /**
@@ -74,8 +91,8 @@ function ripemd160(input: any | string): any {
  */
 function sha256(input: any | string): any {
   return createHash('sha256')
-    .update(input)
-    .digest()
+      .update(input)
+      .digest()
 }
 
 /**
@@ -83,8 +100,8 @@ function sha256(input: any | string): any {
  */
 function sha512(input: any | string): any {
   return createHash('sha512')
-    .update(input)
-    .digest()
+      .update(input)
+      .digest()
 }
 
 /**
@@ -99,7 +116,7 @@ function doubleSha256(input: any | string): any {
  */
 function encodePublic(key: any, prefix: string): string {
   const checksum = ripemd160(key)
-  return prefix + bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
+  return prefix + bs58.encode(NodeBuffer.concat([key, checksum.slice(0, 4)]))
 }
 
 /**
@@ -123,7 +140,7 @@ function decodePublic(encodedKey: string): { key: Buffer; prefix: string } {
 function encodePrivate(key: any): string {
   assert.equal(key.readUInt8(0), 0x80, 'private key network id mismatch')
   const checksum = doubleSha256(key)
-  return bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
+  return bs58.encode(NodeBuffer.concat([key, checksum.slice(0, 4)]))
 }
 
 /**
@@ -132,9 +149,9 @@ function encodePrivate(key: any): string {
 function decodePrivate(encodedKey: string): any {
   const buffer: Buffer = bs58.decode(encodedKey)
   assert.deepEqual(
-    buffer.slice(0, 1),
-    NETWORK_ID,
-    'private key network id mismatch'
+      buffer.slice(0, 1),
+      NETWORK_ID,
+      'private key network id mismatch'
   )
   const checksum = buffer.slice(-4)
   const key = buffer.slice(0, -4)
@@ -148,10 +165,10 @@ function decodePrivate(encodedKey: string): any {
  */
 function isCanonicalSignature(signature: any): boolean {
   return (
-    !(signature[0] & 0x80) &&
-    !(signature[0] === 0 && !(signature[1] & 0x80)) &&
-    !(signature[32] & 0x80) &&
-    !(signature[32] === 0 && !(signature[33] & 0x80))
+      !(signature[0] & 0x80) &&
+      !(signature[0] === 0 && !(signature[1] & 0x80)) &&
+      !(signature[32] & 0x80) &&
+      !(signature[32] === 0 && !(signature[33] & 0x80))
   )
 }
 
@@ -160,15 +177,15 @@ function isCanonicalSignature(signature: any): boolean {
  */
 function isWif(privWif: string | any): boolean {
   try {
-      const bufWif = new Buffer(bs58.decode(privWif))
-      const privKey = bufWif.slice(0, -4)
-      const checksum = bufWif.slice(-4)
-      let newChecksum = sha256(privKey)
-      newChecksum = sha256(newChecksum)
-      newChecksum = newChecksum.slice(0, 4)
-      return (checksum.toString() === newChecksum.toString())
+    const bufWif = NodeBuffer.from(bs58.decode(privWif))
+    const privKey = bufWif.slice(0, -4)
+    const checksum = bufWif.slice(-4)
+    let newChecksum = sha256(privKey)
+    newChecksum = sha256(newChecksum)
+    newChecksum = newChecksum.slice(0, 4)
+    return (checksum.toString() === newChecksum.toString())
   } catch (e) {
-      return false
+    return false
   }
 }
 
@@ -180,11 +197,11 @@ export class PublicKey {
   public readonly uncompressed: any
 
   constructor(
-    public readonly key: any,
-    public readonly prefix = DEFAULT_ADDRESS_PREFIX,
+      public readonly key: any,
+      public readonly prefix = DEFAULT_ADDRESS_PREFIX,
   ) {
     assert(secp256k1.publicKeyVerify(key), 'invalid public key')
-    this.uncompressed = Buffer.from(secp256k1.publicKeyConvert(key, false))
+    this.uncompressed = NodeBuffer.from(secp256k1.publicKeyConvert(key, false))
   }
 
   public static fromBuffer(key: any) {
@@ -283,16 +300,16 @@ export class PrivateKey {
    * Create key from username and password.
    */
   public static fromLogin(
-    username: string,
-    password: string,
-    role: KeyRole = 'active'
+      username: string,
+      password: string,
+      role: KeyRole = 'active'
   ) {
     const seed = username + role + password
     return PrivateKey.fromSeed(seed)
   }
 
   public multiply(pub: any): Buffer {
-    return Buffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false))
+    return NodeBuffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false))
   }
 
   /**
@@ -304,7 +321,7 @@ export class PrivateKey {
     let attempts = 0
     do {
       const options = {
-        data: sha256(Buffer.concat([message, Buffer.alloc(1, ++attempts)]))
+        data: sha256(NodeBuffer.concat([message, NodeBuffer.alloc(1, ++attempts)]))
       }
       rv = secp256k1.sign(message, this.key, options)
     } while (!isCanonicalSignature(rv.signature))
@@ -322,7 +339,7 @@ export class PrivateKey {
    * Return a WIF-encoded representation of the key.
    */
   public toString() {
-    return encodePrivate(Buffer.concat([NETWORK_ID, this.key]))
+    return encodePrivate(NodeBuffer.concat([NETWORK_ID, this.key]))
   }
 
   /**
@@ -339,9 +356,9 @@ export class PrivateKey {
    */
   public get_shared_secret(public_key: PublicKey): Buffer {
     const KBP = ecurve.Point.fromAffine(
-      secp256k1Curve,
-      bigInteger.fromBuffer(public_key.uncompressed.slice(1, 33)),
-      bigInteger.fromBuffer(public_key.uncompressed.slice(33, 65))
+        secp256k1Curve,
+        bigInteger.fromBuffer(public_key.uncompressed.slice(1, 33)),
+        bigInteger.fromBuffer(public_key.uncompressed.slice(33, 65))
     )
     const P = KBP.multiply(bigInteger.fromBuffer(this.key))
     const S = P.affineX.toBuffer({size: 32})
@@ -365,7 +382,7 @@ export class Signature {
   }
 
   public static fromString(string: string) {
-    return Signature.fromBuffer(Buffer.from(string, 'hex'))
+    return Signature.fromBuffer(NodeBuffer.from(string, 'hex'))
   }
 
   /**
@@ -374,13 +391,13 @@ export class Signature {
    */
   public recover(message: Buffer, prefix?: string) {
     return new PublicKey(
-      secp256k1.recover(message, this.data, this.recovery),
-      prefix
+        secp256k1.recover(message, this.data, this.recovery),
+        prefix
     )
   }
 
   public toBuffer() {
-    const buffer = Buffer.alloc(65)
+    const buffer = NodeBuffer.alloc(65)
     buffer.writeUInt8(this.recovery + 31, 0)
     this.data.copy(buffer, 1)
     return buffer
@@ -395,25 +412,31 @@ export class Signature {
  * @param chainId The chain id to use when creating the hash.
  */
 function transactionDigest(
-  transaction: Transaction | SignedTransaction,
-  chainId: Buffer = DEFAULT_CHAIN_ID
+    transaction: Transaction | SignedTransaction,
+    chainId: Buffer = DEFAULT_CHAIN_ID
 ) {
   const buffer = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
+      ByteBuffer.DEFAULT_CAPACITY,
+      ByteBuffer.LITTLE_ENDIAN
   )
   try {
     Types.Transaction(buffer, transaction)
   } catch (cause) {
     throw new VError(
-      { cause, name: 'SerializationError' },
-      'Unable to serialize transaction'
+        { cause, name: 'SerializationError' },
+        'Unable to serialize transaction'
     )
   }
   buffer.flip()
 
-  const transactionData = Buffer.from(buffer.toBuffer())
-  const digest = sha256(Buffer.concat([chainId, transactionData]))
+  // forceCopy=true: extract a freshly-allocated Node Buffer instead of a
+  // view into ByteBuffer's backing allocation. A view can be mutated by
+  // subsequent ByteBuffer operations (or share memory with pooled Node
+  // Buffer slabs) between digest computation and broadcast, causing the
+  // node to re-hash different bytes than what was signed — which surfaces
+  // as "Missing Posting Authority" for certain payload sizes.
+  const transactionData = buffer.toBuffer(true)
+  const digest = sha256(NodeBuffer.concat([chainId, transactionData]))
   return digest
 }
 
@@ -424,9 +447,9 @@ function transactionDigest(
  * @param options Chain id and address prefix, compatible with {@link Client}.
  */
 function signTransaction(
-  transaction: Transaction,
-  keys: PrivateKey | PrivateKey[],
-  chainId: Buffer = DEFAULT_CHAIN_ID
+    transaction: Transaction,
+    keys: PrivateKey | PrivateKey[],
+    chainId: Buffer = DEFAULT_CHAIN_ID
 ) {
   const digest = transactionDigest(transaction, chainId)
   const signedTransaction = copy(transaction) as SignedTransaction
@@ -447,19 +470,22 @@ function signTransaction(
 
 function generateTrxId(transaction: Transaction) {
   const buffer = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
+      ByteBuffer.DEFAULT_CAPACITY,
+      ByteBuffer.LITTLE_ENDIAN
   )
   try {
     Types.Transaction(buffer, transaction)
   } catch (cause) {
     throw new VError(
-      { cause, name: 'SerializationError' },
-      'Unable to serialize transaction'
+        { cause, name: 'SerializationError' },
+        'Unable to serialize transaction'
     )
   }
   buffer.flip()
-  const transactionData = Buffer.from(buffer.toBuffer())
+  // forceCopy=true: see comment in transactionDigest. Same rationale —
+  // the bytes we hash for the trx id must not share memory with the
+  // ByteBuffer that produced them.
+  const transactionData = buffer.toBuffer(true)
   return cryptoUtils.sha256(transactionData).toString('hex').slice(0, 40)
 }
 

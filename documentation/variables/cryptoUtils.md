@@ -8,7 +8,7 @@
 
 > `const` **cryptoUtils**: `object`
 
-Defined in: crypto.ts:467
+Defined in: crypto.ts:493
 
 Misc crypto utility functions.
 
