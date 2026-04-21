@@ -6,7 +6,7 @@
 
 # Class: PublicKey
 
-Defined in: crypto.ts:202
+Defined in: crypto.ts:204
 
 ECDSA (secp256k1) public key.
 
@@ -16,7 +16,7 @@ ECDSA (secp256k1) public key.
 
 > **new PublicKey**(`key`, `prefix?`): `PublicKey`
 
-Defined in: crypto.ts:206
+Defined in: crypto.ts:208
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: crypto.ts:206
 
 > `readonly` **key**: `any`
 
-Defined in: crypto.ts:207
+Defined in: crypto.ts:209
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: crypto.ts:207
 
 > `readonly` **prefix**: `string` = `DEFAULT_ADDRESS_PREFIX`
 
-Defined in: crypto.ts:208
+Defined in: crypto.ts:210
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: crypto.ts:208
 
 > `readonly` **uncompressed**: `any`
 
-Defined in: crypto.ts:204
+Defined in: crypto.ts:206
 
 ## Methods
 
@@ -62,7 +62,7 @@ Defined in: crypto.ts:204
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:264
+Defined in: crypto.ts:266
 
 Used by `utils.inspect` and `console.log` in node.js.
 
@@ -76,7 +76,7 @@ Used by `utils.inspect` and `console.log` in node.js.
 
 > **toJSON**(): `string`
 
-Defined in: crypto.ts:257
+Defined in: crypto.ts:259
 
 Return JSON representation of this key, same as toString().
 
@@ -90,7 +90,7 @@ Return JSON representation of this key, same as toString().
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:250
+Defined in: crypto.ts:252
 
 Return a WIF-encoded representation of the key.
 
@@ -104,7 +104,7 @@ Return a WIF-encoded representation of the key.
 
 > **verify**(`message`, `signature`): `boolean`
 
-Defined in: crypto.ts:243
+Defined in: crypto.ts:245
 
 Verify a 32-byte signature.
 
@@ -132,7 +132,7 @@ Signature to verify.
 
 > `static` **from**(`value`): `PublicKey`
 
-Defined in: crypto.ts:230
+Defined in: crypto.ts:232
 
 Create a new instance.
 
@@ -152,7 +152,7 @@ Create a new instance.
 
 > `static` **fromBuffer**(`key`): `object`
 
-Defined in: crypto.ts:214
+Defined in: crypto.ts:216
 
 #### Parameters
 
@@ -174,7 +174,7 @@ Defined in: crypto.ts:214
 
 > `static` **fromString**(`wif`): `PublicKey`
 
-Defined in: crypto.ts:222
+Defined in: crypto.ts:224
 
 Create a new instance from a WIF-encoded key.
 

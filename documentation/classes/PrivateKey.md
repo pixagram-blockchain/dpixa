@@ -6,7 +6,7 @@
 
 # Class: PrivateKey
 
-Defined in: crypto.ts:274
+Defined in: crypto.ts:276
 
 ECDSA (secp256k1) private key.
 
@@ -16,7 +16,7 @@ ECDSA (secp256k1) private key.
 
 > **new PrivateKey**(`key`): `PrivateKey`
 
-Defined in: crypto.ts:277
+Defined in: crypto.ts:279
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: crypto.ts:277
 
 > **secret**: `any`
 
-Defined in: crypto.ts:275
+Defined in: crypto.ts:277
 
 ## Methods
 
@@ -42,7 +42,7 @@ Defined in: crypto.ts:275
 
 > **createPublic**(`prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:341
+Defined in: crypto.ts:343
 
 Derive the public key for this private key.
 
@@ -62,7 +62,7 @@ Derive the public key for this private key.
 
 > **get\_shared\_secret**(`public_key`): `Buffer`
 
-Defined in: crypto.ts:364
+Defined in: crypto.ts:366
 
 Get shared secret for memo cryptography
 
@@ -82,7 +82,7 @@ Get shared secret for memo cryptography
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:356
+Defined in: crypto.ts:358
 
 Used by `utils.inspect` and `console.log` in node.js. Does not show the full key
 to get the full encoded key you need to explicitly call [toString](#tostring).
@@ -97,7 +97,7 @@ to get the full encoded key you need to explicitly call [toString](#tostring).
 
 > **multiply**(`pub`): `Buffer`
 
-Defined in: crypto.ts:318
+Defined in: crypto.ts:320
 
 #### Parameters
 
@@ -115,7 +115,7 @@ Defined in: crypto.ts:318
 
 > **sign**(`message`): [`Signature`](Signature.md)
 
-Defined in: crypto.ts:326
+Defined in: crypto.ts:328
 
 Sign message.
 
@@ -137,7 +137,7 @@ Sign message.
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:348
+Defined in: crypto.ts:350
 
 Return a WIF-encoded representation of the key.
 
@@ -151,7 +151,7 @@ Return a WIF-encoded representation of the key.
 
 > `static` **from**(`value`): `PrivateKey`
 
-Defined in: crypto.ts:284
+Defined in: crypto.ts:286
 
 Convenience to create a new instance from WIF string or buffer.
 
@@ -171,7 +171,7 @@ Convenience to create a new instance from WIF string or buffer.
 
 > `static` **fromLogin**(`username`, `password`, `role?`): `PrivateKey`
 
-Defined in: crypto.ts:309
+Defined in: crypto.ts:311
 
 Create key from username and password.
 
@@ -199,7 +199,7 @@ Create key from username and password.
 
 > `static` **fromSeed**(`seed`): `PrivateKey`
 
-Defined in: crypto.ts:302
+Defined in: crypto.ts:304
 
 Create a new instance from a seed.
 
@@ -219,7 +219,7 @@ Create a new instance from a seed.
 
 > `static` **fromString**(`wif`): `PrivateKey`
 
-Defined in: crypto.ts:295
+Defined in: crypto.ts:297
 
 Create a new instance from a WIF-encoded key.
 

@@ -8,7 +8,7 @@
 
 > `const` **Memo**: `object`
 
-Defined in: memo.ts:119
+Defined in: memo.ts:132
 
 ## Type Declaration
 
