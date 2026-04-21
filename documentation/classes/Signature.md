@@ -6,7 +6,7 @@
 
 # Class: Signature
 
-Defined in: crypto.ts:354
+Defined in: crypto.ts:355
 
 ECDSA (secp256k1) signature.
 
@@ -16,7 +16,7 @@ ECDSA (secp256k1) signature.
 
 > **new Signature**(`data`, `recovery`): `Signature`
 
-Defined in: crypto.ts:355
+Defined in: crypto.ts:356
 
 #### Parameters
 
@@ -38,7 +38,7 @@ Defined in: crypto.ts:355
 
 > **data**: `Buffer`
 
-Defined in: crypto.ts:355
+Defined in: crypto.ts:356
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: crypto.ts:355
 
 > **recovery**: `number`
 
-Defined in: crypto.ts:355
+Defined in: crypto.ts:356
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: crypto.ts:355
 
 > **recover**(`message`, `prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:374
+Defined in: crypto.ts:375
 
 Recover public key from signature by providing original signed message.
 
@@ -78,25 +78,25 @@ Recover public key from signature by providing original signed message.
 
 ### toBuffer()
 
-> **toBuffer**(): `Buffer`\<`ArrayBuffer`\>
+> **toBuffer**(): `any`
 
-Defined in: crypto.ts:381
+Defined in: crypto.ts:382
 
 #### Returns
 
-`Buffer`\<`ArrayBuffer`\>
+`any`
 
 ***
 
 ### toString()
 
-> **toString**(): `string`
+> **toString**(): `any`
 
-Defined in: crypto.ts:388
+Defined in: crypto.ts:389
 
 #### Returns
 
-`string`
+`any`
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: crypto.ts:388
 
 > `static` **fromBuffer**(`buffer`): `Signature`
 
-Defined in: crypto.ts:359
+Defined in: crypto.ts:360
 
 #### Parameters
 
@@ -122,7 +122,7 @@ Defined in: crypto.ts:359
 
 > `static` **fromString**(`string`): `Signature`
 
-Defined in: crypto.ts:366
+Defined in: crypto.ts:367
 
 #### Parameters
 

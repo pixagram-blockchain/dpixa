@@ -16,7 +16,7 @@ Can be used in both node.js and the browser. Also see [ClientOptions](../interfa
 
 ### Constructor
 
-> **new Client**(`address`, `options`): `Client`
+> **new Client**(`address`, `options?`): `Client`
 
 Defined in: client.ts:257
 
@@ -24,12 +24,12 @@ Defined in: client.ts:257
 
 ##### address
 
+`string` \| `string`[]
+
 The address to the Pixa RPC server,
 e.g. `https://api.pixagram.io`. or [`https://api.pixagram.org`, `https://another.api.com`]
 
-`string` | `string`[]
-
-##### options
+##### options?
 
 [`ClientOptions`](../interfaces/ClientOptions.md) = `{}`
 
@@ -162,7 +162,7 @@ Transaction status API helper.
 
 ### call()
 
-> **call**(`api`, `method`, `params`): `Promise`\<`any`\>
+> **call**(`api`, `method`, `params?`): `Promise`\<`any`\>
 
 Defined in: client.ts:309
 
@@ -182,7 +182,7 @@ The API to call, e.g. `database_api`.
 
 The API method, e.g. `get_dynamic_global_properties`.
 
-##### params
+##### params?
 
 `any` = `[]`
 

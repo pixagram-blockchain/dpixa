@@ -15,7 +15,7 @@ RPC Client options
 
 ### addressPrefix?
 
-> `optional` **addressPrefix**: `string`
+> `optional` **addressPrefix?**: `string`
 
 Defined in: client.ts:142
 
@@ -26,7 +26,7 @@ Pixa address prefix. Defaults to main network:
 
 ### agent?
 
-> `optional` **agent**: `any`
+> `optional` **agent?**: `any`
 
 Defined in: client.ts:174
 
@@ -39,9 +39,9 @@ https://nodejs.org/api/http.html#http_new_agent_options.
 
 ***
 
-### backoff()?
+### backoff?
 
-> `optional` **backoff**: (`tries`) => `number`
+> `optional` **backoff?**: (`tries`) => `number`
 
 Defined in: client.ts:168
 
@@ -61,7 +61,7 @@ Retry backoff function, returns milliseconds. Default = defaultBackoff.
 
 ### chainId?
 
-> `optional` **chainId**: `string`
+> `optional` **chainId?**: `string`
 
 Defined in: client.ts:137
 
@@ -73,7 +73,7 @@ need the new id?
 
 ### consoleOnFailover?
 
-> `optional` **consoleOnFailover**: `boolean`
+> `optional` **consoleOnFailover?**: `boolean`
 
 Defined in: client.ts:163
 
@@ -83,7 +83,7 @@ Whether a console.log should be made when RPC failed over to another one
 
 ### failoverThreshold?
 
-> `optional` **failoverThreshold**: `number`
+> `optional` **failoverThreshold?**: `number`
 
 Defined in: client.ts:158
 
@@ -96,7 +96,7 @@ Can be set to 0 to iterate and retry forever. Defaults to 3 rounds.
 
 ### rebrandedApi?
 
-> `optional` **rebrandedApi**: `boolean`
+> `optional` **rebrandedApi?**: `boolean`
 
 Defined in: client.ts:178
 
@@ -106,7 +106,7 @@ Deprecated - don't use
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `optional` **timeout?**: `number`
 
 Defined in: client.ts:150
 

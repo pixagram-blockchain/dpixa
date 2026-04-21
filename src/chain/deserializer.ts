@@ -1,20 +1,21 @@
-import * as ByteBuffer from '@ecency/bytebuffer'
+const ByteBuffer = require("@ecency/bytebuffer");
+const Buffer = ByteBuffer;
 import { PublicKey } from '../crypto'
 
-export type Deserializer = (buffer: ByteBuffer) => void
+export type Deserializer = (buffer: any) => void
 
 const PublicKeyDeserializer = (
-    buf: ByteBuffer
+    buf: any
 ) => {
-    const c: ByteBuffer = fixed_buf(buf, 33)
+    const c: any = fixed_buf(buf, 33)
     return PublicKey.fromBuffer(c)
 }
 
-const UInt64Deserializer = (b: ByteBuffer) => b.readUint64()
+const UInt64Deserializer = (b: any) => b.readUint64()
 
-const UInt32Deserializer = (b: ByteBuffer) => b.readUint32()
+const UInt32Deserializer = (b: any) => b.readUint32()
 
-const BinaryDeserializer = (b: ByteBuffer) => {
+const BinaryDeserializer = (b: any) => {
     const len = b.readVarint32()
     const b_copy = b.copy(b.offset, b.offset + len)
     b.skip(len)
@@ -22,7 +23,7 @@ const BinaryDeserializer = (b: ByteBuffer) => {
 }
 
 const BufferDeserializer = (keyDeserializers: [string, Deserializer][]) => (
-    buf: ByteBuffer | Buffer
+    buf: any | Buffer
 ) => {
     const obj = {}
     for (const [key, deserializer] of keyDeserializers) {
@@ -38,7 +39,7 @@ const BufferDeserializer = (keyDeserializers: [string, Deserializer][]) => (
     return obj
 }
 
-function fixed_buf(b: ByteBuffer, len: number): Buffer | any {
+function fixed_buf(b: any, len: number): Buffer | any {
     if (!b) {
         throw Error('No buffer found on first parameter')
     } else {

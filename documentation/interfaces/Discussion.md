@@ -234,7 +234,7 @@ Defined in: chain/comment.ts:53
 
 ### first\_reblogged\_by?
 
-> `optional` **first\_reblogged\_by**: `any`
+> `optional` **first\_reblogged\_by?**: `any`
 
 Defined in: chain/comment.ts:90
 
@@ -242,7 +242,7 @@ Defined in: chain/comment.ts:90
 
 ### first\_reblogged\_on?
 
-> `optional` **first\_reblogged\_on**: `any`
+> `optional` **first\_reblogged\_on?**: `any`
 
 Defined in: chain/comment.ts:91
 

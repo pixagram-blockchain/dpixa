@@ -6,7 +6,7 @@
 
 # Class: PublicKey
 
-Defined in: crypto.ts:177
+Defined in: crypto.ts:178
 
 ECDSA (secp256k1) public key.
 
@@ -14,9 +14,9 @@ ECDSA (secp256k1) public key.
 
 ### Constructor
 
-> **new PublicKey**(`key`, `prefix`): `PublicKey`
+> **new PublicKey**(`key`, `prefix?`): `PublicKey`
 
-Defined in: crypto.ts:181
+Defined in: crypto.ts:182
 
 #### Parameters
 
@@ -24,7 +24,7 @@ Defined in: crypto.ts:181
 
 `any`
 
-##### prefix
+##### prefix?
 
 `string` = `DEFAULT_ADDRESS_PREFIX`
 
@@ -38,7 +38,7 @@ Defined in: crypto.ts:181
 
 > `readonly` **key**: `any`
 
-Defined in: crypto.ts:182
+Defined in: crypto.ts:183
 
 ***
 
@@ -46,15 +46,15 @@ Defined in: crypto.ts:182
 
 > `readonly` **prefix**: `string` = `DEFAULT_ADDRESS_PREFIX`
 
-Defined in: crypto.ts:183
+Defined in: crypto.ts:184
 
 ***
 
 ### uncompressed
 
-> `readonly` **uncompressed**: `Buffer`
+> `readonly` **uncompressed**: `any`
 
-Defined in: crypto.ts:179
+Defined in: crypto.ts:180
 
 ## Methods
 
@@ -62,7 +62,7 @@ Defined in: crypto.ts:179
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:239
+Defined in: crypto.ts:240
 
 Used by `utils.inspect` and `console.log` in node.js.
 
@@ -76,7 +76,7 @@ Used by `utils.inspect` and `console.log` in node.js.
 
 > **toJSON**(): `string`
 
-Defined in: crypto.ts:232
+Defined in: crypto.ts:233
 
 Return JSON representation of this key, same as toString().
 
@@ -90,7 +90,7 @@ Return JSON representation of this key, same as toString().
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:225
+Defined in: crypto.ts:226
 
 Return a WIF-encoded representation of the key.
 
@@ -104,7 +104,7 @@ Return a WIF-encoded representation of the key.
 
 > **verify**(`message`, `signature`): `boolean`
 
-Defined in: crypto.ts:218
+Defined in: crypto.ts:219
 
 Verify a 32-byte signature.
 
@@ -112,7 +112,7 @@ Verify a 32-byte signature.
 
 ##### message
 
-`Buffer`
+`any`
 
 32-byte message to verify.
 
@@ -132,7 +132,7 @@ Signature to verify.
 
 > `static` **from**(`value`): `PublicKey`
 
-Defined in: crypto.ts:205
+Defined in: crypto.ts:206
 
 Create a new instance.
 
@@ -140,7 +140,7 @@ Create a new instance.
 
 ##### value
 
-`string` | `PublicKey`
+`string` \| `PublicKey`
 
 #### Returns
 
@@ -152,13 +152,13 @@ Create a new instance.
 
 > `static` **fromBuffer**(`key`): `object`
 
-Defined in: crypto.ts:189
+Defined in: crypto.ts:190
 
 #### Parameters
 
 ##### key
 
-`ByteBuffer`
+`any`
 
 #### Returns
 
@@ -166,7 +166,7 @@ Defined in: crypto.ts:189
 
 ##### key
 
-> **key**: `ByteBuffer`
+> **key**: `any`
 
 ***
 
@@ -174,7 +174,7 @@ Defined in: crypto.ts:189
 
 > `static` **fromString**(`wif`): `PublicKey`
 
-Defined in: crypto.ts:197
+Defined in: crypto.ts:198
 
 Create a new instance from a WIF-encoded key.
 

@@ -199,7 +199,8 @@ const failover = (
 
 // Hack to be able to generate a valid witness_set_properties op
 // Can hopefully be removed when pixad's JSON representation is fixed
-import * as ByteBuffer from '@ecency/bytebuffer'
+const ByteBuffer = require("@ecency/bytebuffer");
+const Buffer = ByteBuffer;
 import { Asset, PriceType } from './chain/asset'
 import { WitnessSetPropertiesOperation } from './chain/operation'
 import { Serializer, Types } from './chain/serializer'

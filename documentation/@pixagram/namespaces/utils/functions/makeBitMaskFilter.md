@@ -8,7 +8,7 @@
 
 > **makeBitMaskFilter**(`allowedOperations`): `any`[]
 
-Defined in: utils.ts:368
+Defined in: utils.ts:369
 
 Make bitmask filter to be used with getAccountHistory call
 

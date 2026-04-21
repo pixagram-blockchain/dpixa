@@ -6,7 +6,7 @@
 
 # Class: PrivateKey
 
-Defined in: crypto.ts:249
+Defined in: crypto.ts:250
 
 ECDSA (secp256k1) private key.
 
@@ -16,13 +16,13 @@ ECDSA (secp256k1) private key.
 
 > **new PrivateKey**(`key`): `PrivateKey`
 
-Defined in: crypto.ts:252
+Defined in: crypto.ts:253
 
 #### Parameters
 
 ##### key
 
-`Buffer`
+`any`
 
 #### Returns
 
@@ -32,9 +32,9 @@ Defined in: crypto.ts:252
 
 ### secret
 
-> **secret**: `Buffer`
+> **secret**: `any`
 
-Defined in: crypto.ts:250
+Defined in: crypto.ts:251
 
 ## Methods
 
@@ -42,7 +42,7 @@ Defined in: crypto.ts:250
 
 > **createPublic**(`prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:316
+Defined in: crypto.ts:317
 
 Derive the public key for this private key.
 
@@ -62,7 +62,7 @@ Derive the public key for this private key.
 
 > **get\_shared\_secret**(`public_key`): `Buffer`
 
-Defined in: crypto.ts:339
+Defined in: crypto.ts:340
 
 Get shared secret for memo cryptography
 
@@ -82,7 +82,7 @@ Get shared secret for memo cryptography
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:331
+Defined in: crypto.ts:332
 
 Used by `utils.inspect` and `console.log` in node.js. Does not show the full key
 to get the full encoded key you need to explicitly call [toString](#tostring).
@@ -97,7 +97,7 @@ to get the full encoded key you need to explicitly call [toString](#tostring).
 
 > **multiply**(`pub`): `Buffer`
 
-Defined in: crypto.ts:293
+Defined in: crypto.ts:294
 
 #### Parameters
 
@@ -115,7 +115,7 @@ Defined in: crypto.ts:293
 
 > **sign**(`message`): [`Signature`](Signature.md)
 
-Defined in: crypto.ts:301
+Defined in: crypto.ts:302
 
 Sign message.
 
@@ -137,7 +137,7 @@ Sign message.
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:323
+Defined in: crypto.ts:324
 
 Return a WIF-encoded representation of the key.
 
@@ -151,7 +151,7 @@ Return a WIF-encoded representation of the key.
 
 > `static` **from**(`value`): `PrivateKey`
 
-Defined in: crypto.ts:259
+Defined in: crypto.ts:260
 
 Convenience to create a new instance from WIF string or buffer.
 
@@ -159,7 +159,7 @@ Convenience to create a new instance from WIF string or buffer.
 
 ##### value
 
-`string` | `Buffer`\<`ArrayBufferLike`\>
+`string` \| `Buffer`\<`ArrayBufferLike`\>
 
 #### Returns
 
@@ -169,9 +169,9 @@ Convenience to create a new instance from WIF string or buffer.
 
 ### fromLogin()
 
-> `static` **fromLogin**(`username`, `password`, `role`): `PrivateKey`
+> `static` **fromLogin**(`username`, `password`, `role?`): `PrivateKey`
 
-Defined in: crypto.ts:284
+Defined in: crypto.ts:285
 
 Create key from username and password.
 
@@ -185,7 +185,7 @@ Create key from username and password.
 
 `string`
 
-##### role
+##### role?
 
 [`KeyRole`](../type-aliases/KeyRole.md) = `'active'`
 
@@ -199,7 +199,7 @@ Create key from username and password.
 
 > `static` **fromSeed**(`seed`): `PrivateKey`
 
-Defined in: crypto.ts:277
+Defined in: crypto.ts:278
 
 Create a new instance from a seed.
 
@@ -219,7 +219,7 @@ Create a new instance from a seed.
 
 > `static` **fromString**(`wif`): `PrivateKey`
 
-Defined in: crypto.ts:270
+Defined in: crypto.ts:271
 
 Create a new instance from a WIF-encoded key.
 

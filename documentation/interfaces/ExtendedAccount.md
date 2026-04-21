@@ -76,7 +76,7 @@ Defined in: chain/account.ts:106
 
 ### blog?
 
-> `optional` **blog**: `any`[]
+> `optional` **blog?**: `any`[]
 
 Defined in: chain/account.ts:165
 
@@ -108,7 +108,7 @@ Defined in: chain/account.ts:96
 
 ### comments?
 
-> `optional` **comments**: `any`[]
+> `optional` **comments?**: `any`[]
 
 Defined in: chain/account.ts:164
 
@@ -152,7 +152,7 @@ Defined in: chain/account.ts:124
 
 ### feed?
 
-> `optional` **feed**: `any`[]
+> `optional` **feed?**: `any`[]
 
 Defined in: chain/account.ts:166
 
@@ -406,7 +406,7 @@ Defined in: chain/account.ts:127
 
 ### open\_orders?
 
-> `optional` **open\_orders**: `any`[]
+> `optional` **open\_orders?**: `any`[]
 
 Defined in: chain/account.ts:163
 
@@ -586,7 +586,7 @@ Defined in: chain/account.ts:125
 
 ### recent\_replies?
 
-> `optional` **recent\_replies**: `any`[]
+> `optional` **recent\_replies?**: `any`[]
 
 Defined in: chain/account.ts:167
 
@@ -594,7 +594,7 @@ Defined in: chain/account.ts:167
 
 ### recommended?
 
-> `optional` **recommended**: `any`[]
+> `optional` **recommended?**: `any`[]
 
 Defined in: chain/account.ts:168
 

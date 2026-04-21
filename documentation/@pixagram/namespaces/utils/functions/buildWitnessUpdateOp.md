@@ -8,7 +8,7 @@
 
 > **buildWitnessUpdateOp**(`owner`, `props`): [`WitnessSetPropertiesOperation`](../../../../interfaces/WitnessSetPropertiesOperation.md)
 
-Defined in: utils.ts:231
+Defined in: utils.ts:232
 
 ## Parameters
 

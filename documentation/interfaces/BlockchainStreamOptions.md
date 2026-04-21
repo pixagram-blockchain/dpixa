@@ -12,7 +12,7 @@ Defined in: helpers/blockchain.ts:51
 
 ### from?
 
-> `optional` **from**: `number`
+> `optional` **from?**: `number`
 
 Defined in: helpers/blockchain.ts:55
 
@@ -22,7 +22,7 @@ Start block number, inclusive. If omitted generation will start from current blo
 
 ### mode?
 
-> `optional` **mode**: [`BlockchainMode`](../enumerations/BlockchainMode.md)
+> `optional` **mode?**: [`BlockchainMode`](../enumerations/BlockchainMode.md)
 
 Defined in: helpers/blockchain.ts:64
 
@@ -33,7 +33,7 @@ Defaults to `Irreversible`.
 
 ### to?
 
-> `optional` **to**: `number`
+> `optional` **to?**: `number`
 
 Defined in: helpers/blockchain.ts:59
 

@@ -36,13 +36,14 @@
 
 import * as assert from 'assert'
 import { createHash } from 'crypto'
-import * as bigInteger from 'bigi'
-import * as bs58 from 'bs58'
-import * as ByteBuffer from '@ecency/bytebuffer'
-import * as ecurve from 'ecurve'
-import * as Ripemd160 from 'ripemd160'
-import * as secp256k1 from 'secp256k1'
-import { VError } from 'verror'
+const bigInteger = require("bigi");
+import * as bs58 from "./base58";
+const ByteBuffer = require("@ecency/bytebuffer");
+const Buffer = ByteBuffer;
+const ecurve = require("ecurve");
+const Ripemd160 = require("ripemd160");
+const secp256k1 = require("secp256k1");
+import { WError as  VError } from 'verror'
 import { Types } from './chain/serializer'
 import { SignedTransaction, Transaction } from './chain/transaction'
 import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
@@ -62,7 +63,7 @@ export const NETWORK_ID = Buffer.from([NETWORK_ID_INT])
 /**
  * Return ripemd160 hash of input.
  */
-function ripemd160(input: Buffer | string): Buffer {
+function ripemd160(input: any | string): any {
   return new Ripemd160()
     .update(input)
     .digest()
@@ -71,7 +72,7 @@ function ripemd160(input: Buffer | string): Buffer {
 /**
  * Return sha256 hash of input.
  */
-function sha256(input: Buffer | string): Buffer {
+function sha256(input: any | string): any {
   return createHash('sha256')
     .update(input)
     .digest()
@@ -80,7 +81,7 @@ function sha256(input: Buffer | string): Buffer {
 /**
  * Return sha512 hash of input
  */
-function sha512(input: Buffer | string): Buffer {
+function sha512(input: any | string): any {
   return createHash('sha512')
     .update(input)
     .digest()
@@ -89,14 +90,14 @@ function sha512(input: Buffer | string): Buffer {
 /**
  * Return 2-round sha256 hash of input.
  */
-function doubleSha256(input: Buffer | string): Buffer {
+function doubleSha256(input: any | string): any {
   return sha256(sha256(input))
 }
 
 /**
  * Encode public key with bs58+ripemd160-checksum.
  */
-function encodePublic(key: Buffer, prefix: string): string {
+function encodePublic(key: any, prefix: string): string {
   const checksum = ripemd160(key)
   return prefix + bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
 }
@@ -108,7 +109,7 @@ function decodePublic(encodedKey: string): { key: Buffer; prefix: string } {
   const prefix = encodedKey.slice(0, 3)
   assert.equal(prefix.length, 3, 'public key invalid prefix')
   encodedKey = encodedKey.slice(3)
-  const buffer: Buffer = bs58.decode(encodedKey)
+  const buffer: any = bs58.decode(encodedKey)
   const checksum = buffer.slice(-4)
   const key = buffer.slice(0, -4)
   const checksumVerify = ripemd160(key).slice(0, 4)
@@ -119,7 +120,7 @@ function decodePublic(encodedKey: string): { key: Buffer; prefix: string } {
 /**
  * Encode bs58+doubleSha256-checksum private key.
  */
-function encodePrivate(key: Buffer): string {
+function encodePrivate(key: any): string {
   assert.equal(key.readUInt8(0), 0x80, 'private key network id mismatch')
   const checksum = doubleSha256(key)
   return bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
@@ -128,7 +129,7 @@ function encodePrivate(key: Buffer): string {
 /**
  * Decode bs58+doubleSha256-checksum encoded private key.
  */
-function decodePrivate(encodedKey: string): Buffer {
+function decodePrivate(encodedKey: string): any {
   const buffer: Buffer = bs58.decode(encodedKey)
   assert.deepEqual(
     buffer.slice(0, 1),
@@ -145,7 +146,7 @@ function decodePrivate(encodedKey: string): Buffer {
 /**
  * Return true if signature is canonical, otherwise false.
  */
-function isCanonicalSignature(signature: Buffer): boolean {
+function isCanonicalSignature(signature: any): boolean {
   return (
     !(signature[0] & 0x80) &&
     !(signature[0] === 0 && !(signature[1] & 0x80)) &&
@@ -157,7 +158,7 @@ function isCanonicalSignature(signature: Buffer): boolean {
 /**
  * Return true if string is wif, otherwise false.
  */
-function isWif(privWif: string | Buffer): boolean {
+function isWif(privWif: string | any): boolean {
   try {
       const bufWif = new Buffer(bs58.decode(privWif))
       const privKey = bufWif.slice(0, -4)
@@ -176,7 +177,7 @@ function isWif(privWif: string | Buffer): boolean {
  */
 export class PublicKey {
 
-  public readonly uncompressed: Buffer
+  public readonly uncompressed: any
 
   constructor(
     public readonly key: any,
@@ -186,7 +187,7 @@ export class PublicKey {
     this.uncompressed = Buffer.from(secp256k1.publicKeyConvert(key, false))
   }
 
-  public static fromBuffer(key: ByteBuffer) {
+  public static fromBuffer(key: any) {
     assert(secp256k1.publicKeyVerify(key), 'invalid buffer as public key')
     return { key }
   }
@@ -215,7 +216,7 @@ export class PublicKey {
    * @param message 32-byte message to verify.
    * @param signature Signature to verify.
    */
-  public verify(message: Buffer, signature: Signature): boolean {
+  public verify(message: any, signature: Signature): boolean {
     return secp256k1.verify(message, signature.data, this.key)
   }
 
@@ -247,9 +248,9 @@ export type KeyRole = 'owner' | 'active' | 'posting' | 'memo'
  * ECDSA (secp256k1) private key.
  */
 export class PrivateKey {
-  public secret: Buffer
+  public secret: any
 
-  constructor(private key: Buffer) {
+  constructor(private key: any) {
     assert(secp256k1.privateKeyVerify(key), 'invalid private key')
   }
 

@@ -20,7 +20,7 @@ Defined in: chain/pixamind.ts:5
 
 ### admins?
 
-> `optional` **admins**: `string`[]
+> `optional` **admins?**: `string`[]
 
 Defined in: chain/pixamind.ts:20
 
@@ -140,7 +140,7 @@ Defined in: chain/pixamind.ts:10
 
 ### team?
 
-> `optional` **team**: `string`[]
+> `optional` **team?**: `string`[]
 
 Defined in: chain/pixamind.ts:19
 

@@ -8,11 +8,11 @@
 
 > `const` **Types**: `object`
 
-Defined in: chain/serializer.ts:656
+Defined in: chain/serializer.ts:657
 
 ## Type Declaration
 
-### Array()
+### Array
 
 > **Array**: (`itemSerializer`) => (`buffer`, `data`) => `void` = `ArraySerializer`
 
@@ -24,23 +24,9 @@ Defined in: chain/serializer.ts:656
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-`any`[]
-
-##### Returns
-
-`void`
-
-### Asset()
+### Asset
 
 > **Asset**: (`buffer`, `data`) => `void` = `AssetSerializer`
 
@@ -50,11 +36,11 @@ Serialize asset.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
-`string` | `number` | [`Asset`](../classes/Asset.md)
+`string` \| `number` \| [`Asset`](../classes/Asset.md)
 
 #### Returns
 
@@ -65,7 +51,7 @@ Serialize asset.
 This looses precision for amounts larger than 2^53-1/10^precision.
       Should not be a problem in real-word usage.
 
-### Authority()
+### Authority
 
 > **Authority**: (`buffer`, `data`) => `void` = `AuthoritySerializer`
 
@@ -73,7 +59,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -81,7 +67,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Binary()
+### Binary
 
 > **Binary**: (`size?`) => (`buffer`, `data`) => `void` = `BinarySerializer`
 
@@ -93,23 +79,9 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-`Buffer`\<`ArrayBufferLike`\> | [`HexBuffer`](../classes/HexBuffer.md)
-
-##### Returns
-
-`void`
-
-### Boolean()
+### Boolean
 
 > **Boolean**: (`buffer`, `data`) => `void` = `BooleanSerializer`
 
@@ -117,7 +89,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -127,7 +99,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Date()
+### Date
 
 > **Date**: (`buffer`, `data`) => `void` = `DateSerializer`
 
@@ -135,7 +107,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -145,7 +117,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### EncryptedMemo()
+### EncryptedMemo
 
 > **EncryptedMemo**: (`buffer`, `data`) => `void` = `EncryptedMemoSerializer`
 
@@ -153,7 +125,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -161,7 +133,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### FlatMap()
+### FlatMap
 
 > **FlatMap**: (`keySerializer`, `valueSerializer`) => (`buffer`, `data`) => `void` = `FlatMapSerializer`
 
@@ -177,23 +149,9 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-\[`any`, `any`\][]
-
-##### Returns
-
-`void`
-
-### Int16()
+### Int16
 
 > **Int16**: (`buffer`, `data`) => `void` = `Int16Serializer`
 
@@ -201,7 +159,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -211,7 +169,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Int32()
+### Int32
 
 > **Int32**: (`buffer`, `data`) => `void` = `Int32Serializer`
 
@@ -219,7 +177,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -229,7 +187,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Int64()
+### Int64
 
 > **Int64**: (`buffer`, `data`) => `void` = `Int64Serializer`
 
@@ -237,7 +195,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -247,7 +205,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Int8()
+### Int8
 
 > **Int8**: (`buffer`, `data`) => `void` = `Int8Serializer`
 
@@ -255,7 +213,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -265,7 +223,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Object()
+### Object
 
 > **Object**: (`keySerializers`) => (`buffer`, `data`) => `void` = `ObjectSerializer`
 
@@ -277,21 +235,9 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-##### Returns
-
-`void`
-
-### Operation()
+### Operation
 
 > **Operation**: (`buffer`, `operation`) => `void` = `OperationSerializer`
 
@@ -299,7 +245,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### operation
 
@@ -309,7 +255,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Optional()
+### Optional
 
 > **Optional**: (`valueSerializer`) => (`buffer`, `data`) => `void` = `OptionalSerializer`
 
@@ -321,23 +267,9 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-`any`
-
-##### Returns
-
-`void`
-
-### Price()
+### Price
 
 > **Price**: (`buffer`, `data`) => `void` = `PriceSerializer`
 
@@ -345,7 +277,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -353,7 +285,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### PublicKey()
+### PublicKey
 
 > **PublicKey**: (`buffer`, `data`) => `void` = `PublicKeySerializer`
 
@@ -361,17 +293,17 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
-`string` | [`PublicKey`](../classes/PublicKey.md) | `null`
+`string` \| [`PublicKey`](../classes/PublicKey.md) \| `null`
 
 #### Returns
 
 `void`
 
-### StaticVariant()
+### StaticVariant
 
 > **StaticVariant**: (`itemSerializers`) => (`buffer`, `data`) => `void` = `StaticVariantSerializer`
 
@@ -383,23 +315,9 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 #### Returns
 
-> (`buffer`, `data`): `void`
+(`buffer`, `data`) => `void`
 
-##### Parameters
-
-###### buffer
-
-`ByteBuffer`
-
-###### data
-
-\[`number`, `any`\]
-
-##### Returns
-
-`void`
-
-### String()
+### String
 
 > **String**: (`buffer`, `data`) => `void` = `StringSerializer`
 
@@ -407,7 +325,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -417,7 +335,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Transaction()
+### Transaction
 
 > **Transaction**: (`buffer`, `data`) => `void` = `TransactionSerializer`
 
@@ -425,7 +343,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -433,7 +351,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### UInt16()
+### UInt16
 
 > **UInt16**: (`buffer`, `data`) => `void` = `UInt16Serializer`
 
@@ -441,7 +359,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -451,7 +369,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### UInt32()
+### UInt32
 
 > **UInt32**: (`buffer`, `data`) => `void` = `UInt32Serializer`
 
@@ -459,7 +377,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -469,7 +387,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### UInt64()
+### UInt64
 
 > **UInt64**: (`buffer`, `data`) => `void` = `UInt64Serializer`
 
@@ -477,7 +395,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -487,7 +405,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### UInt8()
+### UInt8
 
 > **UInt8**: (`buffer`, `data`) => `void` = `UInt8Serializer`
 
@@ -495,7 +413,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 ##### data
 
@@ -505,7 +423,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 `void`
 
-### Void()
+### Void
 
 > **Void**: (`buffer`) => `never` = `VoidSerializer`
 
@@ -513,7 +431,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### buffer
 
-`ByteBuffer`
+`any`
 
 #### Returns
 

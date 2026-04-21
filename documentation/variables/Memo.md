@@ -8,11 +8,11 @@
 
 > `const` **Memo**: `object`
 
-Defined in: memo.ts:118
+Defined in: memo.ts:119
 
 ## Type Declaration
 
-### decode()
+### decode
 
 > **decode**: (`private_key`, `memo`) => `string`
 
@@ -22,9 +22,9 @@ Encrypted memo/message decryption
 
 ##### private\_key
 
-Private memo key of recipient
+`string` \| [`PrivateKey`](../classes/PrivateKey.md)
 
-`string` | [`PrivateKey`](../classes/PrivateKey.md)
+Private memo key of recipient
 
 ##### memo
 
@@ -36,7 +36,7 @@ Encrypted message/memo
 
 `string`
 
-### encode()
+### encode
 
 > **encode**: (`private_key`, `public_key`, `memo`, `testNonce?`) => `string`
 
@@ -46,15 +46,15 @@ Memo/Any message encoding using AES (aes-cbc algorithm)
 
 ##### private\_key
 
-Private memo key of sender
+`string` \| [`PrivateKey`](../classes/PrivateKey.md)
 
-`string` | [`PrivateKey`](../classes/PrivateKey.md)
+Private memo key of sender
 
 ##### public\_key
 
-public memo key of recipient
+`string` \| [`PublicKey`](../classes/PublicKey.md)
 
-`string` | [`PublicKey`](../classes/PublicKey.md)
+public memo key of recipient
 
 ##### memo
 

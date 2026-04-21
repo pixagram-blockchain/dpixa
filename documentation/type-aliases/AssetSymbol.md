@@ -6,7 +6,7 @@
 
 # Type Alias: AssetSymbol
 
-> **AssetSymbol** = `"PXA"` \| `"PIXA"` \| `"TESTS"` \| `"PXP"` \| `"VESTS"` \| `"PXS"` \| `"TBD"` \| `"STEEM"` \| `"TPS"` \| `"SBD"`
+> **AssetSymbol** = `"PXA"` \| `"PIXA"` \| `"TESTS"` \| `"PXP"` \| `"VESTS"` \| `"PXS"` \| `"TBD"` \| `"STEEM"` \| `"TPS"` \| `"SBD"` \| `"HBD"`
 
 Defined in: chain/asset.ts:48
 

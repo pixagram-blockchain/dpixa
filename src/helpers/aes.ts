@@ -6,7 +6,8 @@ import {
   randomBytes
 } from 'crypto'
 import { PrivateKey, PublicKey } from '../crypto'
-const ByteBuffer = require('@ecency/bytebuffer')
+const ByteBuffer = require("@ecency/bytebuffer");
+const Buffer = ByteBuffer;
 const Long = ByteBuffer.Long
 
 export const encrypt = (

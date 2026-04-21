@@ -48,9 +48,9 @@ Return a asynchronous block number iterator.
 
 ##### options?
 
-Feed options, can also be a block number to start from.
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+Feed options, can also be a block number to start from.
 
 #### Returns
 
@@ -70,7 +70,7 @@ Return a stream of block numbers, accepts same parameters as [getBlockNumbers](#
 
 ##### options?
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
 #### Returns
 
@@ -90,7 +90,7 @@ Return a asynchronous block iterator, accepts same parameters as [getBlockNumber
 
 ##### options?
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
 #### Returns
 
@@ -110,7 +110,7 @@ Return a stream of blocks, accepts same parameters as [getBlockNumbers](#getbloc
 
 ##### options?
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
 #### Returns
 
@@ -160,7 +160,7 @@ Get latest block header.
 
 ### getCurrentBlockNum()
 
-> **getCurrentBlockNum**(`mode`): `Promise`\<`number`\>
+> **getCurrentBlockNum**(`mode?`): `Promise`\<`number`\>
 
 Defined in: helpers/blockchain.ts:73
 
@@ -168,7 +168,7 @@ Get latest block number.
 
 #### Parameters
 
-##### mode
+##### mode?
 
 [`BlockchainMode`](../enumerations/BlockchainMode.md) = `BlockchainMode.Irreversible`
 
@@ -190,7 +190,7 @@ Return a asynchronous operation iterator, accepts same parameters as [getBlockNu
 
 ##### options?
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
 #### Returns
 
@@ -210,7 +210,7 @@ Return a stream of operations, accepts same parameters as [getBlockNumbers](#get
 
 ##### options?
 
-`number` | [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
+`number` \| [`BlockchainStreamOptions`](../interfaces/BlockchainStreamOptions.md)
 
 #### Returns
 

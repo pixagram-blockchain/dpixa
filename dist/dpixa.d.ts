@@ -1,14 +1,21 @@
+declare module 'dpixa/base58' {
+	/** Encode a Buffer (or Uint8Array / array-like of bytes) to a base58 string. */
+	export function encode(source: any): string;
+	/** Decode a base58 string to a Buffer. Throws on invalid characters. */
+	export function decode(source: string): any;
+
+}
 declare module 'dpixa/version' {
 	 const _default: string;
 	export default _default;
 
 }
 declare module 'dpixa/parameters' {
-	export const MAINNET_HEX_CHAIN_ID = "18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e";
+	export const MAINNET_HEX_CHAIN_ID = "706978616772616d000000000000000000000000000000000000000000000000";
 	export const TESTNET_HEX_CHAIN_ID = "18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e";
 	export const PREFIX_MAINNET_ADDRESS = "PIX";
 	export const PREFIX_TESTNET_ADDRESS = "TST";
-	export const MAIN_MAINNET_NODE_URL = "http://31.220.76.179:7777";
+	export const MAIN_MAINNET_NODE_URL = "https://34.118.51.13";
 	export const MAIN_TESTNET_NODE_URL = "http://31.220.76.179:7777";
 	export const NETWORK_ID_INT = 128;
 
@@ -57,7 +64,7 @@ declare module 'dpixa/chain/asset' {
 	/**
 	 * Asset symbol string.
 	 */
-	export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD';
+	export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD';
 	/**
 	 * Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
 	 */
@@ -347,7 +354,6 @@ declare module 'dpixa/chain/misc' {
 	 */
 	import { Account } from 'dpixa/chain/account';
 	import { Asset, Price } from 'dpixa/chain/asset';
-	import { Buffer } from 'buffer';
 	/**
 	 * Large number that may be unsafe to represent natively in JavaScript.
 	 */
@@ -356,8 +362,8 @@ declare module 'dpixa/chain/misc' {
 	 * Buffer wrapper that serializes to a hex-encoded string.
 	 */
 	export class HexBuffer {
-	    buffer: Buffer;
-	    constructor(buffer: Buffer);
+	    buffer: any;
+	    constructor(buffer: any);
 	    /**
 	     * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
 	     */
@@ -565,48 +571,47 @@ declare module 'dpixa/chain/serializer' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import * as ByteBuffer from 'bytebuffer';
 	import { PublicKey } from 'dpixa/crypto';
 	import { Asset } from 'dpixa/chain/asset';
 	import { HexBuffer } from 'dpixa/chain/misc';
 	import { Operation } from 'dpixa/chain/operation';
-	export type Serializer = (buffer: ByteBuffer, data: any) => void;
+	export type Serializer = (buffer: any, data: any) => void;
 	export const Types: {
-	    Array: (itemSerializer: Serializer) => (buffer: ByteBuffer, data: any[]) => void;
-	    Asset: (buffer: ByteBuffer, data: Asset | string | number) => void;
-	    Authority: (buffer: ByteBuffer, data: {
+	    Array: (itemSerializer: Serializer) => (buffer: any, data: any[]) => void;
+	    Asset: (buffer: any, data: Asset | string | number) => void;
+	    Authority: (buffer: any, data: {
 	        [key: string]: any;
 	    }) => void;
-	    Binary: (size?: number) => (buffer: ByteBuffer, data: Buffer | HexBuffer) => void;
-	    Boolean: (buffer: ByteBuffer, data: boolean) => void;
-	    Date: (buffer: ByteBuffer, data: string) => void;
-	    EncryptedMemo: (buffer: ByteBuffer, data: {
+	    Binary: (size?: number) => (buffer: any, data: Buffer | HexBuffer) => void;
+	    Boolean: (buffer: any, data: boolean) => void;
+	    Date: (buffer: any, data: string) => void;
+	    EncryptedMemo: (buffer: any, data: {
 	        [key: string]: any;
 	    }) => void;
-	    FlatMap: (keySerializer: Serializer, valueSerializer: Serializer) => (buffer: ByteBuffer, data: [any, any][]) => void;
-	    Int16: (buffer: ByteBuffer, data: number) => void;
-	    Int32: (buffer: ByteBuffer, data: number) => void;
-	    Int64: (buffer: ByteBuffer, data: number) => void;
-	    Int8: (buffer: ByteBuffer, data: number) => void;
-	    Object: (keySerializers: [string, Serializer][]) => (buffer: ByteBuffer, data: {
+	    FlatMap: (keySerializer: Serializer, valueSerializer: Serializer) => (buffer: any, data: [any, any][]) => void;
+	    Int16: (buffer: any, data: number) => void;
+	    Int32: (buffer: any, data: number) => void;
+	    Int64: (buffer: any, data: number) => void;
+	    Int8: (buffer: any, data: number) => void;
+	    Object: (keySerializers: [string, Serializer][]) => (buffer: any, data: {
 	        [key: string]: any;
 	    }) => void;
-	    Operation: (buffer: ByteBuffer, operation: Operation) => void;
-	    Optional: (valueSerializer: Serializer) => (buffer: ByteBuffer, data: any) => void;
-	    Price: (buffer: ByteBuffer, data: {
+	    Operation: (buffer: any, operation: Operation) => void;
+	    Optional: (valueSerializer: Serializer) => (buffer: any, data: any) => void;
+	    Price: (buffer: any, data: {
 	        [key: string]: any;
 	    }) => void;
-	    PublicKey: (buffer: ByteBuffer, data: PublicKey | string | null) => void;
-	    StaticVariant: (itemSerializers: Serializer[]) => (buffer: ByteBuffer, data: [number, any]) => void;
-	    String: (buffer: ByteBuffer, data: string) => void;
-	    Transaction: (buffer: ByteBuffer, data: {
+	    PublicKey: (buffer: any, data: PublicKey | string | null) => void;
+	    StaticVariant: (itemSerializers: Serializer[]) => (buffer: any, data: [number, any]) => void;
+	    String: (buffer: any, data: string) => void;
+	    Transaction: (buffer: any, data: {
 	        [key: string]: any;
 	    }) => void;
-	    UInt16: (buffer: ByteBuffer, data: number) => void;
-	    UInt32: (buffer: ByteBuffer, data: number) => void;
-	    UInt64: (buffer: ByteBuffer, data: number) => void;
-	    UInt8: (buffer: ByteBuffer, data: number) => void;
-	    Void: (buffer: ByteBuffer) => never;
+	    UInt16: (buffer: any, data: number) => void;
+	    UInt32: (buffer: any, data: number) => void;
+	    UInt64: (buffer: any, data: number) => void;
+	    UInt8: (buffer: any, data: number) => void;
+	    Void: (buffer: any) => never;
 	};
 
 }
@@ -701,22 +706,21 @@ declare module 'dpixa/crypto' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import * as ByteBuffer from '@ecency/bytebuffer';
 	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction';
 	/**
 	 * Network id used in WIF-encoding.
 	 */
-	export const NETWORK_ID: Buffer<ArrayBuffer>; function ripemd160(input: Buffer | string): Buffer; function sha256(input: Buffer | string): Buffer; function doubleSha256(input: Buffer | string): Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Buffer): boolean; function isWif(privWif: string | Buffer): boolean;
+	export const NETWORK_ID: any; function ripemd160(input: any | string): any; function sha256(input: any | string): any; function doubleSha256(input: any | string): any; function encodePublic(key: any, prefix: string): string; function encodePrivate(key: any): string; function decodePrivate(encodedKey: string): any; function isCanonicalSignature(signature: any): boolean; function isWif(privWif: string | any): boolean;
 	/**
 	 * ECDSA (secp256k1) public key.
 	 */
 	export class PublicKey {
 	    readonly key: any;
 	    readonly prefix: string;
-	    readonly uncompressed: Buffer;
+	    readonly uncompressed: any;
 	    constructor(key: any, prefix?: string);
-	    static fromBuffer(key: ByteBuffer): {
-	        key: ByteBuffer;
+	    static fromBuffer(key: any): {
+	        key: any;
 	    };
 	    /**
 	     * Create a new instance from a WIF-encoded key.
@@ -731,7 +735,7 @@ declare module 'dpixa/crypto' {
 	     * @param message 32-byte message to verify.
 	     * @param signature Signature to verify.
 	     */
-	    verify(message: Buffer, signature: Signature): boolean;
+	    verify(message: any, signature: Signature): boolean;
 	    /**
 	     * Return a WIF-encoded representation of the key.
 	     */
@@ -751,8 +755,8 @@ declare module 'dpixa/crypto' {
 	 */
 	export class PrivateKey {
 	    private key;
-	    secret: Buffer;
-	    constructor(key: Buffer);
+	    secret: any;
+	    constructor(key: any);
 	    /**
 	     * Convenience to create a new instance from WIF string or buffer.
 	     */
@@ -807,9 +811,9 @@ declare module 'dpixa/crypto' {
 	     * @param message 32-byte message that was used to create the signature.
 	     */
 	    recover(message: Buffer, prefix?: string): PublicKey;
-	    toBuffer(): Buffer<ArrayBuffer>;
-	    toString(): string;
-	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): Buffer<ArrayBufferLike>; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): string;
+	    toBuffer(): any;
+	    toString(): any;
+	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): any; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): any;
 	/** Misc crypto utility functions. */
 	export const cryptoUtils: {
 	    decodePrivate: typeof decodePrivate;
@@ -2957,8 +2961,7 @@ declare module 'dpixa/client' {
 
 }
 declare module 'dpixa/chain/deserializer' {
-	import * as ByteBuffer from '@ecency/bytebuffer';
-	export type Deserializer = (buffer: ByteBuffer) => void;
+	export type Deserializer = (buffer: any) => void;
 	export const types: {
 	    EncryptedMemoD: any;
 	};

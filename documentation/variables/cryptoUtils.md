@@ -8,15 +8,15 @@
 
 > `const` **cryptoUtils**: `object`
 
-Defined in: crypto.ts:466
+Defined in: crypto.ts:467
 
 Misc crypto utility functions.
 
 ## Type Declaration
 
-### decodePrivate()
+### decodePrivate
 
-> **decodePrivate**: (`encodedKey`) => `Buffer`
+> **decodePrivate**: (`encodedKey`) => `any`
 
 Decode bs58+doubleSha256-checksum encoded private key.
 
@@ -28,11 +28,11 @@ Decode bs58+doubleSha256-checksum encoded private key.
 
 #### Returns
 
-`Buffer`
+`any`
 
-### doubleSha256()
+### doubleSha256
 
-> **doubleSha256**: (`input`) => `Buffer`
+> **doubleSha256**: (`input`) => `any`
 
 Return 2-round sha256 hash of input.
 
@@ -40,13 +40,13 @@ Return 2-round sha256 hash of input.
 
 ##### input
 
-`string` | `Buffer`\<`ArrayBufferLike`\>
+`any`
 
 #### Returns
 
-`Buffer`
+`any`
 
-### encodePrivate()
+### encodePrivate
 
 > **encodePrivate**: (`key`) => `string`
 
@@ -56,13 +56,13 @@ Encode bs58+doubleSha256-checksum private key.
 
 ##### key
 
-`Buffer`
+`any`
 
 #### Returns
 
 `string`
 
-### encodePublic()
+### encodePublic
 
 > **encodePublic**: (`key`, `prefix`) => `string`
 
@@ -72,7 +72,7 @@ Encode public key with bs58+ripemd160-checksum.
 
 ##### key
 
-`Buffer`
+`any`
 
 ##### prefix
 
@@ -82,9 +82,9 @@ Encode public key with bs58+ripemd160-checksum.
 
 `string`
 
-### generateTrxId()
+### generateTrxId
 
-> **generateTrxId**: (`transaction`) => `string`
+> **generateTrxId**: (`transaction`) => `any`
 
 #### Parameters
 
@@ -94,9 +94,9 @@ Encode public key with bs58+ripemd160-checksum.
 
 #### Returns
 
-`string`
+`any`
 
-### isCanonicalSignature()
+### isCanonicalSignature
 
 > **isCanonicalSignature**: (`signature`) => `boolean`
 
@@ -106,13 +106,13 @@ Return true if signature is canonical, otherwise false.
 
 ##### signature
 
-`Buffer`
+`any`
 
 #### Returns
 
 `boolean`
 
-### isWif()
+### isWif
 
 > **isWif**: (`privWif`) => `boolean`
 
@@ -122,15 +122,15 @@ Return true if string is wif, otherwise false.
 
 ##### privWif
 
-`string` | `Buffer`\<`ArrayBufferLike`\>
+`any`
 
 #### Returns
 
 `boolean`
 
-### ripemd160()
+### ripemd160
 
-> **ripemd160**: (`input`) => `Buffer`
+> **ripemd160**: (`input`) => `any`
 
 Return ripemd160 hash of input.
 
@@ -138,15 +138,15 @@ Return ripemd160 hash of input.
 
 ##### input
 
-`string` | `Buffer`\<`ArrayBufferLike`\>
+`any`
 
 #### Returns
 
-`Buffer`
+`any`
 
-### sha256()
+### sha256
 
-> **sha256**: (`input`) => `Buffer`
+> **sha256**: (`input`) => `any`
 
 Return sha256 hash of input.
 
@@ -154,13 +154,13 @@ Return sha256 hash of input.
 
 ##### input
 
-`string` | `Buffer`\<`ArrayBufferLike`\>
+`any`
 
 #### Returns
 
-`Buffer`
+`any`
 
-### signTransaction()
+### signTransaction
 
 > **signTransaction**: (`transaction`, `keys`, `chainId`) => [`SignedTransaction`](../interfaces/SignedTransaction.md)
 
@@ -176,11 +176,11 @@ Transaction to sign.
 
 ##### keys
 
+[`PrivateKey`](../classes/PrivateKey.md) \| [`PrivateKey`](../classes/PrivateKey.md)[]
+
 Key(s) to sign transaction with.
 
-[`PrivateKey`](../classes/PrivateKey.md) | [`PrivateKey`](../classes/PrivateKey.md)[]
-
-##### chainId
+##### chainId?
 
 `Buffer` = `DEFAULT_CHAIN_ID`
 
@@ -188,9 +188,9 @@ Key(s) to sign transaction with.
 
 [`SignedTransaction`](../interfaces/SignedTransaction.md)
 
-### transactionDigest()
+### transactionDigest
 
-> **transactionDigest**: (`transaction`, `chainId`) => `Buffer`\<`ArrayBufferLike`\>
+> **transactionDigest**: (`transaction`, `chainId`) => `any`
 
 Return the sha256 transaction digest.
 
@@ -198,9 +198,9 @@ Return the sha256 transaction digest.
 
 ##### transaction
 
-[`Transaction`](../interfaces/Transaction.md) | [`SignedTransaction`](../interfaces/SignedTransaction.md)
+[`Transaction`](../interfaces/Transaction.md) \| [`SignedTransaction`](../interfaces/SignedTransaction.md)
 
-##### chainId
+##### chainId?
 
 `Buffer` = `DEFAULT_CHAIN_ID`
 
@@ -208,4 +208,4 @@ The chain id to use when creating the hash.
 
 #### Returns
 
-`Buffer`\<`ArrayBufferLike`\>
+`any`

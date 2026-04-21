@@ -36,7 +36,8 @@
 import { Account } from './account'
 import { Asset, Price } from './asset'
 // 💡 FIX: Explicitly import the Buffer type from Node.js
-import { Buffer } from 'buffer'
+const ByteBuffer = require("@ecency/bytebuffer");
+const Buffer = ByteBuffer;
 
 /**
  * Large number that may be unsafe to represent natively in JavaScript.
@@ -48,7 +49,7 @@ export type Bignum = string
  */
 export class HexBuffer {
     // 💡 FIX: Explicitly use the imported Buffer type
-    constructor(public buffer: Buffer) {}
+    constructor(public buffer: any) {}
 
     /**
      * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.

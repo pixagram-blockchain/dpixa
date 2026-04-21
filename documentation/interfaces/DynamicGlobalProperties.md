@@ -6,7 +6,7 @@
 
 # Interface: DynamicGlobalProperties
 
-Defined in: chain/misc.ts:132
+Defined in: chain/misc.ts:133
 
 Node state.
 
@@ -16,7 +16,7 @@ Node state.
 
 > **average\_block\_size**: `number`
 
-Defined in: chain/misc.ts:190
+Defined in: chain/misc.ts:191
 
 Average block size is updated every block to be:
 
@@ -31,7 +31,7 @@ approximately 50% or less utilization of network capacity.
 
 > **confidential\_pxs\_supply**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:167
+Defined in: chain/misc.ts:168
 
 Total asset held in confidential balances.
 
@@ -41,7 +41,7 @@ Total asset held in confidential balances.
 
 > **confidential\_supply**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:162
+Defined in: chain/misc.ts:163
 
 Total asset held in confidential balances.
 
@@ -51,7 +51,7 @@ Total asset held in confidential balances.
 
 > **current\_aslot**: `number`
 
-Defined in: chain/misc.ts:205
+Defined in: chain/misc.ts:206
 
 The current absolute slot number. Equal to the total
 number of slots since genesis. Also equal to the total
@@ -63,7 +63,7 @@ number of missed slots plus head_block_number.
 
 > **current\_pxs\_supply**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:163
+Defined in: chain/misc.ts:164
 
 ***
 
@@ -71,7 +71,7 @@ Defined in: chain/misc.ts:163
 
 > **current\_reserve\_ratio**: `number`
 
-Defined in: chain/misc.ts:228
+Defined in: chain/misc.ts:229
 
 Any time average_block_size <= 50% maximum_block_size this value grows by 1 until it
 reaches MAX_RESERVE_RATIO.  Any time average_block_size is greater than
@@ -84,7 +84,7 @@ happen every block.
 
 > **current\_supply**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:158
+Defined in: chain/misc.ts:159
 
 ***
 
@@ -92,7 +92,7 @@ Defined in: chain/misc.ts:158
 
 > **current\_witness**: `string`
 
-Defined in: chain/misc.ts:146
+Defined in: chain/misc.ts:147
 
 Currently elected witness.
 
@@ -102,7 +102,7 @@ Currently elected witness.
 
 > **head\_block\_id**: `string`
 
-Defined in: chain/misc.ts:138
+Defined in: chain/misc.ts:139
 
 ***
 
@@ -110,7 +110,7 @@ Defined in: chain/misc.ts:138
 
 > **head\_block\_number**: `number`
 
-Defined in: chain/misc.ts:137
+Defined in: chain/misc.ts:138
 
 Current block height.
 
@@ -120,7 +120,7 @@ Current block height.
 
 > **id**: `number`
 
-Defined in: chain/misc.ts:133
+Defined in: chain/misc.ts:134
 
 ***
 
@@ -128,7 +128,7 @@ Defined in: chain/misc.ts:133
 
 > **last\_irreversible\_block\_num**: `number`
 
-Defined in: chain/misc.ts:211
+Defined in: chain/misc.ts:212
 
 ***
 
@@ -136,7 +136,7 @@ Defined in: chain/misc.ts:211
 
 > **max\_virtual\_bandwidth**: `string`
 
-Defined in: chain/misc.ts:221
+Defined in: chain/misc.ts:222
 
 The maximum bandwidth the blockchain can support is:
 
@@ -152,7 +152,7 @@ max_bandwidth * current_reserve_ratio
 
 > **maximum\_block\_size**: `number`
 
-Defined in: chain/misc.ts:199
+Defined in: chain/misc.ts:200
 
 Maximum block size is decided by the set of active witnesses which change every round.
 Each witness posts what they think the maximum size should be as part of their witness
@@ -169,7 +169,7 @@ network from getting stuck by witnesses attempting to set this too low.
 
 > **num\_pow\_witnesses**: `number`
 
-Defined in: chain/misc.ts:156
+Defined in: chain/misc.ts:157
 
 The current count of how many pending POW witnesses there are, determines
 the difficulty of doing pow.
@@ -180,7 +180,7 @@ the difficulty of doing pow.
 
 > **participation\_count**: `number`
 
-Defined in: chain/misc.ts:210
+Defined in: chain/misc.ts:211
 
 ***
 
@@ -188,7 +188,7 @@ Defined in: chain/misc.ts:210
 
 > **pending\_rewarded\_vesting\_pixa**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:176
+Defined in: chain/misc.ts:177
 
 ***
 
@@ -196,7 +196,7 @@ Defined in: chain/misc.ts:176
 
 > **pending\_rewarded\_vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:175
+Defined in: chain/misc.ts:176
 
 ***
 
@@ -204,7 +204,7 @@ Defined in: chain/misc.ts:175
 
 > **pxs\_interest\_rate**: `number`
 
-Defined in: chain/misc.ts:180
+Defined in: chain/misc.ts:181
 
 This property defines the interest rate that PXS deposits receive.
 
@@ -214,7 +214,7 @@ This property defines the interest rate that PXS deposits receive.
 
 > **pxs\_print\_rate**: `number`
 
-Defined in: chain/misc.ts:181
+Defined in: chain/misc.ts:182
 
 ***
 
@@ -222,7 +222,7 @@ Defined in: chain/misc.ts:181
 
 > **recent\_slots\_filled**: `string`
 
-Defined in: chain/misc.ts:209
+Defined in: chain/misc.ts:210
 
 Used to compute witness participation.
 
@@ -232,7 +232,7 @@ Used to compute witness participation.
 
 > **time**: `string`
 
-Defined in: chain/misc.ts:142
+Defined in: chain/misc.ts:143
 
 UTC Server time, e.g. 2020-01-15T00:42:00
 
@@ -242,7 +242,7 @@ UTC Server time, e.g. 2020-01-15T00:42:00
 
 > **total\_pow**: `number`
 
-Defined in: chain/misc.ts:151
+Defined in: chain/misc.ts:152
 
 The total POW accumulated, aka the sum of num_pow_witness at the time
 new POW is added.
@@ -253,7 +253,7 @@ new POW is added.
 
 > **total\_reward\_fund\_pixa**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:170
+Defined in: chain/misc.ts:171
 
 ***
 
@@ -261,7 +261,7 @@ Defined in: chain/misc.ts:170
 
 > **total\_reward\_shares2**: `string`
 
-Defined in: chain/misc.ts:174
+Defined in: chain/misc.ts:175
 
 The running total of REWARD^2.
 
@@ -271,7 +271,7 @@ The running total of REWARD^2.
 
 > **total\_vesting\_fund\_pixa**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:168
+Defined in: chain/misc.ts:169
 
 ***
 
@@ -279,7 +279,7 @@ Defined in: chain/misc.ts:168
 
 > **total\_vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:169
+Defined in: chain/misc.ts:170
 
 ***
 
@@ -287,7 +287,7 @@ Defined in: chain/misc.ts:169
 
 > **virtual\_supply**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:157
+Defined in: chain/misc.ts:158
 
 ***
 
@@ -295,7 +295,7 @@ Defined in: chain/misc.ts:157
 
 > **vote\_power\_reserve\_rate**: `number`
 
-Defined in: chain/misc.ts:234
+Defined in: chain/misc.ts:235
 
 The number of votes regenerated per day.  Any user voting slower than this rate will be
 "wasting" voting power through spillover; any user voting faster than this rate will have

@@ -40,7 +40,7 @@ Defined in: chain/operation.ts:193
 
 #### active?
 
-> `optional` **active**: [`AuthorityType`](AuthorityType.md)
+> `optional` **active?**: [`AuthorityType`](AuthorityType.md)
 
 #### json\_metadata
 
@@ -52,11 +52,11 @@ Defined in: chain/operation.ts:193
 
 #### owner?
 
-> `optional` **owner**: [`AuthorityType`](AuthorityType.md)
+> `optional` **owner?**: [`AuthorityType`](AuthorityType.md)
 
 #### posting?
 
-> `optional` **posting**: [`AuthorityType`](AuthorityType.md)
+> `optional` **posting?**: [`AuthorityType`](AuthorityType.md)
 
 #### Overrides
 

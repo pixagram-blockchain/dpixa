@@ -4,17 +4,17 @@
 
 [@pixagram/dpixa](../globals.md) / Serializer
 
-# Type Alias: Serializer()
+# Type Alias: Serializer
 
 > **Serializer** = (`buffer`, `data`) => `void`
 
-Defined in: chain/serializer.ts:43
+Defined in: chain/serializer.ts:44
 
 ## Parameters
 
 ### buffer
 
-`ByteBuffer`
+`any`
 
 ### data
 

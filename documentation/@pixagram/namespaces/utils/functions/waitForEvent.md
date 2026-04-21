@@ -26,7 +26,7 @@ Return a promise that will resove when a specific event is emitted.
 
 ### eventName
 
-`string` | `symbol`
+`string` \| `symbol`
 
 ## Returns
 

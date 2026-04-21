@@ -36,7 +36,7 @@ Defined in: chain/operation.ts:594
 
 #### new\_owner\_key?
 
-> `optional` **new\_owner\_key**: `string` \| [`PublicKey`](../classes/PublicKey.md)
+> `optional` **new\_owner\_key?**: `string` \| [`PublicKey`](../classes/PublicKey.md)
 
 #### props
 

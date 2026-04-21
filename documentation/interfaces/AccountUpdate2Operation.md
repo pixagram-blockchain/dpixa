@@ -40,7 +40,7 @@ Defined in: chain/operation.ts:920
 
 #### active?
 
-> `optional` **active**: [`AuthorityType`](AuthorityType.md)
+> `optional` **active?**: [`AuthorityType`](AuthorityType.md)
 
 #### extensions
 
@@ -52,15 +52,15 @@ Defined in: chain/operation.ts:920
 
 #### memo\_key?
 
-> `optional` **memo\_key**: `string` \| [`PublicKey`](../classes/PublicKey.md)
+> `optional` **memo\_key?**: `string` \| [`PublicKey`](../classes/PublicKey.md)
 
 #### owner?
 
-> `optional` **owner**: [`AuthorityType`](AuthorityType.md)
+> `optional` **owner?**: [`AuthorityType`](AuthorityType.md)
 
 #### posting?
 
-> `optional` **posting**: [`AuthorityType`](AuthorityType.md)
+> `optional` **posting?**: [`AuthorityType`](AuthorityType.md)
 
 #### posting\_json\_metadata
 

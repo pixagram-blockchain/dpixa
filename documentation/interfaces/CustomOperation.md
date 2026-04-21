@@ -36,7 +36,7 @@ Defined in: chain/operation.ts:344
 
 #### data
 
-> **data**: `number`[] \| `Buffer`\<`ArrayBufferLike`\> \| [`HexBuffer`](../classes/HexBuffer.md)
+> **data**: `number`[] \| [`HexBuffer`](../classes/HexBuffer.md) \| `Buffer`\<`ArrayBufferLike`\>
 
 #### id
 

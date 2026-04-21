@@ -271,7 +271,7 @@ Return state of server.
 
 ### getOperations()
 
-> **getOperations**(`blockNum`, `onlyVirtual`): `Promise`\<[`AppliedOperation`](../interfaces/AppliedOperation.md)[]\>
+> **getOperations**(`blockNum`, `onlyVirtual?`): `Promise`\<[`AppliedOperation`](../interfaces/AppliedOperation.md)[]\>
 
 Defined in: helpers/database.ts:174
 
@@ -283,7 +283,7 @@ Return all applied operations in *blockNum*.
 
 `number`
 
-##### onlyVirtual
+##### onlyVirtual?
 
 `boolean` = `false`
 
@@ -352,7 +352,7 @@ return rpc node version
 
 ### getVestingDelegations()
 
-> **getVestingDelegations**(`account`, `from`, `limit`): `Promise`\<[`VestingDelegation`](../interfaces/VestingDelegation.md)[]\>
+> **getVestingDelegations**(`account`, `from?`, `limit?`): `Promise`\<[`VestingDelegation`](../interfaces/VestingDelegation.md)[]\>
 
 Defined in: helpers/database.ts:141
 
@@ -366,13 +366,13 @@ Get list of delegations made by account.
 
 Account delegating
 
-##### from
+##### from?
 
 `string` = `''`
 
 Delegatee start offset, used for paging.
 
-##### limit
+##### limit?
 
 `number` = `1000`
 

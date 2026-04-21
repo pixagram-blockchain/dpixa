@@ -80,7 +80,7 @@ Convenience to create a new instance from PublicKey or authority object.
 
 ##### value
 
-`string` | [`AuthorityType`](../interfaces/AuthorityType.md) | [`PublicKey`](PublicKey.md)
+`string` \| [`AuthorityType`](../interfaces/AuthorityType.md) \| [`PublicKey`](PublicKey.md)
 
 #### Returns
 

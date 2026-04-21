@@ -12,7 +12,7 @@ Defined in: helpers/database.ts:65
 
 ### filter\_tags?
 
-> `optional` **filter\_tags**: `string`[]
+> `optional` **filter\_tags?**: `string`[]
 
 Defined in: helpers/database.ts:74
 
@@ -30,7 +30,7 @@ Number of results, max 100.
 
 ### parent\_author?
 
-> `optional` **parent\_author**: `string`
+> `optional` **parent\_author?**: `string`
 
 Defined in: helpers/database.ts:91
 
@@ -38,7 +38,7 @@ Defined in: helpers/database.ts:91
 
 ### parent\_permlink?
 
-> `optional` **parent\_permlink**: `string`
+> `optional` **parent\_permlink?**: `string`
 
 Defined in: helpers/database.ts:92
 
@@ -46,7 +46,7 @@ Defined in: helpers/database.ts:92
 
 ### select\_authors?
 
-> `optional` **select\_authors**: `string`[]
+> `optional` **select\_authors?**: `string`[]
 
 Defined in: helpers/database.ts:75
 
@@ -54,7 +54,7 @@ Defined in: helpers/database.ts:75
 
 ### select\_tags?
 
-> `optional` **select\_tags**: `string`[]
+> `optional` **select\_tags?**: `string`[]
 
 Defined in: helpers/database.ts:76
 
@@ -62,7 +62,7 @@ Defined in: helpers/database.ts:76
 
 ### start\_author?
 
-> `optional` **start\_author**: `string`
+> `optional` **start\_author?**: `string`
 
 Defined in: helpers/database.ts:85
 
@@ -73,7 +73,7 @@ Should be used in conjunction with `start_permlink`.
 
 ### start\_permlink?
 
-> `optional` **start\_permlink**: `string`
+> `optional` **start\_permlink?**: `string`
 
 Defined in: helpers/database.ts:90
 
@@ -84,7 +84,7 @@ Should be used in conjunction with `start_author`.
 
 ### tag?
 
-> `optional` **tag**: `string`
+> `optional` **tag?**: `string`
 
 Defined in: helpers/database.ts:69
 
@@ -94,7 +94,7 @@ Name of author or tag to fetch.
 
 ### truncate\_body?
 
-> `optional` **truncate\_body**: `number`
+> `optional` **truncate\_body?**: `number`
 
 Defined in: helpers/database.ts:80
 

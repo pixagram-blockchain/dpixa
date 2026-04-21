@@ -6,9 +6,9 @@
 
 # Function: getVests()
 
-> **getVests**(`account`, `subtract_delegated`, `add_received`): `number`
+> **getVests**(`account`, `subtract_delegated?`, `add_received?`): `number`
 
-Defined in: chain/misc.ts:253
+Defined in: chain/misc.ts:254
 
 Returns the vests of specified account. Default: Subtract delegated & add received
 
@@ -18,11 +18,11 @@ Returns the vests of specified account. Default: Subtract delegated & add receiv
 
 [`Account`](../interfaces/Account.md)
 
-### subtract\_delegated
+### subtract\_delegated?
 
 `boolean` = `true`
 
-### add\_received
+### add\_received?
 
 `boolean` = `true`
 

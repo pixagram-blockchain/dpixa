@@ -20,7 +20,7 @@ Fetch API wrapper that retries until timeout is reached.
 
 ### allAddresses
 
-`string` | `string`[]
+`string` \| `string`[]
 
 ### opts
 

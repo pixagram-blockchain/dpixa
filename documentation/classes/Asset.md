@@ -62,7 +62,7 @@ Return a new Asset instance with amount added.
 
 ##### amount
 
-`string` | `number` | `Asset`
+`string` \| `number` \| `Asset`
 
 #### Returns
 
@@ -82,7 +82,7 @@ Return a new Asset with the amount divided.
 
 ##### divisor
 
-`string` | `number` | `Asset`
+`string` \| `number` \| `Asset`
 
 #### Returns
 
@@ -116,7 +116,7 @@ Return a new Asset with the amount multiplied by factor.
 
 ##### factor
 
-`string` | `number` | `Asset`
+`string` \| `number` \| `Asset`
 
 #### Returns
 
@@ -151,7 +151,7 @@ Return a new Asset instance with amount subtracted.
 
 ##### amount
 
-`string` | `number` | `Asset`
+`string` \| `number` \| `Asset`
 
 #### Returns
 
@@ -199,7 +199,7 @@ Convenience to create new Asset.
 
 ##### value
 
-`string` | `number` | `Asset`
+`string` \| `number` \| `Asset`
 
 ##### symbol?
 

@@ -153,9 +153,9 @@ List all subscriptions by particular account
 
 ##### account
 
-the account you want to query
+`string` \| `object`
 
-`string` | `object`
+the account you want to query
 
 #### Returns
 

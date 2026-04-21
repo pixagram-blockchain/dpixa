@@ -45,7 +45,7 @@ export interface SMTAsset {
 /**
  * Asset symbol string.
  */
-export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD';
+export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD';
 
 /**
  * Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
@@ -62,7 +62,7 @@ export class Asset {
   public static fromString(string: string, expectedSymbol?: AssetSymbol) {
     const [amountString, symbol] = string.split(' ')
     if (
-      !['PXA', 'PIXA', 'TESTS', 'PXP', 'VESTS', 'PXS', 'TBD', 'STEEM', 'TPS', 'SBD'].includes(symbol)
+      !['PXA', 'PIXA', 'TESTS', 'PXP', 'VESTS', 'PXS', 'TBD', 'STEEM', 'TPS', 'SBD', 'HBD'].includes(symbol)
     ) {
       throw new Error(`Invalid asset symbol: ${symbol}`)
     }
