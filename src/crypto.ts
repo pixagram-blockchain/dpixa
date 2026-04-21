@@ -40,7 +40,7 @@ const bigInteger = require("bigi");
 import * as bs58 from "./base58";
 const ByteBuffer = require("@ecency/bytebuffer");
 // NOTE: Previously this file did `const Buffer = ByteBuffer;` which shadowed
-// the global Buffer with the ByteBuffer constructor. ByteBuffer exposes
+// the real Buffer with the ByteBuffer constructor. ByteBuffer exposes
 // .concat (with DIFFERENT semantics — it returns a ByteBuffer instance, not
 // a Buffer) but no .from / .alloc. The result was that calls like
 // `Buffer.from(...)` silently resolved to the global Buffer while
@@ -54,16 +54,18 @@ const ByteBuffer = require("@ecency/bytebuffer");
 // re-serializes — producing the misleading "Missing Posting Authority"
 // error for small comment bodies.
 //
-// Fix: use the real global Buffer (provided by the `buffer` polyfill in
-// browser builds, or Node's native Buffer in node builds) as `NodeBuffer`,
-// explicitly and without shadowing. ByteBuffer is still used — but only as
-// ByteBuffer, never aliased to Buffer.
+// Fix: explicitly require the `buffer` package (listed as a direct
+// dependency of dpixa) and use ITS `Buffer` class for all byte
+// manipulation. This works uniformly in:
+//   - node.js builds (`require('buffer')` → Node core, `Buffer.from/alloc/concat` all exist)
+//   - browserify browser builds (resolves to feross/buffer, same API)
+//   - webpack consumers of the built dist/dpixa.js (dpixa is already bundled,
+//     so this require is already resolved before webpack sees anything)
 //
-// `Buffer` (capital-B, unqualified) is the runtime global here. Do NOT
-// introduce a local `const Buffer = ...` binding again — it would shadow
-// the global and reintroduce the original bug.
-declare const Buffer: any;
-const NodeBuffer = Buffer;
+// DO NOT reintroduce a local `const Buffer = ...` binding — that shadowing
+// is exactly what caused the original bug.
+const bufferModule = require("safe-buffer");
+const NodeBuffer = bufferModule.Buffer;
 const ecurve = require("ecurve");
 const Ripemd160 = require("ripemd160");
 const secp256k1 = require("secp256k1");

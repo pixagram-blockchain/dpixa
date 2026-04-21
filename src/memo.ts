@@ -1,6 +1,16 @@
 import * as bs58 from "./base58";
 const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+// See long NOTE in crypto.ts. Same bug pattern here — the previous
+// `const Buffer = ByteBuffer;` alias silently routed `Buffer.concat(...)` to
+// ByteBuffer.concat (returning a ByteBuffer instance, not a Buffer) while
+// `Buffer.from(...)` resolved to the global. Mixing the two produces
+// ByteBuffer objects in crypto inputs, which get coerced via toString() to
+// a size-dependent debug string. For memo this would corrupt AES input
+// encoding / decoding at specific payload sizes.
+//
+// DO NOT reintroduce a local `const Buffer = ...` alias.
+const bufferModule = require("safe-buffer");
+const NodeBuffer = bufferModule.Buffer;
 import { types } from './chain/deserializer'
 import { Types } from './chain/serializer'
 import { PrivateKey, PublicKey } from './crypto'
@@ -14,10 +24,10 @@ import * as Aes from './helpers/aes'
  * @param {number} testNonce nonce with high entropy
  */
 const encode = (
-  private_key: PrivateKey | string,
-  public_key: PublicKey | string,
-  memo: string,
-  testNonce?: string
+    private_key: PrivateKey | string,
+    public_key: PublicKey | string,
+    memo: string,
+    testNonce?: string
 ): string => {
   if (!memo.startsWith('#')) {
     return memo
@@ -27,20 +37,20 @@ const encode = (
   private_key = toPrivateObj(private_key)
   public_key = toPublicObj(public_key)
   const mbuf = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
+      ByteBuffer.DEFAULT_CAPACITY,
+      ByteBuffer.LITTLE_ENDIAN
   )
   mbuf.writeVString(memo)
-  const memoBuffer = Buffer.from(mbuf.copy(0, mbuf.offset).toBinary(), 'binary')
+  const memoBuffer = NodeBuffer.from(mbuf.copy(0, mbuf.offset).toBinary(), 'binary')
   const { nonce, message, checksum } = Aes.encrypt(
-    private_key,
-    public_key,
-    memoBuffer,
-    testNonce
+      private_key,
+      public_key,
+      memoBuffer,
+      testNonce
   )
   const mbuf2 = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
+      ByteBuffer.DEFAULT_CAPACITY,
+      ByteBuffer.LITTLE_ENDIAN
   )
   Types.EncryptedMemo(mbuf2, {
     check: checksum,
@@ -50,7 +60,10 @@ const encode = (
     to: public_key
   })
   mbuf2.flip()
-  const data = Buffer.from(mbuf2.toBuffer())
+  // forceCopy=true: same rationale as transactionDigest in crypto.ts. The
+  // bs58-encoded output must not share memory with the ByteBuffer backing
+  // allocation.
+  const data = mbuf2.toBuffer(true)
   return '#' + bs58.encode(data)
 }
 
@@ -67,17 +80,17 @@ const decode = (private_key: PrivateKey | string, memo: string): string => {
   checkEncryption()
   private_key = toPrivateObj(private_key)
   memo = bs58.decode(memo)
-  let memoBuffer = types.EncryptedMemoD(Buffer.from(memo, 'binary'))
+  let memoBuffer = types.EncryptedMemoD(NodeBuffer.from(memo, 'binary'))
   const { from, to, nonce, check, encrypted } = memoBuffer
   const pubkey = private_key.createPublic().toString()
   const otherpub =
-    pubkey === new PublicKey(from.key).toString()
-      ? new PublicKey(to.key)
-      : new PublicKey(from.key)
+      pubkey === new PublicKey(from.key).toString()
+          ? new PublicKey(to.key)
+          : new PublicKey(from.key)
   memoBuffer = Aes.decrypt(private_key, otherpub, nonce, encrypted, check)
   const mbuf = ByteBuffer.fromBinary(
-    memoBuffer.toString('binary'),
-    ByteBuffer.LITTLE_ENDIAN
+      memoBuffer.toString('binary'),
+      ByteBuffer.LITTLE_ENDIAN
   )
   try {
     mbuf.mark()
@@ -85,7 +98,7 @@ const decode = (private_key: PrivateKey | string, memo: string): string => {
   } catch (e) {
     mbuf.reset()
     // Sender did not length-prefix the memo
-    memo = Buffer.from(mbuf.toString('binary'), 'binary').toString('utf-8')
+    memo = NodeBuffer.from(mbuf.toString('binary'), 'binary').toString('utf-8')
     return '#' + memo
   }
 }
@@ -112,9 +125,9 @@ const checkEncryption: any = () => {
 }
 
 const toPrivateObj = (o: any): PrivateKey =>
-  o ? (o.key ? o : PrivateKey.fromString(o)) : o /* null or undefined*/
+    o ? (o.key ? o : PrivateKey.fromString(o)) : o /* null or undefined*/
 const toPublicObj = (o: any): PublicKey =>
-  o ? (o.key ? o : PublicKey.fromString(o)) : o /* null or undefined*/
+    o ? (o.key ? o : PublicKey.fromString(o)) : o /* null or undefined*/
 
 export const Memo = {
   decode,

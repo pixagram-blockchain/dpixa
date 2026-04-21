@@ -1,6 +1,6 @@
 {
   "name": "@pixagram/dpixa",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Pixa blockchain RPC client library",
   "author": "pixa-blockchain",
   "license": "BSD-3-Clause-No-Military-License",
@@ -37,7 +37,7 @@
   ],
   "dependencies": {
     "@ecency/bytebuffer": "~6.0.0",
-    "buffer": "~6.0.3",
+    "safe-buffer": "~5.2.1",
     "bigi": "~1.4.2",
     "core-js": "~3.49.0",
     "cross-fetch": "~4.1.0",
