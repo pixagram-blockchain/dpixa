@@ -6,7 +6,7 @@
 
 # Class: PrivateKey
 
-Defined in: crypto.ts:247
+Defined in: crypto.ts:303
 
 ECDSA (secp256k1) private key.
 
@@ -16,7 +16,7 @@ ECDSA (secp256k1) private key.
 
 > **new PrivateKey**(`key`): `PrivateKey`
 
-Defined in: crypto.ts:250
+Defined in: crypto.ts:306
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: crypto.ts:250
 
 > **secret**: `BBuffer`
 
-Defined in: crypto.ts:248
+Defined in: crypto.ts:304
 
 ## Methods
 
@@ -42,7 +42,7 @@ Defined in: crypto.ts:248
 
 > **createPublic**(`prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:314
+Defined in: crypto.ts:391
 
 Derive the public key for this private key.
 
@@ -62,9 +62,17 @@ Derive the public key for this private key.
 
 > **get\_shared\_secret**(`public_key`): `BBuffer`
 
-Defined in: crypto.ts:337
+Defined in: crypto.ts:422
 
-Get shared secret for memo cryptography
+Get shared secret for memo cryptography.
+
+The Hive/Pixa memo protocol is: multiply peer's pubkey point by our
+private scalar, take the 32-byte x-coordinate, sha512 it. `getSharedSecret`
+returns the compressed-encoded shared point (33 bytes: parity byte + x);
+slicing off byte 0 gives us exactly the x-coordinate the protocol wants.
+
+This replaces the previous bigi + ecurve point multiplication. Verified
+that both paths produce byte-for-byte identical output.
 
 #### Parameters
 
@@ -82,7 +90,7 @@ Get shared secret for memo cryptography
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:329
+Defined in: crypto.ts:406
 
 Used by `utils.inspect` and `console.log` in node.js. Does not show the full key
 to get the full encoded key you need to explicitly call [toString](#tostring).
@@ -97,7 +105,14 @@ to get the full encoded key you need to explicitly call [toString](#tostring).
 
 > **multiply**(`pub`): `BBuffer`
 
-Defined in: crypto.ts:291
+Defined in: crypto.ts:356
+
+Multiply a public key by this private key's scalar. Equivalent to the old
+secp256k1-node `publicKeyTweakMul(pub, secret, compressed=false)`.
+
+Implemented via noble's Point math: convert pub bytes to a Point, convert
+this.key (big-endian 32-byte scalar) to a bigint, multiply, and re-encode
+as uncompressed (matching the old `false` compressed flag).
 
 #### Parameters
 
@@ -115,7 +130,7 @@ Defined in: crypto.ts:291
 
 > **sign**(`message`): [`Signature`](Signature.md)
 
-Defined in: crypto.ts:299
+Defined in: crypto.ts:376
 
 Sign message.
 
@@ -127,6 +142,16 @@ Sign message.
 
 32-byte message.
 
+Noble's sync `sign` already produces deterministic RFC6979 signatures with
+lowS enforced by default — both of which are what the old retry-with-
+extra-entropy loop was trying to guarantee. The result is therefore
+*always* canonical, so the loop is unnecessary. We keep the
+`isCanonicalSignature` assertion as a defensive sanity check.
+
+We pass `prehash: false` because `message` is already a sha256 digest
+(produced by transactionDigest). Without that flag noble would sha256
+the digest a second time and produce a bogus signature.
+
 #### Returns
 
 [`Signature`](Signature.md)
@@ -137,7 +162,7 @@ Sign message.
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:321
+Defined in: crypto.ts:398
 
 Return a WIF-encoded representation of the key.
 
@@ -151,7 +176,7 @@ Return a WIF-encoded representation of the key.
 
 > `static` **from**(`value`): `PrivateKey`
 
-Defined in: crypto.ts:257
+Defined in: crypto.ts:314
 
 Convenience to create a new instance from WIF string or buffer.
 
@@ -171,7 +196,7 @@ Convenience to create a new instance from WIF string or buffer.
 
 > `static` **fromLogin**(`username`, `password`, `role?`): `PrivateKey`
 
-Defined in: crypto.ts:282
+Defined in: crypto.ts:339
 
 Create key from username and password.
 
@@ -199,7 +224,7 @@ Create key from username and password.
 
 > `static` **fromSeed**(`seed`): `PrivateKey`
 
-Defined in: crypto.ts:275
+Defined in: crypto.ts:332
 
 Create a new instance from a seed.
 
@@ -219,7 +244,7 @@ Create a new instance from a seed.
 
 > `static` **fromString**(`wif`): `PrivateKey`
 
-Defined in: crypto.ts:268
+Defined in: crypto.ts:325
 
 Create a new instance from a WIF-encoded key.
 

@@ -8,7 +8,7 @@
 
 > `const` **cryptoUtils**: `object`
 
-Defined in: crypto.ts:472
+Defined in: crypto.ts:565
 
 Misc crypto utility functions.
 
@@ -40,7 +40,7 @@ Return 2-round sha256 hash of input.
 
 ##### input
 
-`string` \| `BBuffer`
+`string` \| `Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
 
 #### Returns
 
@@ -101,12 +101,13 @@ Encode public key with bs58+ripemd160-checksum.
 > **isCanonicalSignature**: (`signature`) => `boolean`
 
 Return true if signature is canonical, otherwise false.
+Accepts any byte array (typed array or Buffer) — only indexed reads are used.
 
 #### Parameters
 
 ##### signature
 
-`BBuffer`
+`ArrayLike`\<`number`\> \| `Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
 
 #### Returns
 
@@ -134,11 +135,20 @@ Return true if string is wif, otherwise false.
 
 Return ripemd160 hash of input.
 
+Switched from the `ripemd160` package (which exposed a default class) to
+`ripemd160-min`. Key differences:
+  - Use the named import `{ RIPEMD160 }` — the package's default export
+    isn't callable as a constructor under ESM interop.
+  - `.update()` only accepts bytes (Uint8Array or number[]), so strings
+    must be encoded first (handled by `toBytes`).
+  - `.digest()` returns a Uint8Array, not a Node Buffer — we wrap it in
+    `Buffer.from(...)` so callers can still use `.slice()` / `.toString('hex')`.
+
 #### Parameters
 
 ##### input
 
-`string` \| `BBuffer`
+`string` \| `Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
 
 #### Returns
 
@@ -150,11 +160,15 @@ Return ripemd160 hash of input.
 
 Return sha256 hash of input.
 
+Uses `@noble/hashes/sha2.js`. `sha256` is directly callable as a function
+(no createHash/update/digest boilerplate) and returns a Uint8Array; we
+wrap that in `Buffer.from(...)` for `.slice()` / `.toString('hex')` users.
+
 #### Parameters
 
 ##### input
 
-`string` \| `BBuffer`
+`string` \| `Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
 
 #### Returns
 

@@ -888,11 +888,11 @@ declare module 'dpixa/crypto' {
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
 	import ByteBuffer, { BBuffer as Buffer } from 'dpixa/bytebuffer';
-	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction';
+	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction'; function ripemd160(input: Uint8Array | Buffer | string): Buffer; function sha256(input: Uint8Array | Buffer | string): Buffer; function doubleSha256(input: Uint8Array | Buffer | string): Buffer;
 	/**
 	 * Network id used in WIF-encoding.
 	 */
-	export const NETWORK_ID: Buffer; function ripemd160(input: Buffer | string): Buffer; function sha256(input: Buffer | string): Buffer; function doubleSha256(input: Buffer | string): Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Buffer): boolean; function isWif(privWif: string | Buffer): boolean;
+	export const NETWORK_ID: Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Uint8Array | Buffer | ArrayLike<number>): boolean; function isWif(privWif: string | Buffer): boolean;
 	/**
 	 * ECDSA (secp256k1) public key.
 	 */
@@ -955,10 +955,28 @@ declare module 'dpixa/crypto' {
 	     * Create key from username and password.
 	     */
 	    static fromLogin(username: string, password: string, role?: KeyRole): PrivateKey;
+	    /**
+	     * Multiply a public key by this private key's scalar. Equivalent to the old
+	     * secp256k1-node `publicKeyTweakMul(pub, secret, compressed=false)`.
+	     *
+	     * Implemented via noble's Point math: convert pub bytes to a Point, convert
+	     * this.key (big-endian 32-byte scalar) to a bigint, multiply, and re-encode
+	     * as uncompressed (matching the old `false` compressed flag).
+	     */
 	    multiply(pub: any): Buffer;
 	    /**
 	     * Sign message.
 	     * @param message 32-byte message.
+	     *
+	     * Noble's sync `sign` already produces deterministic RFC6979 signatures with
+	     * lowS enforced by default — both of which are what the old retry-with-
+	     * extra-entropy loop was trying to guarantee. The result is therefore
+	     * *always* canonical, so the loop is unnecessary. We keep the
+	     * `isCanonicalSignature` assertion as a defensive sanity check.
+	     *
+	     * We pass `prehash: false` because `message` is already a sha256 digest
+	     * (produced by transactionDigest). Without that flag noble would sha256
+	     * the digest a second time and produce a bogus signature.
 	     */
 	    sign(message: Buffer): Signature;
 	    /**
@@ -975,7 +993,15 @@ declare module 'dpixa/crypto' {
 	     */
 	    inspect(): string;
 	    /**
-	     * Get shared secret for memo cryptography
+	     * Get shared secret for memo cryptography.
+	     *
+	     * The Hive/Pixa memo protocol is: multiply peer's pubkey point by our
+	     * private scalar, take the 32-byte x-coordinate, sha512 it. `getSharedSecret`
+	     * returns the compressed-encoded shared point (33 bytes: parity byte + x);
+	     * slicing off byte 0 gives us exactly the x-coordinate the protocol wants.
+	     *
+	     * This replaces the previous bigi + ecurve point multiplication. Verified
+	     * that both paths produce byte-for-byte identical output.
 	     */
 	    get_shared_secret(public_key: PublicKey): Buffer;
 	}
@@ -985,12 +1011,20 @@ declare module 'dpixa/crypto' {
 	export class Signature {
 	    data: Buffer;
 	    recovery: number;
-	    constructor(data: Uint8Array | Buffer, recovery: number);
+	    constructor(data: Uint8Array | Buffer | ArrayLike<number>, recovery: number);
 	    static fromBuffer(buffer: Buffer): Signature;
 	    static fromString(string: string): Signature;
 	    /**
 	     * Recover public key from signature by providing original signed message.
 	     * @param message 32-byte message that was used to create the signature.
+	     *
+	     * `@noble/secp256k1` v3's `recoverPublicKey` takes the "recovered" format:
+	     * a 65-byte Uint8Array laid out as [recovery_byte(1) || r(32) || s(32)].
+	     * Note that's *recovery first*, unlike our internal wire format
+	     * (`toBuffer` below) which puts `recovery + 31` first then the 64-byte
+	     * compact sig. Same shape, different byte values — we just rebuild it.
+	     *
+	     * `prehash: false` because the message is already a sha256 digest.
 	     */
 	    recover(message: Buffer, prefix?: string): PublicKey;
 	    toBuffer(): Buffer;

@@ -34,13 +34,12 @@
  */
 
 import * as assert from 'assert'
-import { createHash } from 'crypto'
-import * as bigInteger from 'bigi'
 import * as bs58 from './base58'
 import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
-import * as ecurve from 'ecurve'
-import * as Ripemd160 from 'ripemd160'
-import * as secp256k1 from 'secp256k1'
+import { RIPEMD160 } from 'ripemd160-min'
+import * as secp256k1 from '@noble/secp256k1'
+import { hmac } from '@noble/hashes/hmac.js'
+import { sha256 as nobleSha256, sha512 as nobleSha512 } from '@noble/hashes/sha2.js'
 import { VError } from 'verror'
 import { Types } from './chain/serializer'
 import { SignedTransaction, Transaction } from './chain/transaction'
@@ -48,48 +47,96 @@ import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
 import { copy } from './utils'
 
 /**
- * secp256k1 ecurve
+ * Wire up the synchronous hash providers that `@noble/secp256k1` v3 needs
+ * for its sync `sign` / `verify` / `recoverPublicKey` entry points. Without
+ * this, those calls throw; only the async variants work out of the box.
+ *
+ * We do this at module load so every subsequent call into `secp256k1.sign`,
+ * `secp256k1.verify`, etc. has a functioning hmac-sha256 backend.
  */
-const secp256k1Curve = ecurve.getCurveByName('secp256k1')
+secp256k1.hashes.sha256 = nobleSha256
+secp256k1.hashes.hmacSha256 = (key, msg) => hmac(nobleSha256, key, msg)
 
 /**
- * Network id used in WIF-encoding.
+ * UTF-8 encoder used by the hash helpers below to accept `string` inputs.
+ * Sharing one instance is a micro-optimisation — TextEncoder is stateless.
  */
-export const NETWORK_ID = Buffer.from([0x80])
+const utf8 = new TextEncoder()
+
+/**
+ * Normalise a hash helper's input to a Uint8Array.
+ *
+ * `@noble/hashes` and `ripemd160-min` both require byte inputs — neither
+ * accepts strings. Node's `createHash(...).update(str)` did the UTF-8
+ * encoding for us, so to keep call sites like `sha256(seed)` working with
+ * a plain string, we do the encoding here.
+ */
+function toBytes(input: Uint8Array | Buffer | string): Uint8Array {
+  return typeof input === 'string' ? utf8.encode(input) : input
+}
 
 /**
  * Return ripemd160 hash of input.
+ *
+ * Switched from the `ripemd160` package (which exposed a default class) to
+ * `ripemd160-min`. Key differences:
+ *   - Use the named import `{ RIPEMD160 }` — the package's default export
+ *     isn't callable as a constructor under ESM interop.
+ *   - `.update()` only accepts bytes (Uint8Array or number[]), so strings
+ *     must be encoded first (handled by `toBytes`).
+ *   - `.digest()` returns a Uint8Array, not a Node Buffer — we wrap it in
+ *     `Buffer.from(...)` so callers can still use `.slice()` / `.toString('hex')`.
  */
-function ripemd160(input: Buffer | string): Buffer {
-  return new Ripemd160()
-      .update(input)
-      .digest()
+function ripemd160(input: Uint8Array | Buffer | string): Buffer {
+  const h = new RIPEMD160()
+  h.update(toBytes(input))
+  return Buffer.from(h.digest() as Uint8Array)
 }
 
 /**
  * Return sha256 hash of input.
+ *
+ * Uses `@noble/hashes/sha2.js`. `sha256` is directly callable as a function
+ * (no createHash/update/digest boilerplate) and returns a Uint8Array; we
+ * wrap that in `Buffer.from(...)` for `.slice()` / `.toString('hex')` users.
  */
-function sha256(input: Buffer | string): Buffer {
-  return createHash('sha256')
-      .update(input)
-      .digest()
+function sha256(input: Uint8Array | Buffer | string): Buffer {
+  return Buffer.from(nobleSha256(toBytes(input)))
 }
 
 /**
- * Return sha512 hash of input
+ * Return sha512 hash of input.
  */
-function sha512(input: Buffer | string): Buffer {
-  return createHash('sha512')
-      .update(input)
-      .digest()
+function sha512(input: Uint8Array | Buffer | string): Buffer {
+  return Buffer.from(nobleSha512(toBytes(input)))
 }
 
 /**
  * Return 2-round sha256 hash of input.
  */
-function doubleSha256(input: Buffer | string): Buffer {
+function doubleSha256(input: Uint8Array | Buffer | string): Buffer {
   return sha256(sha256(input))
 }
+
+/**
+ * Convert a big-endian byte array to a bigint.
+ *
+ * Used to turn a 32-byte secp256k1 secret key into the bigint scalar that
+ * `noble`'s `Point.multiply` expects. Equivalent to the previous
+ * `bigi.fromBuffer(bytes)` call — same byte ordering, same resulting number.
+ */
+function bytesToBigInt(bytes: Uint8Array): bigint {
+  let n = 0n
+  for (let i = 0; i < bytes.length; i++) {
+    n = (n << 8n) | BigInt(bytes[i])
+  }
+  return n
+}
+
+/**
+ * Network id used in WIF-encoding.
+ */
+export const NETWORK_ID = Buffer.from([0x80])
 
 /**
  * Encode public key with bs58+ripemd160-checksum.
@@ -142,8 +189,9 @@ function decodePrivate(encodedKey: string): Buffer {
 
 /**
  * Return true if signature is canonical, otherwise false.
+ * Accepts any byte array (typed array or Buffer) — only indexed reads are used.
  */
-function isCanonicalSignature(signature: Buffer): boolean {
+function isCanonicalSignature(signature: Uint8Array | Buffer | ArrayLike<number>): boolean {
   return (
       !(signature[0] & 0x80) &&
       !(signature[0] === 0 && !(signature[1] & 0x80)) &&
@@ -180,12 +228,17 @@ export class PublicKey {
       public readonly key: any,
       public readonly prefix = DEFAULT_ADDRESS_PREFIX,
   ) {
-    assert(secp256k1.publicKeyVerify(key), 'invalid public key')
-    this.uncompressed = Buffer.from(secp256k1.publicKeyConvert(key, false))
+    // @noble/secp256k1 v3: utils.isValidPublicKey accepts both compressed
+    // (33-byte) and uncompressed (65-byte) SEC1 encodings.
+    assert(secp256k1.utils.isValidPublicKey(key), 'invalid public key')
+    // Point.fromBytes(...).toBytes(false) is the noble equivalent of the old
+    // publicKeyConvert(key, false) — it re-encodes as 65-byte uncompressed.
+    // Wrap in Buffer.from so we get an independent BBuffer allocation.
+    this.uncompressed = Buffer.from(secp256k1.Point.fromBytes(key).toBytes(false))
   }
 
   public static fromBuffer(key: ByteBuffer) {
-    assert(secp256k1.publicKeyVerify(key), 'invalid buffer as public key')
+    assert(secp256k1.utils.isValidPublicKey(key as any), 'invalid buffer as public key')
     return { key }
   }
 
@@ -214,7 +267,10 @@ export class PublicKey {
    * @param signature Signature to verify.
    */
   public verify(message: Buffer, signature: Signature): boolean {
-    return secp256k1.verify(message, signature.data, this.key)
+    // @noble/secp256k1 v3: verify(sig, message, pubKey, opts). Our messages
+    // are already sha256 digests (transactionDigest produces one), so we MUST
+    // pass prehash: false — otherwise noble would sha256 it a second time.
+    return secp256k1.verify(signature.data, message, this.key, { prehash: false })
   }
 
   /**
@@ -248,7 +304,8 @@ export class PrivateKey {
   public secret: Buffer
 
   constructor(private key: Buffer) {
-    assert(secp256k1.privateKeyVerify(key), 'invalid private key')
+    // @noble/secp256k1 v3: utils.isValidSecretKey replaces privateKeyVerify.
+    assert(secp256k1.utils.isValidSecretKey(key), 'invalid private key')
   }
 
   /**
@@ -288,31 +345,51 @@ export class PrivateKey {
     return PrivateKey.fromSeed(seed)
   }
 
+  /**
+   * Multiply a public key by this private key's scalar. Equivalent to the old
+   * secp256k1-node `publicKeyTweakMul(pub, secret, compressed=false)`.
+   *
+   * Implemented via noble's Point math: convert pub bytes to a Point, convert
+   * this.key (big-endian 32-byte scalar) to a bigint, multiply, and re-encode
+   * as uncompressed (matching the old `false` compressed flag).
+   */
   public multiply(pub: any): Buffer {
-    return Buffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false))
+    const scalar = bytesToBigInt(this.key)
+    const point = secp256k1.Point.fromBytes(pub.key)
+    return Buffer.from(point.multiply(scalar).toBytes(false))
   }
 
   /**
    * Sign message.
    * @param message 32-byte message.
+   *
+   * Noble's sync `sign` already produces deterministic RFC6979 signatures with
+   * lowS enforced by default — both of which are what the old retry-with-
+   * extra-entropy loop was trying to guarantee. The result is therefore
+   * *always* canonical, so the loop is unnecessary. We keep the
+   * `isCanonicalSignature` assertion as a defensive sanity check.
+   *
+   * We pass `prehash: false` because `message` is already a sha256 digest
+   * (produced by transactionDigest). Without that flag noble would sha256
+   * the digest a second time and produce a bogus signature.
    */
   public sign(message: Buffer): Signature {
-    let rv: { signature: Buffer; recovery: number }
-    let attempts = 0
-    do {
-      const options = {
-        data: sha256(Buffer.concat([message, Buffer.alloc(1, ++attempts)]))
-      }
-      rv = secp256k1.sign(message, this.key, options)
-    } while (!isCanonicalSignature(rv.signature))
-    return new Signature(rv.signature, rv.recovery)
+    const recovered = secp256k1.sign(message, this.key, {
+      prehash: false,
+      format: 'recovered'
+    })
+    // Noble's "recovered" format is [recovery_byte(1) || r(32) || s(32)].
+    const recovery = recovered[0]
+    const sigData = recovered.slice(1) // 64-byte compact r||s
+    assert(isCanonicalSignature(sigData), 'noble returned a non-canonical signature')
+    return new Signature(sigData, recovery)
   }
 
   /**
    * Derive the public key for this private key.
    */
   public createPublic(prefix?: string): PublicKey {
-    return new PublicKey(secp256k1.publicKeyCreate(this.key), prefix)
+    return new PublicKey(secp256k1.getPublicKey(this.key, true), prefix)
   }
 
   /**
@@ -332,17 +409,20 @@ export class PrivateKey {
   }
 
   /**
-   * Get shared secret for memo cryptography
+   * Get shared secret for memo cryptography.
+   *
+   * The Hive/Pixa memo protocol is: multiply peer's pubkey point by our
+   * private scalar, take the 32-byte x-coordinate, sha512 it. `getSharedSecret`
+   * returns the compressed-encoded shared point (33 bytes: parity byte + x);
+   * slicing off byte 0 gives us exactly the x-coordinate the protocol wants.
+   *
+   * This replaces the previous bigi + ecurve point multiplication. Verified
+   * that both paths produce byte-for-byte identical output.
    */
   public get_shared_secret(public_key: PublicKey): Buffer {
-    const KBP = ecurve.Point.fromAffine(
-        secp256k1Curve,
-        bigInteger.fromBuffer(public_key.uncompressed.slice(1, 33)),
-        bigInteger.fromBuffer(public_key.uncompressed.slice(33, 65))
-    )
-    const P = KBP.multiply(bigInteger.fromBuffer(this.key))
-    const S = P.affineX.toBuffer({size: 32})
-    return sha512(S)
+    const sharedCompressed = secp256k1.getSharedSecret(this.key, public_key.key, true)
+    const xCoord = sharedCompressed.slice(1) // drop the 02/03 parity byte
+    return sha512(xCoord)
   }
 }
 
@@ -353,12 +433,14 @@ export class Signature {
   public data: Buffer
   public recovery: number
 
-  constructor(data: Uint8Array | Buffer, recovery: number) {
-    assert.equal(data.length, 64, 'invalid signature')
+  constructor(data: Uint8Array | Buffer | ArrayLike<number>, recovery: number) {
+    assert.equal((data as { length: number }).length, 64, 'invalid signature')
     // Normalise to BBuffer so .copy(), .toString('hex'), etc. always work
     // regardless of whether the caller passed a Node Buffer, a plain Uint8Array
-    // (e.g. from secp256k1 in browser builds), or our own BBuffer.
-    this.data = data instanceof Buffer ? data : Buffer.from(data)
+    // (e.g. from secp256k1, whose types use Uint8Array<ArrayBufferLike>), or
+    // our own BBuffer. Using Buffer.from here always produces an independent
+    // copy — no ArrayBuffer aliasing with the caller's data.
+    this.data = data instanceof Buffer ? data : Buffer.from(data as any)
     this.recovery = recovery
   }
 
@@ -376,10 +458,21 @@ export class Signature {
   /**
    * Recover public key from signature by providing original signed message.
    * @param message 32-byte message that was used to create the signature.
+   *
+   * `@noble/secp256k1` v3's `recoverPublicKey` takes the "recovered" format:
+   * a 65-byte Uint8Array laid out as [recovery_byte(1) || r(32) || s(32)].
+   * Note that's *recovery first*, unlike our internal wire format
+   * (`toBuffer` below) which puts `recovery + 31` first then the 64-byte
+   * compact sig. Same shape, different byte values — we just rebuild it.
+   *
+   * `prehash: false` because the message is already a sha256 digest.
    */
   public recover(message: Buffer, prefix?: string) {
+    const recovered = new Uint8Array(65)
+    recovered[0] = this.recovery
+    recovered.set(this.data, 1)
     return new PublicKey(
-        secp256k1.recover(message, this.data, this.recovery),
+        secp256k1.recoverPublicKey(recovered, message, { prehash: false }),
         prefix
     )
   }

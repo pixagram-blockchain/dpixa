@@ -1,4 +1,3 @@
-
 SHELL := /bin/bash
 PATH  := ./node_modules/.bin:$(PATH)
 
@@ -18,15 +17,31 @@ lib: $(SRC_FILES) node_modules
 	echo "$$VERSION_TEMPLATE" > lib/version.js
 	touch lib
 
+# Bundle rule.
+#
+# Changes from the previous version:
+#   * `--plugin esmify` lets browserify 16's CJS-only parser understand
+#     import/export syntax in ESM-only npm packages (@noble/secp256k1@3,
+#     @noble/hashes@2).
+#   * `--plugin ./scripts/esmify-ts-patch.js` works around an esmify bug
+#     (hardcoded [.mjs, .js] extension list in its resolver) that otherwise
+#     breaks extensionless imports of .ts files, e.g. `export * from './index'`
+#     in index-browser.ts. Must run AFTER esmify.
+#   * The babelify transform now runs `--global` with `--extensions .ts
+#     --extensions .js` so that dependencies in node_modules are also
+#     transpiled. This is required because @noble/hashes uses ES2021 syntax
+#     like `||=` that browserify 16's bundled acorn@7 parser can't handle.
+#     Preset config lives in `babel.config.js` at the project root — that
+#     specific filename is the one Babel applies to node_modules too.
 dist/%.js: lib
 	browserify $(filter-out $<,$^) --debug --full-paths \
-		--standalone dpixa --plugin tsify \
-		--transform [ babelify --extensions .ts ] \
-		| derequire > $@
+	   --standalone dpixa --plugin tsify --plugin esmify --plugin ./scripts/esmify-ts-patch.js \
+	   --transform [ babelify --extensions .ts --extensions .js --global ] \
+	   | derequire > $@
 	terser $@ \
-		--source-map "content=inline,url=$(notdir $@).map,filename=$@.map" \
-		--compress "dead_code,collapse_vars,reduce_vars,keep_infinity,drop_console,passes=2" \
-		--output $@ || rm $@
+	   --source-map "content=inline,url=$(notdir $@).map,filename=$@.map" \
+	   --compress "dead_code,collapse_vars,reduce_vars,keep_infinity,drop_console,passes=2" \
+	   --output $@ || rm $@
 
 dist/dpixa.js: src/index-browser.ts
 
@@ -55,7 +70,7 @@ ci-test: node_modules
 .PHONY: browser-test
 browser-test: dist/dpixa.js
 	BUILD_NUMBER="$$(git rev-parse --short HEAD)-$$(date +%s)" \
-		karma start test/_karma-sauce.js
+	   karma start test/_karma-sauce.js
 
 .PHONY: browser-test-local
 browser-test-local: dist/dpixa.js

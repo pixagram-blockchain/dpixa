@@ -6,7 +6,7 @@
 
 # Class: Signature
 
-Defined in: crypto.ts:352
+Defined in: crypto.ts:432
 
 ECDSA (secp256k1) signature.
 
@@ -16,13 +16,13 @@ ECDSA (secp256k1) signature.
 
 > **new Signature**(`data`, `recovery`): `Signature`
 
-Defined in: crypto.ts:356
+Defined in: crypto.ts:436
 
 #### Parameters
 
 ##### data
 
-`Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
+`ArrayLike`\<`number`\> \| `Uint8Array`\<`ArrayBufferLike`\> \| `BBuffer`
 
 ##### recovery
 
@@ -38,7 +38,7 @@ Defined in: crypto.ts:356
 
 > **data**: `BBuffer`
 
-Defined in: crypto.ts:353
+Defined in: crypto.ts:433
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: crypto.ts:353
 
 > **recovery**: `number`
 
-Defined in: crypto.ts:354
+Defined in: crypto.ts:434
 
 ## Methods
 
@@ -54,7 +54,7 @@ Defined in: crypto.ts:354
 
 > **recover**(`message`, `prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:380
+Defined in: crypto.ts:470
 
 Recover public key from signature by providing original signed message.
 
@@ -65,6 +65,14 @@ Recover public key from signature by providing original signed message.
 `BBuffer`
 
 32-byte message that was used to create the signature.
+
+`@noble/secp256k1` v3's `recoverPublicKey` takes the "recovered" format:
+a 65-byte Uint8Array laid out as [recovery_byte(1) || r(32) || s(32)].
+Note that's *recovery first*, unlike our internal wire format
+(`toBuffer` below) which puts `recovery + 31` first then the 64-byte
+compact sig. Same shape, different byte values — we just rebuild it.
+
+`prehash: false` because the message is already a sha256 digest.
 
 ##### prefix?
 
@@ -80,7 +88,7 @@ Recover public key from signature by providing original signed message.
 
 > **toBuffer**(): `BBuffer`
 
-Defined in: crypto.ts:387
+Defined in: crypto.ts:480
 
 #### Returns
 
@@ -92,7 +100,7 @@ Defined in: crypto.ts:387
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:394
+Defined in: crypto.ts:487
 
 #### Returns
 
@@ -104,7 +112,7 @@ Defined in: crypto.ts:394
 
 > `static` **fromBuffer**(`buffer`): `Signature`
 
-Defined in: crypto.ts:365
+Defined in: crypto.ts:447
 
 #### Parameters
 
@@ -122,7 +130,7 @@ Defined in: crypto.ts:365
 
 > `static` **fromString**(`string`): `Signature`
 
-Defined in: crypto.ts:372
+Defined in: crypto.ts:454
 
 #### Parameters
 
