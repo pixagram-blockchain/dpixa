@@ -28,3 +28,4 @@ export interface Notifications {
     msg: string
     url: string
 }
+

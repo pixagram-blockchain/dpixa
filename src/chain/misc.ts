@@ -33,10 +33,10 @@
  * You acknowledge that this software is not designed, licensed or intended for use
  * in the design, construction, operation or maintenance of any military facility.
  */
-import { Account } from './account'
-import { Asset, Price } from './asset'
 // Custom Uint8Array-backed Buffer shim (see bytebuffer.ts).
 import { BBuffer as Buffer } from '../bytebuffer'
+import { Account } from './account'
+import { Asset, Price } from './asset'
 
 /**
  * Large number that may be unsafe to represent natively in JavaScript.
@@ -51,12 +51,20 @@ export class HexBuffer {
 
     /**
      * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
+     *
+     * Accepts any Uint8Array-backed buffer, which includes the bundled BBuffer,
+     * Node's native Buffer, and plain Uint8Array. Previously the parameter was
+     * typed as just `Buffer` (= BBuffer in this file) which rejected Node
+     * Buffers even though they work identically at runtime — broke the
+     * operations test suite under strict TS.
      */
-    public static from(value: Buffer | HexBuffer | number[] | string) {
+    public static from(value: Uint8Array | HexBuffer | number[] | string) {
         if (value instanceof HexBuffer) {
             return value
-        } else if (value instanceof Buffer) {
-            return new HexBuffer(value)
+        } else if (value instanceof Uint8Array) {
+            // Both BBuffer and Node's Buffer extend Uint8Array. Wrap in BBuffer
+            // so downstream `.toString('hex')` calls are consistent.
+            return new HexBuffer(Buffer.from(value))
         } else if (typeof value === 'string') {
             return new HexBuffer(Buffer.from(value, 'hex'))
         } else {

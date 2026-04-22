@@ -34,13 +34,13 @@
  */
 
 import * as assert from 'assert'
-import * as bs58 from './base58'
-import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
-import { RIPEMD160 } from 'ripemd160-min'
-import * as secp256k1 from '@noble/secp256k1'
 import { hmac } from '@noble/hashes/hmac.js'
 import { sha256 as nobleSha256, sha512 as nobleSha512 } from '@noble/hashes/sha2.js'
+import * as secp256k1 from '@noble/secp256k1'
+import { RIPEMD160 } from 'ripemd160-min'
 import { VError } from 'verror'
+import * as bs58 from './base58'
+import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
 import { Types } from './chain/serializer'
 import { SignedTransaction, Transaction } from './chain/transaction'
 import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
@@ -127,8 +127,8 @@ function doubleSha256(input: Uint8Array | Buffer | string): Buffer {
  */
 function bytesToBigInt(bytes: Uint8Array): bigint {
   let n = 0n
-  for (let i = 0; i < bytes.length; i++) {
-    n = (n << 8n) | BigInt(bytes[i])
+  for (const b of bytes) {
+    n = (n << 8n) | BigInt(b)
   }
   return n
 }
@@ -212,7 +212,7 @@ function isWif(privWif: string | Buffer): boolean {
     newChecksum = sha256(newChecksum)
     newChecksum = newChecksum.slice(0, 4)
     return (checksum.toString() === newChecksum.toString())
-  } catch (e) {
+  } catch {
     return false
   }
 }
@@ -226,7 +226,7 @@ export class PublicKey {
 
   constructor(
       public readonly key: any,
-      public readonly prefix = DEFAULT_ADDRESS_PREFIX,
+      public readonly prefix = DEFAULT_ADDRESS_PREFIX
   ) {
     // @noble/secp256k1 v3: utils.isValidPublicKey accepts both compressed
     // (33-byte) and uncompressed (65-byte) SEC1 encodings.
@@ -361,28 +361,46 @@ export class PrivateKey {
 
   /**
    * Sign message.
-   * @param message 32-byte message.
+   * @param message 32-byte message (typically a sha256 digest).
    *
-   * Noble's sync `sign` already produces deterministic RFC6979 signatures with
-   * lowS enforced by default — both of which are what the old retry-with-
-   * extra-entropy loop was trying to guarantee. The result is therefore
-   * *always* canonical, so the loop is unnecessary. We keep the
-   * `isCanonicalSignature` assertion as a defensive sanity check.
+   * Noble's sync `sign` is deterministic RFC6979 with `lowS` enforced, BUT
+   * "lowS" only constrains `s <= n/2`. The Hive/Pixa wire format additionally
+   * requires both `r` and `s` to have their high byte bit clear (see
+   * `isCanonicalSignature`) — a stricter predicate than lowS. Roughly a
+   * quarter of RFC6979 signatures fail it, so we reproduce the original
+   * secp256k1-node retry loop: perturb the RFC6979 nonce via `extraEntropy`
+   * until the resulting signature passes `isCanonicalSignature`.
    *
-   * We pass `prehash: false` because `message` is already a sha256 digest
-   * (produced by transactionDigest). Without that flag noble would sha256
-   * the digest a second time and produce a bogus signature.
+   * Important: `extraEntropy` only mixes into nonce derivation — it does NOT
+   * change the message being signed. The returned signature still verifies
+   * (and recovers) against the original `message`.
+   *
+   * `prehash: false` because `message` is already a digest; noble would
+   * otherwise sha256 it a second time.
    */
   public sign(message: Buffer): Signature {
-    const recovered = secp256k1.sign(message, this.key, {
-      prehash: false,
-      format: 'recovered'
-    })
-    // Noble's "recovered" format is [recovery_byte(1) || r(32) || s(32)].
-    const recovery = recovered[0]
-    const sigData = recovered.slice(1) // 64-byte compact r||s
-    assert(isCanonicalSignature(sigData), 'noble returned a non-canonical signature')
-    return new Signature(sigData, recovery)
+    let sigData: Uint8Array
+    let recovery: number
+    let attempts = 0
+    do {
+      // 0 -> no extra entropy (matches the old first attempt of the loop).
+      // >0 -> 32-byte buffer filled with the attempt counter, fed into RFC6979.
+      const extraEntropy = attempts === 0 ? false : Buffer.alloc(32, attempts)
+      const recovered = secp256k1.sign(message, this.key, {
+        prehash: false,
+        format: 'recovered',
+        extraEntropy
+      })
+      // Noble's "recovered" format is [recovery_byte(1) || r(32) || s(32)].
+      recovery = recovered[0]
+      sigData = recovered.slice(1)
+      attempts++
+      // Cap attempts defensively. Each attempt has ~3/4 success probability
+      // for the canonical predicate, so exhausting 64 tries has probability
+      // ~(1/4)^64 ≈ 10^-38 — effectively impossible for any real key.
+      assert(attempts < 64, 'unable to find canonical signature')
+    } while (!isCanonicalSignature(sigData))
+    return new Signature(Buffer.from(sigData), recovery)
   }
 
   /**

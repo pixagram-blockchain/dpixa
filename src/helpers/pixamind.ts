@@ -47,10 +47,6 @@ interface CommunityQuery {
     observer: string
 }
 
-interface CommunityRolesQuery {
-    community: string
-}
-
 interface AccountNotifsQuery {
     account: Account['name']
     limit: number
@@ -67,9 +63,10 @@ interface ListCommunitiesQuery {
      */
     limit: number
     /**
-     * To be developed, not ready yet
+     * To be developed, not ready yet. Currently always a string; typed as
+     * `any` to allow richer query objects in future without a breaking change.
      */
-    query?: string | any
+    query?: any
     /**
      * Observer account
      */
@@ -138,3 +135,4 @@ export class PixamindAPI {
         return this.call('list_communities', options)
     }
 }
+

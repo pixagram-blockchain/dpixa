@@ -34,7 +34,7 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import ByteBuffer, { BBuffer as Buffer } from '../bytebuffer'
+import { BBuffer as Buffer } from '../bytebuffer'
 import { PublicKey } from '../crypto'
 import { Asset } from './asset'
 import { HexBuffer } from './misc'
@@ -42,7 +42,7 @@ import { Operation } from './operation'
 
 export type Serializer = (buffer: any, data: any) => void
 
-const VoidSerializer = (buffer: any) => {
+const VoidSerializer = (_buffer: any) => {
   throw new Error('Void can not be serialized')
 }
 
@@ -87,8 +87,8 @@ const BooleanSerializer = (buffer: any, data: boolean) => {
 }
 
 const StaticVariantSerializer = (itemSerializers: Serializer[]) => (
-  buffer: any,
-  data: [number, any]
+    buffer: any,
+    data: [number, any]
 ) => {
   const [id, item] = data
   buffer.writeVarint32(id)
@@ -115,13 +115,13 @@ const DateSerializer = (buffer: any, data: string) => {
 }
 
 const PublicKeySerializer = (
-  buffer: any,
-  data: PublicKey | string | null
+    buffer: any,
+    data: PublicKey | string | null
 ) => {
   if (
-    data === null ||
-    (typeof data === 'string' &&
-      data.endsWith('1111111111111111111111111111111114T1Anm'))
+      data === null ||
+      (typeof data === 'string' &&
+          data.endsWith('1111111111111111111111111111111114T1Anm'))
   ) {
     buffer.append(Buffer.alloc(33, 0))
   } else {
@@ -130,15 +130,15 @@ const PublicKeySerializer = (
 }
 
 const BinarySerializer = (size?: number) => (
-  buffer: any,
-  data: Buffer | HexBuffer
+    buffer: any,
+    data: Buffer | HexBuffer
 ) => {
   data = HexBuffer.from(data)
   const len = data.buffer.length
   if (size) {
     if (len !== size) {
       throw new Error(
-        `Unable to serialize binary. Expected ${size} bytes, got ${len}`
+          `Unable to serialize binary. Expected ${size} bytes, got ${len}`
       )
     }
   } else {
@@ -150,8 +150,8 @@ const BinarySerializer = (size?: number) => (
 const VariableBinarySerializer = BinarySerializer()
 
 const FlatMapSerializer = (
-  keySerializer: Serializer,
-  valueSerializer: Serializer
+    keySerializer: Serializer,
+    valueSerializer: Serializer
 ) => (buffer: any, data: [any, any][]) => {
   buffer.writeVarint32(data.length)
   for (const [key, value] of data) {
@@ -161,8 +161,8 @@ const FlatMapSerializer = (
 }
 
 const ArraySerializer = (itemSerializer: Serializer) => (
-  buffer: any,
-  data: any[]
+    buffer: any,
+    data: any[]
 ) => {
   buffer.writeVarint32(data.length)
   for (const item of data) {
@@ -171,8 +171,8 @@ const ArraySerializer = (itemSerializer: Serializer) => (
 }
 
 const ObjectSerializer = (keySerializers: [string, Serializer][]) => (
-  buffer: any,
-  data: { [key: string]: any }
+    buffer: any,
+    data: { [key: string]: any }
 ) => {
   for (const [key, serializer] of keySerializers) {
     try {
@@ -185,8 +185,8 @@ const ObjectSerializer = (keySerializers: [string, Serializer][]) => (
 }
 
 const OptionalSerializer = (valueSerializer: Serializer) => (
-  buffer: any,
-  data: any
+    buffer: any,
+    data: any
 ) => {
   if (data) {
     buffer.writeByte(1)
@@ -232,8 +232,8 @@ const ChainPropertiesSerializer = ObjectSerializer([
 ])
 
 const OperationDataSerializer = (
-  operationId: number,
-  definitions: [string, Serializer][]
+    operationId: number,
+    definitions: [string, Serializer][]
 ) => {
   const objectSerializer = ObjectSerializer(definitions)
   return (buffer: any, data: { [key: string]: any }) => {
@@ -255,19 +255,19 @@ OperationSerializers.account_create = OperationDataSerializer(9, [
 ])
 
 OperationSerializers.account_create_with_delegation = OperationDataSerializer(
-  41,
-  [
-    ['fee', AssetSerializer],
-    ['delegation', AssetSerializer],
-    ['creator', StringSerializer],
-    ['new_account_name', StringSerializer],
-    ['owner', AuthoritySerializer],
-    ['active', AuthoritySerializer],
-    ['posting', AuthoritySerializer],
-    ['memo_key', PublicKeySerializer],
-    ['json_metadata', StringSerializer],
-    ['extensions', ArraySerializer(VoidSerializer)]
-  ]
+    41,
+    [
+      ['fee', AssetSerializer],
+      ['delegation', AssetSerializer],
+      ['creator', StringSerializer],
+      ['new_account_name', StringSerializer],
+      ['owner', AuthoritySerializer],
+      ['active', AuthoritySerializer],
+      ['posting', AuthoritySerializer],
+      ['memo_key', PublicKeySerializer],
+      ['json_metadata', StringSerializer],
+      ['extensions', ArraySerializer(VoidSerializer)]
+    ]
 )
 
 OperationSerializers.account_update = OperationDataSerializer(10, [
@@ -291,11 +291,11 @@ OperationSerializers.account_witness_vote = OperationDataSerializer(12, [
 ])
 
 OperationSerializers.cancel_transfer_from_savings = OperationDataSerializer(
-  34,
-  [
-    ['from', StringSerializer],
-    ['request_id', UInt32Serializer]
-  ]
+    34,
+    [
+      ['from', StringSerializer],
+      ['request_id', UInt32Serializer]
+    ]
 )
 
 OperationSerializers.change_recovery_account = OperationDataSerializer(26, [
@@ -337,11 +337,11 @@ OperationSerializers.comment_options = OperationDataSerializer(19, [
   [
     'extensions',
     ArraySerializer(
-      StaticVariantSerializer([
-        ObjectSerializer([
-          ['beneficiaries', ArraySerializer(BeneficiarySerializer)]
+        StaticVariantSerializer([
+          ObjectSerializer([
+            ['beneficiaries', ArraySerializer(BeneficiarySerializer)]
+          ])
         ])
-      ])
     )
   ]
 ])
@@ -680,3 +680,4 @@ export const Types = {
   UInt8: UInt8Serializer,
   Void: VoidSerializer
 }
+

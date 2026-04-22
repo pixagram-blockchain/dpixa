@@ -1,6 +1,6 @@
 {
   "name": "@pixagram/dpixa",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "Pixa blockchain RPC client library",
   "author": "pixa-blockchain",
   "license": "BSD-3-Clause-No-Military-License",
@@ -22,7 +22,7 @@
   "scripts": {
     "lint": "make lint",
     "test": "make ci-test",
-    "prepublish": "make all"
+    "prepublishOnly": "make all"
   },
   "keywords": [
     "blockchain",
@@ -54,16 +54,15 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^24.10.1",
     "@types/verror": "^1.10.3",
-    "@typescript-eslint/eslint-plugin": "^2.24.0",
-    "@typescript-eslint/eslint-plugin-tslint": "^2.24.0",
-    "@typescript-eslint/parser": "^2.24.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
     "coveralls": "^3.0.11",
     "derequire": "^2.0.6",
     "dts-generator": "^2.1.0",
     "encoding": "^0.1.12",
-    "eslint": "^6.8.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prefer-arrow": "^1.1.7",
     "esmify": "^2.1.1",

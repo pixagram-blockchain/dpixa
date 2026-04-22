@@ -6,7 +6,7 @@
 
 # Class: PixamindAPI
 
-Defined in: helpers/pixamind.ts:79
+Defined in: helpers/pixamind.ts:76
 
 ## Constructors
 
@@ -14,7 +14,7 @@ Defined in: helpers/pixamind.ts:79
 
 > **new PixamindAPI**(`client`): `PixamindAPI`
 
-Defined in: helpers/pixamind.ts:80
+Defined in: helpers/pixamind.ts:77
 
 #### Parameters
 
@@ -32,7 +32,7 @@ Defined in: helpers/pixamind.ts:80
 
 > `readonly` **client**: [`Client`](Client.md)
 
-Defined in: helpers/pixamind.ts:80
+Defined in: helpers/pixamind.ts:77
 
 ## Methods
 
@@ -40,7 +40,7 @@ Defined in: helpers/pixamind.ts:80
 
 > **call**(`method`, `params?`): `Promise`\<`any`\>
 
-Defined in: helpers/pixamind.ts:87
+Defined in: helpers/pixamind.ts:84
 
 Convenience of calling pixamind api
 
@@ -64,7 +64,7 @@ Convenience of calling pixamind api
 
 > **getAccountNotifications**(`options?`): `Promise`\<[`Notifications`](../interfaces/Notifications.md)[]\>
 
-Defined in: helpers/pixamind.ts:129
+Defined in: helpers/pixamind.ts:126
 
 Get particular account notifications feed
 
@@ -84,7 +84,7 @@ Get particular account notifications feed
 
 > **getAccountPosts**(`options`): `Promise`\<[`Discussion`](../interfaces/Discussion.md)[]\>
 
-Defined in: helpers/pixamind.ts:103
+Defined in: helpers/pixamind.ts:100
 
 Get posts by particular account from Pixamind
 
@@ -104,7 +104,7 @@ Get posts by particular account from Pixamind
 
 > **getCommunity**(`options`): `Promise`\<[`CommunityDetail`](../interfaces/CommunityDetail.md)[]\>
 
-Defined in: helpers/pixamind.ts:112
+Defined in: helpers/pixamind.ts:109
 
 Get community details such as who are the admin,
 moderators, how many subscribers, etc..
@@ -125,7 +125,7 @@ moderators, how many subscribers, etc..
 
 > **getRankedPosts**(`options`): `Promise`\<[`Discussion`](../interfaces/Discussion.md)[]\>
 
-Defined in: helpers/pixamind.ts:95
+Defined in: helpers/pixamind.ts:92
 
 Get trending, hot, recent community posts from Pixamind
 
@@ -145,7 +145,7 @@ Get trending, hot, recent community posts from Pixamind
 
 > **listAllSubscriptions**(`account`): `Promise`\<[`Discussion`](../interfaces/Discussion.md)[]\>
 
-Defined in: helpers/pixamind.ts:121
+Defined in: helpers/pixamind.ts:118
 
 List all subscriptions by particular account
 
@@ -169,7 +169,7 @@ return role, what community the account joined
 
 > **listCommunities**(`options`): `Promise`\<[`CommunityDetail`](../interfaces/CommunityDetail.md)[]\>
 
-Defined in: helpers/pixamind.ts:137
+Defined in: helpers/pixamind.ts:134
 
 List all available communities on pixamind
 

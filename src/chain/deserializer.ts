@@ -22,13 +22,26 @@ const BinaryDeserializer = (b: any) => {
 }
 
 const BufferDeserializer = (keyDeserializers: [string, Deserializer][]) => (
-    buf: any | Buffer
+    buf: any
 ) => {
     const obj = {}
+    // Convert the input to a ByteBuffer ONCE, outside the loop. Each
+    // deserializer then reads sequentially, advancing the shared offset.
+    //
+    // Prior versions of this code re-ran `ByteBuffer.fromBinary(buf.toString(...))`
+    // on every iteration. That pattern only worked because the old
+    // @ecency/bytebuffer's `toString('binary')` serialized just the *remaining*
+    // bytes (respecting offset/limit). The bundled replacement in
+    // src/bytebuffer.ts serializes the entire buffer instead, so the re-parse
+    // pattern silently rewound the read offset to 0 on every field, corrupting
+    // every field after the first. Symptoms: memo decryption throwing
+    // "Invalid key" because the nonce parsed as the first 8 bytes of the
+    // `from` public key.
+    if (!(buf instanceof ByteBuffer)) {
+        buf = ByteBuffer.fromBinary(buf.toString('binary'), ByteBuffer.LITTLE_ENDIAN)
+    }
     for (const [key, deserializer] of keyDeserializers) {
         try {
-            // Decodes a binary encoded string to a ByteBuffer.
-            buf = ByteBuffer.fromBinary(buf.toString('binary'), ByteBuffer.LITTLE_ENDIAN)
             obj[key] = deserializer(buf)
         } catch (error) {
             error.message = `${key}: ${error.message}`
@@ -38,7 +51,7 @@ const BufferDeserializer = (keyDeserializers: [string, Deserializer][]) => (
     return obj
 }
 
-function fixed_buf(b: any, len: number): Buffer | any {
+function fixed_buf(b: any, len: number): any {
     if (!b) {
         throw Error('No buffer found on first parameter')
     } else {

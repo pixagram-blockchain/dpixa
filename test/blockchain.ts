@@ -50,7 +50,7 @@ describe("blockchain", function() {
   });
 
   it("should stream blocks", async function() {
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const stream = client.blockchain.getBlockStream({ from: 1, to: 2 });
       let ids: string[] = [];
       stream.on("data", (block: SignedBlock) => {
@@ -76,7 +76,7 @@ describe("blockchain", function() {
   });
 
   it("should stream operations", async function() {
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const stream = client.blockchain.getOperationsStream({
         from: 13300000,
         to: 13300001
@@ -94,7 +94,7 @@ describe("blockchain", function() {
   });
 
   it("should handle errors on stream", async function() {
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       const stream = client.blockchain.getBlockStream(Number.MAX_VALUE);
       stream.on("data", () => {
         assert(false, "unexpected stream data");
@@ -107,7 +107,7 @@ describe("blockchain", function() {
 
   it("should get block number stream", async function() {
     const current = await client.blockchain.getCurrentBlockNum();
-    await new Promise(async (resolve, reject) => {
+    await new Promise<void>(async (resolve, reject) => {
       const stream = client.blockchain.getBlockNumberStream();
       stream.on("data", num => {
         assert(num >= current);

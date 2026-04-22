@@ -42,7 +42,7 @@ Defined in: crypto.ts:304
 
 > **createPublic**(`prefix?`): [`PublicKey`](PublicKey.md)
 
-Defined in: crypto.ts:391
+Defined in: crypto.ts:409
 
 Derive the public key for this private key.
 
@@ -62,7 +62,7 @@ Derive the public key for this private key.
 
 > **get\_shared\_secret**(`public_key`): `BBuffer`
 
-Defined in: crypto.ts:422
+Defined in: crypto.ts:440
 
 Get shared secret for memo cryptography.
 
@@ -90,7 +90,7 @@ that both paths produce byte-for-byte identical output.
 
 > **inspect**(): `string`
 
-Defined in: crypto.ts:406
+Defined in: crypto.ts:424
 
 Used by `utils.inspect` and `console.log` in node.js. Does not show the full key
 to get the full encoded key you need to explicitly call [toString](#tostring).
@@ -130,7 +130,7 @@ as uncompressed (matching the old `false` compressed flag).
 
 > **sign**(`message`): [`Signature`](Signature.md)
 
-Defined in: crypto.ts:376
+Defined in: crypto.ts:381
 
 Sign message.
 
@@ -140,17 +140,22 @@ Sign message.
 
 `BBuffer`
 
-32-byte message.
+32-byte message (typically a sha256 digest).
 
-Noble's sync `sign` already produces deterministic RFC6979 signatures with
-lowS enforced by default — both of which are what the old retry-with-
-extra-entropy loop was trying to guarantee. The result is therefore
-*always* canonical, so the loop is unnecessary. We keep the
-`isCanonicalSignature` assertion as a defensive sanity check.
+Noble's sync `sign` is deterministic RFC6979 with `lowS` enforced, BUT
+"lowS" only constrains `s <= n/2`. The Hive/Pixa wire format additionally
+requires both `r` and `s` to have their high byte bit clear (see
+`isCanonicalSignature`) — a stricter predicate than lowS. Roughly a
+quarter of RFC6979 signatures fail it, so we reproduce the original
+secp256k1-node retry loop: perturb the RFC6979 nonce via `extraEntropy`
+until the resulting signature passes `isCanonicalSignature`.
 
-We pass `prehash: false` because `message` is already a sha256 digest
-(produced by transactionDigest). Without that flag noble would sha256
-the digest a second time and produce a bogus signature.
+Important: `extraEntropy` only mixes into nonce derivation — it does NOT
+change the message being signed. The returned signature still verifies
+(and recovers) against the original `message`.
+
+`prehash: false` because `message` is already a digest; noble would
+otherwise sha256 it a second time.
 
 #### Returns
 
@@ -162,7 +167,7 @@ the digest a second time and produce a bogus signature.
 
 > **toString**(): `string`
 
-Defined in: crypto.ts:398
+Defined in: crypto.ts:416
 
 Return a WIF-encoded representation of the key.
 

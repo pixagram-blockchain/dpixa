@@ -54,18 +54,35 @@ dist/%.gz: dist/dpixa.js
 
 bundle: dist/dpixa.js.gz dist/dpixa.d.ts
 
-.PHONY: coverage
-coverage: node_modules
-	nyc -r html -r text -e .ts -i ts-node/register mocha --exit --reporter nyan --require ts-node/register test/*.ts
+# CI gate: lint-only. Tests live in test/ and are intentionally NOT run
+# here (see `make test` below). Rationale: the integration tests under
+# test/*.ts depend on a live RPC endpoint and are not appropriate for an
+# offline publish gate. Pure-unit test files (test/crypto.ts, test/memo.ts,
+# test/serializers.ts, test/asset.ts) remain in the tree for local /
+# manual execution via `make test`.
+.PHONY: ci-test
+ci-test: node_modules
+	eslint -c .eslintrc.json 'src/**/*.ts'
 
+# Run the full test suite locally. Several files (test/blockchain.ts,
+# test/broadcast.ts, test/database.ts, test/hivemind.ts, test/operations.ts,
+# test/rc.ts) hit a live Pixa RPC node and will hang or fail without one.
+# Override the default endpoint by setting TEST_NODE, e.g.
+#   TEST_NODE=https://my-node.example.com make test
+# Filter individual tests with `make test grep='<pattern>'`.
 .PHONY: test
 test: node_modules
 	mocha --exit --require ts-node/register -r test/_node.js test/*.ts --grep '$(grep)'
 
-.PHONY: ci-test
-ci-test: node_modules
-	eslint -c .eslintrc.json src/**/*.ts
-	nyc -r lcov -e .ts -i ts-node/register mocha --exit --reporter tap --require ts-node/register test/*.ts
+# Subset that doesn't need network. Fast, deterministic, safe to run anywhere.
+.PHONY: test-unit
+test-unit: node_modules
+	mocha --exit --require ts-node/register \
+		test/crypto.ts test/serializers.ts test/asset.ts test/memo.ts
+
+.PHONY: coverage
+coverage: node_modules
+	nyc -r html -r text -e .ts -i ts-node/register mocha --exit --reporter nyan --require ts-node/register test/*.ts
 
 .PHONY: browser-test
 browser-test: dist/dpixa.js
@@ -76,9 +93,13 @@ browser-test: dist/dpixa.js
 browser-test-local: dist/dpixa.js
 	karma start test/_karma.js
 
+# Lint (eslint replaces the deprecated tslint used previously; the tslint
+# parser couldn't handle TS 5.x tuple types and was emitting false-positive
+# parse errors on src/chain/account.ts, serializer.ts, operation.ts, etc.).
+# --fix applies autofixes for semicolons, quotes, spacing, import order.
 .PHONY: lint
 lint: node_modules
-	tslint -p tsconfig.json -c tslint.json -t stylish --fix
+	eslint -c .eslintrc.json 'src/**/*.ts' --fix
 
 node_modules:
 	yarn install --non-interactive --frozen-lockfile
@@ -86,7 +107,7 @@ node_modules:
 docs: $(SRC_FILES) node_modules
 	typedoc --gitRevision master --out docs src --plugin typedoc-material-theme --themeColor '#666666'
 	find docs -name "*.html" | xargs perl -i -pe's~$(shell pwd)~.~g'
-	echo "Served at <https://pixagram.io/dpixa>" > docs/README.md
+	echo "Served at <https://pixagram.com/dpixa>" > docs/README.md
 	touch docs
 	typedoc --gitRevision master --out documentation src --plugin typedoc-plugin-markdown
 

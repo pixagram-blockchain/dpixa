@@ -8,7 +8,7 @@
 
 > **getVests**(`account`, `subtract_delegated?`, `add_received?`): `number`
 
-Defined in: chain/misc.ts:249
+Defined in: chain/misc.ts:257
 
 Returns the vests of specified account. Default: Subtract delegated & add received
 

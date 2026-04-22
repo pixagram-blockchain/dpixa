@@ -1,7 +1,12 @@
 import "mocha";
 import * as assert from "assert";
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+// The test file previously aliased `Buffer = require("@ecency/bytebuffer")`,
+// which (a) shadowed Node's real Buffer with a ByteBuffer class that happened
+// to expose a compatible `from(...)` API, and (b) broke at import time once
+// the 1.4.x refactor dropped @ecency/bytebuffer from dependencies.
+//
+// We don't need an alias at all — Node's global Buffer does everything the
+// tests want (Buffer.from(hex, 'hex'), Buffer.alloc, etc).
 import { randomBytes, createHash } from "crypto";
 
 import {
@@ -87,6 +92,43 @@ describe("crypto", function() {
     assert(!testKey.createPublic().verify(message, signature));
   });
 
+  it("should always produce Hive-canonical signatures", function() {
+    // Regression for a 1.4.x bug: noble v3's deterministic RFC6979 signatures
+    // pass `lowS` by default but roughly half fail the stricter Hive-canonical
+    // predicate (high bit of r[0] must be 0 — s[0] is already constrained by
+    // lowS). The fix is to retry with `extraEntropy` until canonical.
+    //
+    // A known-bad fixture: PrivateKey.fromSeed("dpixa-fixture-A").sign(
+    //     sha256("fixed-digest-input"))
+    // produces a first-attempt signature whose r[0] = 0xe7 — non-canonical.
+    // The patched sign() must loop past that and return a canonical result.
+    const knownBadSeed = PrivateKey.fromSeed("dpixa-fixture-A");
+    const knownBadDigest = cryptoUtils.sha256(Buffer.from("fixed-digest-input", "utf-8"));
+    const sig0 = knownBadSeed.sign(knownBadDigest);
+    assert.strictEqual(sig0.data[0] & 0x80, 0, "r[0] high bit must be clear");
+    assert.strictEqual(sig0.data[32] & 0x80, 0, "s[0] high bit must be clear");
+    assert(
+      knownBadSeed.createPublic().verify(knownBadDigest, sig0),
+      "known-bad signature must verify against original digest"
+    );
+
+    // Also exercise many random seeds — on any unpatched build, ~50% of
+    // these would trigger the canonical-signature assertion.
+    this.timeout(10000);
+    for (let i = 0; i < 200; i++) {
+      const key = PrivateKey.from(randomBytes(32));
+      const msg = randomBytes(32);
+      const sig = key.sign(msg);
+      assert.strictEqual(sig.data[0] & 0x80, 0);
+      assert.strictEqual(sig.data[32] & 0x80, 0);
+      assert(key.createPublic().verify(msg, sig));
+      assert.strictEqual(
+        sig.recover(msg).toString(),
+        key.createPublic().toString()
+      );
+    }
+  });
+
   it("should de/encode signatures", function() {
     const signature = Signature.fromString(testSig);
     assert.equal(signature.toString(), testSig);
@@ -106,7 +148,9 @@ describe("crypto", function() {
     const key = PrivateKey.fromLogin("foo", "barman");
     assert.equal(
       key.createPublic().toString(),
-      "STM87F7tN56tAUL2C6J9Gzi9HzgNpZdi6M2cLQo7TjDU5v178QsYA"
+      // Default address prefix was changed from STM to PIX — the underlying
+      // key bytes are identical; only the base58 prefix differs.
+      "PIX87F7tN56tAUL2C6J9Gzi9HzgNpZdi6M2cLQo7TjDU5v178QsYA"
     );
   });
 
@@ -124,23 +168,19 @@ describe("crypto", function() {
       ]
     };
     const key = PrivateKey.fromSeed("hello");
-    const buffer = new ByteBuffer(
-      ByteBuffer.DEFAULT_CAPACITY,
-      ByteBuffer.LITTLE_ENDIAN
-    );
-    Types.Transaction(buffer, tx);
-    buffer.flip();
-    const data = Buffer.from(buffer.toBuffer());
-    const digest = createHash("sha256")
-      .update(Buffer.concat([DEFAULT_CHAIN_ID, data]))
-      .digest();
+    // Previously this test reconstructed the digest via raw ByteBuffer calls.
+    // With @ecency/bytebuffer removed from dependencies in 1.4.x we use the
+    // library's own `transactionDigest` helper — which is what signTransaction
+    // uses internally anyway, making this a more honest round-trip test.
+    const digest = cryptoUtils.transactionDigest(tx, DEFAULT_CHAIN_ID);
     const signed = cryptoUtils.signTransaction(tx, key);
     const pkey = key.createPublic();
     const sig = Signature.fromString(signed.signatures[0]);
     assert(pkey.verify(digest, sig));
     assert.equal(
       sig.recover(digest).toString(),
-      "STM7s4VJuYFfHq8HCPpgC649Lu7CjA1V9oXgPfv8f3fszKMk3Kny9"
+      // See note on login test: address prefix changed from STM to PIX.
+      "PIX7s4VJuYFfHq8HCPpgC649Lu7CjA1V9oXgPfv8f3fszKMk3Kny9"
     );
   });
 

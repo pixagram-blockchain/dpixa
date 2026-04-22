@@ -497,44 +497,8 @@ declare module 'dpixa/chain/account' {
 
 }
 declare module 'dpixa/chain/misc' {
-	/**
-	 * @file Misc hive/pixa type definitions.
-	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
-	 * @license
-	 * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
-	 * Copyright (c) 2025 Matias Affolter. All Rights Reserved.
-	 *
-	 * Redistribution and use in source and binary forms, with or without modification,
-	 * are permitted provided that the following conditions are met:
-	 *
-	 * 1. Redistribution of source code must retain the above copyright notice, this
-	 * list of conditions and the following disclaimer.
-	 *
-	 * 2. Redistribution in binary form must reproduce the above copyright notice,
-	 * this list of conditions and the following disclaimer in the documentation
-	 * and/or other materials provided with the distribution.
-	 *
-	 * 3. Neither the name of the copyright holder nor the names of its contributors
-	 * may be used to endorse or promote products derived from this software without
-	 * specific prior written permission.
-	 *
-	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-	 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-	 * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
-	 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-	 * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-	 * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-	 * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-	 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
-	 * OF THE POSSIBILITY OF SUCH DAMAGE.
-	 *
-	 * You acknowledge that this software is not designed, licensed or intended for use
-	 * in the design, construction, operation or maintenance of any military facility.
-	 */
 	import { Account } from 'dpixa/chain/account';
 	import { Asset, Price } from 'dpixa/chain/asset';
-	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	/**
 	 * Large number that may be unsafe to represent natively in JavaScript.
 	 */
@@ -547,8 +511,14 @@ declare module 'dpixa/chain/misc' {
 	    constructor(buffer: any);
 	    /**
 	     * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
+	     *
+	     * Accepts any Uint8Array-backed buffer, which includes the bundled BBuffer,
+	     * Node's native Buffer, and plain Uint8Array. Previously the parameter was
+	     * typed as just `Buffer` (= BBuffer in this file) which rejected Node
+	     * Buffers even though they work identically at runtime — broke the
+	     * operations test suite under strict TS.
 	     */
-	    static from(value: Buffer | HexBuffer | number[] | string): HexBuffer;
+	    static from(value: Uint8Array | HexBuffer | number[] | string): HexBuffer;
 	    toString(encoding?: 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1'): string;
 	    toJSON(): string;
 	}
@@ -793,7 +763,7 @@ declare module 'dpixa/chain/serializer' {
 	    UInt32: (buffer: any, data: number) => void;
 	    UInt64: (buffer: any, data: number) => void;
 	    UInt8: (buffer: any, data: number) => void;
-	    Void: (buffer: any) => never;
+	    Void: (_buffer: any) => never;
 	};
 
 }
@@ -966,17 +936,22 @@ declare module 'dpixa/crypto' {
 	    multiply(pub: any): Buffer;
 	    /**
 	     * Sign message.
-	     * @param message 32-byte message.
+	     * @param message 32-byte message (typically a sha256 digest).
 	     *
-	     * Noble's sync `sign` already produces deterministic RFC6979 signatures with
-	     * lowS enforced by default — both of which are what the old retry-with-
-	     * extra-entropy loop was trying to guarantee. The result is therefore
-	     * *always* canonical, so the loop is unnecessary. We keep the
-	     * `isCanonicalSignature` assertion as a defensive sanity check.
+	     * Noble's sync `sign` is deterministic RFC6979 with `lowS` enforced, BUT
+	     * "lowS" only constrains `s <= n/2`. The Hive/Pixa wire format additionally
+	     * requires both `r` and `s` to have their high byte bit clear (see
+	     * `isCanonicalSignature`) — a stricter predicate than lowS. Roughly a
+	     * quarter of RFC6979 signatures fail it, so we reproduce the original
+	     * secp256k1-node retry loop: perturb the RFC6979 nonce via `extraEntropy`
+	     * until the resulting signature passes `isCanonicalSignature`.
 	     *
-	     * We pass `prehash: false` because `message` is already a sha256 digest
-	     * (produced by transactionDigest). Without that flag noble would sha256
-	     * the digest a second time and produce a bogus signature.
+	     * Important: `extraEntropy` only mixes into nonce derivation — it does NOT
+	     * change the message being signed. The returned signature still verifies
+	     * (and recovers) against the original `message`.
+	     *
+	     * `prehash: false` because `message` is already a digest; noble would
+	     * otherwise sha256 it a second time.
 	     */
 	    sign(message: Buffer): Signature;
 	    /**
@@ -2789,9 +2764,10 @@ declare module 'dpixa/helpers/pixamind' {
 	     */
 	    limit: number;
 	    /**
-	     * To be developed, not ready yet
+	     * To be developed, not ready yet. Currently always a string; typed as
+	     * `any` to allow richer query objects in future without a breaking change.
 	     */
-	    query?: string | any;
+	    query?: any;
 	    /**
 	     * Observer account
 	     */

@@ -42,7 +42,7 @@ Defined in: chain/misc.ts:50
 
 > **toJSON**(): `string`
 
-Defined in: chain/misc.ts:71
+Defined in: chain/misc.ts:79
 
 #### Returns
 
@@ -54,7 +54,7 @@ Defined in: chain/misc.ts:71
 
 > **toString**(`encoding?`): `string`
 
-Defined in: chain/misc.ts:67
+Defined in: chain/misc.ts:75
 
 #### Parameters
 
@@ -72,15 +72,21 @@ Defined in: chain/misc.ts:67
 
 > `static` **from**(`value`): `HexBuffer`
 
-Defined in: chain/misc.ts:55
+Defined in: chain/misc.ts:61
 
 Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
+
+Accepts any Uint8Array-backed buffer, which includes the bundled BBuffer,
+Node's native Buffer, and plain Uint8Array. Previously the parameter was
+typed as just `Buffer` (= BBuffer in this file) which rejected Node
+Buffers even though they work identically at runtime — broke the
+operations test suite under strict TS.
 
 #### Parameters
 
 ##### value
 
-`string` \| `number`[] \| `BBuffer` \| `HexBuffer`
+`string` \| `number`[] \| `Uint8Array`\<`ArrayBufferLike`\> \| `HexBuffer`
 
 #### Returns
 

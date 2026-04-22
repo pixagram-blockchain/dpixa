@@ -6,7 +6,7 @@
 
 # Interface: ChainProperties
 
-Defined in: chain/misc.ts:79
+Defined in: chain/misc.ts:87
 
 Chain roperties that are decided by the witnesses.
 
@@ -16,7 +16,7 @@ Chain roperties that are decided by the witnesses.
 
 > **account\_creation\_fee**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:90
+Defined in: chain/misc.ts:98
 
 This fee, paid in PIXA, is converted into VESTING SHARES for the new account. Accounts
 without vesting shares cannot earn usage rations and therefore are powerless. This minimum
@@ -34,7 +34,7 @@ This has to be multiplied by STEEMIT ? `CREATE_ACCOUNT_WITH_PIXA_MODIFIER`
 
 > **maximum\_block\_size**: `number`
 
-Defined in: chain/misc.ts:95
+Defined in: chain/misc.ts:103
 
 This witnesses vote for the maximum_block_size which is used by the network
 to tune rate limiting and capacity.
@@ -45,6 +45,6 @@ to tune rate limiting and capacity.
 
 > **pxs\_interest\_rate**: `number`
 
-Defined in: chain/misc.ts:99
+Defined in: chain/misc.ts:107
 
 The PXS interest percentage rate decided by witnesses, expressed 0 to 10000.

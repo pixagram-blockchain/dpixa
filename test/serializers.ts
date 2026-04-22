@@ -1,7 +1,10 @@
 import 'mocha'
 import * as assert from 'assert'
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+// Previously: `require("@ecency/bytebuffer")`. The 1.4.x refactor replaced
+// that external dep with a local implementation at src/bytebuffer.ts; pull
+// the stream-style ByteBuffer from there. Node's global Buffer is used for
+// the hex-string conversion (no alias needed).
+import ByteBuffer from '../src/bytebuffer'
 
 import {Types, Serializer, HexBuffer} from '../src'
 

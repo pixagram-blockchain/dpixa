@@ -425,11 +425,11 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ### Void
 
-> **Void**: (`buffer`) => `never` = `VoidSerializer`
+> **Void**: (`_buffer`) => `never` = `VoidSerializer`
 
 #### Parameters
 
-##### buffer
+##### \_buffer
 
 `any`
 
