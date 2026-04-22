@@ -37,6 +37,7 @@
 import * as assert from 'assert'
 import { VError } from 'verror'
 import packageVersion from './version'
+import { BBuffer as Buffer } from './bytebuffer'
 import {
     MAINNET_HEX_CHAIN_ID,
     TESTNET_HEX_CHAIN_ID,

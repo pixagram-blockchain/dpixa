@@ -1,5 +1,4 @@
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+import ByteBuffer, { BBuffer as Buffer } from '../bytebuffer'
 import { PublicKey } from '../crypto'
 
 export type Deserializer = (buffer: any) => void

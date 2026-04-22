@@ -8,7 +8,7 @@
 
 > **getVestingSharePrice**(`props`): [`Price`](../classes/Price.md)
 
-Defined in: chain/misc.ts:241
+Defined in: chain/misc.ts:236
 
 Return the vesting share price.
 

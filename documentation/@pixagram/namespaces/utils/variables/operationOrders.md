@@ -8,7 +8,7 @@
 
 > `const` **operationOrders**: `object`
 
-Defined in: utils.ts:275
+Defined in: utils.ts:274
 
 ## Type Declaration
 

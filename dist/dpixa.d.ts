@@ -1,3 +1,183 @@
+declare module 'dpixa/bytebuffer' {
+	/**
+	 * @file Custom ByteBuffer / Buffer implementation backed by Uint8Array.
+	 *
+	 * Replaces `@ecency/bytebuffer`. The previous library suffered from copy /
+	 * allocation bugs (affecting `memo.ts` and `crypto.ts` in particular) because
+	 * it shared underlying ArrayBuffers between views in surprising ways. This
+	 * implementation is allocation-explicit: every `copy()`, `slice()`, and
+	 * `toBuffer()` produces an independent buffer.
+	 *
+	 * Exports:
+	 *   - BBuffer       Node-Buffer shim (from/alloc/concat/slice/toString/…)
+	 *   - ByteBuffer    Stream-style writer/reader (writeVString, flip, …)
+	 *   - Long          Minimal 64-bit integer helper (only methods used by aes.ts)
+	 *
+	 * The module default export mirrors the historical `require("@ecency/bytebuffer")`
+	 * call-site shape: calling `new ByteBuffer(cap, le)` builds a stream buffer,
+	 * and static helpers like `ByteBuffer.DEFAULT_CAPACITY`, `ByteBuffer.LITTLE_ENDIAN`,
+	 * `ByteBuffer.fromBinary`, and `ByteBuffer.Long` are all available.
+	 */
+	type Encoding = 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1';
+	export class BBuffer extends Uint8Array {
+	    /**
+	     * Allocate a new zero-filled buffer of the given size.
+	     * The optional `fill` argument is a byte value (0-255) to pre-fill with.
+	     */
+	    static alloc(size: number, fill?: number): BBuffer;
+	    /**
+	     * Build a buffer from an array-like of bytes, a string (with encoding),
+	     * another Uint8Array, or an ArrayBuffer. Always produces an *independent*
+	     * allocation — slicing the result cannot alias the input.
+	     *
+	     * Signature is declared as overloads so this override is assignable to
+	     * `Uint8Array.from` (which has two- and three-arg shapes with `mapfn`).
+	     */
+	    static from(value: string, encoding?: Encoding): BBuffer;
+	    static from(value: ArrayBuffer | Uint8Array | BBuffer | ArrayLike<number>): BBuffer;
+	    /** Concatenate a list of Uint8Arrays / BBuffers into a single new buffer. */
+	    static concat(list: Array<Uint8Array | BBuffer>, totalLength?: number): BBuffer;
+	    /** Internal helper: wrap a Uint8Array in a BBuffer with its own memory. */
+	    private static fromUint8Array;
+	    /**
+	     * Return a string in the given encoding. Defaults to utf-8 so that calls
+	     * like `buf.toString()` behave like Node.js `Buffer`.
+	     */
+	    toString(encoding?: Encoding, start?: number, end?: number): string;
+	    /**
+	     * Return an *independent* copy of the sub-range. Node's `Buffer.slice`
+	     * returns a view that aliases the original; that aliasing is one of the
+	     * classes of bug this module is meant to prevent, so we always copy.
+	     */
+	    slice(begin?: number, end?: number): BBuffer;
+	    /** Read a single unsigned byte. */
+	    readUInt8(offset?: number): number;
+	    /** Write a single unsigned byte. Returns new offset like Node. */
+	    writeUInt8(value: number, offset?: number): number;
+	    /**
+	     * Read an unsigned little-endian 16/32-bit integer at `offset`.
+	     * Matches Node.js `Buffer.prototype.readUInt{16,32}LE`.
+	     */
+	    readUInt16LE(offset?: number): number;
+	    readUInt32LE(offset?: number): number;
+	    /** Big-endian variants, for completeness. */
+	    readUInt16BE(offset?: number): number;
+	    readUInt32BE(offset?: number): number;
+	    /**
+	     * Copy bytes from this buffer into `target`, starting at `targetStart`,
+	     * reading `[sourceStart, sourceEnd)` of this buffer. Mirrors Node's
+	     * `Buffer.prototype.copy` return value (number of bytes copied).
+	     */
+	    copy(target: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number): number;
+	}
+	export class Long {
+	    static isLong(value: unknown): value is Long;
+	    static fromNumber(n: number): Long;
+	    static fromString(s: string, unsigned?: boolean, radix?: number): Long;
+	    /** Always stored masked to 64 unsigned bits. */
+	    private readonly value;
+	    constructor(value: bigint);
+	    shiftLeft(n: number): Long;
+	    or(other: Long): Long;
+	    toString(radix?: number): string;
+	    /** Low/high 32-bit halves, for little-endian serialisation. */
+	    getLow32(): number;
+	    getHigh32(): number;
+	    toBigInt(): bigint;
+	}
+	export class ByteBuffer {
+	    static readonly DEFAULT_CAPACITY = 64;
+	    static readonly LITTLE_ENDIAN = 1;
+	    static readonly BIG_ENDIAN = 0;
+	    static readonly Long: typeof Long;
+	    /**
+	     * Build a ByteBuffer whose contents are the bytes of a "binary" (Latin-1)
+	     * string. Call-sites use either (binary, endian) or (binary, capacity, endian);
+	     * we accept both.
+	     */
+	    static fromBinary(binary: string, capacityOrEndian?: number, _endian?: number): ByteBuffer;
+	    private data;
+	    private view;
+	    private _offset;
+	    private _limit;
+	    private writeOffset;
+	    private markedOffset;
+	    constructor(capacity?: number, _endian?: number);
+	    /** Current read/write cursor. The legacy API exposed this as `.offset`. */
+	    get offset(): number;
+	    set offset(v: number);
+	    /** Total capacity of the underlying storage. */
+	    capacity(): number;
+	    private ensure;
+	    writeByte(value: number): ByteBuffer;
+	    writeInt8(value: number): ByteBuffer;
+	    writeUint8(value: number): ByteBuffer;
+	    writeInt16(value: number): ByteBuffer;
+	    writeUint16(value: number): ByteBuffer;
+	    writeInt32(value: number): ByteBuffer;
+	    writeUint32(value: number): ByteBuffer;
+	    /** Accepts Long, bigint, number, or decimal string. Always little-endian. */
+	    writeInt64(value: Long | bigint | number | string): ByteBuffer;
+	    writeUint64(value: Long | bigint | number | string): ByteBuffer;
+	    /** Varint-32, protobuf-style (7 bits per byte, MSB = continuation). */
+	    writeVarint32(value: number): ByteBuffer;
+	    /**
+	     * Write a length-prefixed UTF-8 string: varint32 length followed by bytes.
+	     * Matches @ecency/bytebuffer's writeVString.
+	     */
+	    writeVString(value: string): ByteBuffer;
+	    /**
+	     * Append raw bytes or a string at the current offset. When `data` is a
+	     * string and `encoding` is 'binary', each char is treated as a single byte.
+	     */
+	    append(data: Uint8Array | ArrayBuffer | string | {
+	        buffer: Uint8Array;
+	    } | number[], encoding?: Encoding): ByteBuffer;
+	    readUint8(): number;
+	    readInt8(): number;
+	    readUint16(): number;
+	    readInt16(): number;
+	    readUint32(): number;
+	    readInt32(): number;
+	    /** Returns a Long (decimal-string-printable) for call-site compatibility. */
+	    readUint64(): Long;
+	    readInt64(): Long;
+	    readVarint32(): number;
+	    readVString(): string;
+	    skip(n: number): ByteBuffer;
+	    mark(offset?: number): ByteBuffer;
+	    reset(): ByteBuffer;
+	    /**
+	     * Flip from "write" to "read" mode: limit = current offset, offset = 0.
+	     * Matches @ecency/bytebuffer semantics.
+	     */
+	    flip(): ByteBuffer;
+	    /**
+	     * Return a new ByteBuffer containing an independent copy of bytes
+	     * `[start, end)`. The new buffer is in read mode: offset = 0,
+	     * limit = end - start. This is a deep copy — the caller cannot alias
+	     * this buffer's memory through the returned one.
+	     */
+	    copy(start?: number, end?: number): ByteBuffer;
+	    /**
+	     * Return an independent Uint8Array containing the meaningful bytes.
+	     * After flip(): bytes [0, limit). Otherwise: bytes [0, offset).
+	     */
+	    toBuffer(): Uint8Array;
+	    /** Same bytes as toBuffer(), but wrapped as a BBuffer (Node-Buffer shim). */
+	    toBBuffer(): BBuffer;
+	    /** "binary" (Latin-1) string of the meaningful bytes. */
+	    toBinary(): string;
+	    /**
+	     * Encode the meaningful bytes. Default is hex (the most common call-site
+	     * in utils.ts). Accepts 'hex', 'binary', 'utf-8'.
+	     */
+	    toString(encoding?: Encoding): string;
+	    private checkReadable;
+	}
+	export default ByteBuffer;
+
+}
 declare module 'dpixa/base58' {
 	/** Encode a Buffer (or Uint8Array / array-like of bytes) to a base58 string. */
 	export function encode(source: any): string;
@@ -354,6 +534,7 @@ declare module 'dpixa/chain/misc' {
 	 */
 	import { Account } from 'dpixa/chain/account';
 	import { Asset, Price } from 'dpixa/chain/asset';
+	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	/**
 	 * Large number that may be unsafe to represent natively in JavaScript.
 	 */
@@ -368,7 +549,7 @@ declare module 'dpixa/chain/misc' {
 	     * Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
 	     */
 	    static from(value: Buffer | HexBuffer | number[] | string): HexBuffer;
-	    toString(encoding?: BufferEncoding): string;
+	    toString(encoding?: 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1'): string;
 	    toJSON(): string;
 	}
 	/**
@@ -571,6 +752,7 @@ declare module 'dpixa/chain/serializer' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
+	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	import { PublicKey } from 'dpixa/crypto';
 	import { Asset } from 'dpixa/chain/asset';
 	import { HexBuffer } from 'dpixa/chain/misc';
@@ -672,11 +854,10 @@ declare module 'dpixa/chain/transaction' {
 }
 declare module 'dpixa/crypto' {
 	/**
-	 * @file Hive/Pixa crypto helpers.
-	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
+	 * @file Hive crypto helpers.
+	 * @author Johan Nordberg <code@johan-nordberg.com>
 	 * @license
 	 * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
-	 * Copyright (c) 2025 Matias Affolter. All Rights Reserved.
 	 *
 	 * Redistribution and use in source and binary forms, with or without modification,
 	 * are permitted provided that the following conditions are met:
@@ -706,21 +887,22 @@ declare module 'dpixa/crypto' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
+	import ByteBuffer, { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction';
 	/**
 	 * Network id used in WIF-encoding.
 	 */
-	export const NETWORK_ID: any; function ripemd160(input: any | string): any; function sha256(input: any | string): any; function doubleSha256(input: any | string): any; function encodePublic(key: any, prefix: string): string; function encodePrivate(key: any): string; function decodePrivate(encodedKey: string): any; function isCanonicalSignature(signature: any): boolean; function isWif(privWif: string | any): boolean;
+	export const NETWORK_ID: Buffer; function ripemd160(input: Buffer | string): Buffer; function sha256(input: Buffer | string): Buffer; function doubleSha256(input: Buffer | string): Buffer; function encodePublic(key: Buffer, prefix: string): string; function encodePrivate(key: Buffer): string; function decodePrivate(encodedKey: string): Buffer; function isCanonicalSignature(signature: Buffer): boolean; function isWif(privWif: string | Buffer): boolean;
 	/**
 	 * ECDSA (secp256k1) public key.
 	 */
 	export class PublicKey {
 	    readonly key: any;
 	    readonly prefix: string;
-	    readonly uncompressed: any;
+	    readonly uncompressed: Buffer;
 	    constructor(key: any, prefix?: string);
-	    static fromBuffer(key: any): {
-	        key: any;
+	    static fromBuffer(key: ByteBuffer): {
+	        key: ByteBuffer;
 	    };
 	    /**
 	     * Create a new instance from a WIF-encoded key.
@@ -735,7 +917,7 @@ declare module 'dpixa/crypto' {
 	     * @param message 32-byte message to verify.
 	     * @param signature Signature to verify.
 	     */
-	    verify(message: any, signature: Signature): boolean;
+	    verify(message: Buffer, signature: Signature): boolean;
 	    /**
 	     * Return a WIF-encoded representation of the key.
 	     */
@@ -755,8 +937,8 @@ declare module 'dpixa/crypto' {
 	 */
 	export class PrivateKey {
 	    private key;
-	    secret: any;
-	    constructor(key: any);
+	    secret: Buffer;
+	    constructor(key: Buffer);
 	    /**
 	     * Convenience to create a new instance from WIF string or buffer.
 	     */
@@ -803,7 +985,7 @@ declare module 'dpixa/crypto' {
 	export class Signature {
 	    data: Buffer;
 	    recovery: number;
-	    constructor(data: Buffer, recovery: number);
+	    constructor(data: Uint8Array | Buffer, recovery: number);
 	    static fromBuffer(buffer: Buffer): Signature;
 	    static fromString(string: string): Signature;
 	    /**
@@ -811,9 +993,9 @@ declare module 'dpixa/crypto' {
 	     * @param message 32-byte message that was used to create the signature.
 	     */
 	    recover(message: Buffer, prefix?: string): PublicKey;
-	    toBuffer(): any;
-	    toString(): any;
-	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): any; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): any;
+	    toBuffer(): Buffer;
+	    toString(): string;
+	} function transactionDigest(transaction: Transaction | SignedTransaction, chainId?: Buffer): Buffer; function signTransaction(transaction: Transaction, keys: PrivateKey | PrivateKey[], chainId?: Buffer): SignedTransaction; function generateTrxId(transaction: Transaction): string;
 	/** Misc crypto utility functions. */
 	export const cryptoUtils: {
 	    decodePrivate: typeof decodePrivate;
@@ -2811,6 +2993,7 @@ declare module 'dpixa/client' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
+	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	import { Blockchain } from 'dpixa/helpers/blockchain';
 	import { BroadcastAPI } from 'dpixa/helpers/broadcast';
 	import { DatabaseAPI } from 'dpixa/helpers/database';
@@ -2825,7 +3008,7 @@ declare module 'dpixa/client' {
 	/**
 	 * Main Pixa network chain id.
 	 */
-	export const DEFAULT_CHAIN_ID: Buffer<ArrayBuffer>;
+	export const DEFAULT_CHAIN_ID: Buffer;
 	/**
 	 * Main Pixa network address prefix.
 	 */
@@ -2969,6 +3152,7 @@ declare module 'dpixa/chain/deserializer' {
 }
 declare module 'dpixa/helpers/aes' {
 	import { PrivateKey, PublicKey } from 'dpixa/crypto';
+	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
 	export const encrypt: (private_key: PrivateKey, public_key: PublicKey, message: Buffer, nonce?: string) => any;
 	export const decrypt: (private_key: PrivateKey, public_key: PublicKey, nonce: any, message: any, checksum: number) => any;
 	/**

@@ -1,10 +1,9 @@
 // base58.ts
 // Fast base58 encoder/decoder using the Bitcoin alphabet.
 // Uint8Array lookup tables for O(1) char <-> index conversion.
-// I/O uses @ecency/bytebuffer's Buffer shim.
+// I/O uses the custom Uint8Array-backed Buffer shim.
 
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+import { BBuffer as Buffer } from './bytebuffer'
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 

@@ -6,7 +6,7 @@
 
 # Interface: VestingDelegation
 
-Defined in: chain/misc.ts:107
+Defined in: chain/misc.ts:102
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: chain/misc.ts:107
 
 > **delegatee**: `string`
 
-Defined in: chain/misc.ts:119
+Defined in: chain/misc.ts:114
 
 Account that is receiving vests from delegator.
 
@@ -24,7 +24,7 @@ Account that is receiving vests from delegator.
 
 > **delegator**: `string`
 
-Defined in: chain/misc.ts:115
+Defined in: chain/misc.ts:110
 
 Account that is delegating vests to delegatee.
 
@@ -34,7 +34,7 @@ Account that is delegating vests to delegatee.
 
 > **id**: `number`
 
-Defined in: chain/misc.ts:111
+Defined in: chain/misc.ts:106
 
 Delegation id.
 
@@ -44,7 +44,7 @@ Delegation id.
 
 > **min\_delegation\_time**: `string`
 
-Defined in: chain/misc.ts:127
+Defined in: chain/misc.ts:122
 
 Earliest date delegation can be removed.
 
@@ -54,6 +54,6 @@ Earliest date delegation can be removed.
 
 > **vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/misc.ts:123
+Defined in: chain/misc.ts:118
 
 Amount of VESTS delegated.

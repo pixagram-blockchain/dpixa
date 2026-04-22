@@ -1,6 +1,6 @@
 {
   "name": "@pixagram/dpixa",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Pixa blockchain RPC client library",
   "author": "pixa-blockchain",
   "license": "BSD-3-Clause-No-Military-License",
@@ -36,13 +36,11 @@
     "sdk"
   ],
   "dependencies": {
-    "@ecency/bytebuffer": "~6.0.0",
-    "safe-buffer": "~5.2.1",
     "bigi": "~1.4.2",
     "core-js": "~3.49.0",
     "cross-fetch": "~4.1.0",
     "ecurve": "~1.0.6",
-    "https": "^1.0.0",
+    "https": "~1.0.0",
     "jsbi": "~4.3.2",
     "node-fetch": "~3.3.2",
     "ripemd160": "~2.0.3",
@@ -53,7 +51,6 @@
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
-    "@types/bytebuffer": "^5.0.33",
     "@types/mocha": "^5.2.5",
     "@types/node": "^24.10.1",
     "@types/verror": "^1.10.3",

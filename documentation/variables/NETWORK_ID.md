@@ -6,8 +6,8 @@
 
 # Variable: NETWORK\_ID
 
-> `const` **NETWORK\_ID**: `any`
+> `const` **NETWORK\_ID**: `BBuffer`
 
-Defined in: crypto.ts:87
+Defined in: crypto.ts:58
 
 Network id used in WIF-encoding.

@@ -8,6 +8,6 @@
 
 > `const` **DEFAULT\_ADDRESS\_PREFIX**: `"PIX"` = `PREFIX_MAINNET_ADDRESS`
 
-Defined in: client.ts:75
+Defined in: client.ts:76
 
 Main Pixa network address prefix.

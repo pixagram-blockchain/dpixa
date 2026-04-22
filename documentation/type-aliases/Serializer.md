@@ -8,7 +8,7 @@
 
 > **Serializer** = (`buffer`, `data`) => `void`
 
-Defined in: chain/serializer.ts:44
+Defined in: chain/serializer.ts:43
 
 ## Parameters
 

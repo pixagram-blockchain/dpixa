@@ -1,16 +1,5 @@
-import * as bs58 from "./base58";
-const ByteBuffer = require("@ecency/bytebuffer");
-// See long NOTE in crypto.ts. Same bug pattern here — the previous
-// `const Buffer = ByteBuffer;` alias silently routed `Buffer.concat(...)` to
-// ByteBuffer.concat (returning a ByteBuffer instance, not a Buffer) while
-// `Buffer.from(...)` resolved to the global. Mixing the two produces
-// ByteBuffer objects in crypto inputs, which get coerced via toString() to
-// a size-dependent debug string. For memo this would corrupt AES input
-// encoding / decoding at specific payload sizes.
-//
-// DO NOT reintroduce a local `const Buffer = ...` alias.
-const bufferModule = require("safe-buffer");
-const NodeBuffer = bufferModule.Buffer;
+import * as bs58 from './base58'
+import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
 import { types } from './chain/deserializer'
 import { Types } from './chain/serializer'
 import { PrivateKey, PublicKey } from './crypto'
@@ -41,7 +30,7 @@ const encode = (
       ByteBuffer.LITTLE_ENDIAN
   )
   mbuf.writeVString(memo)
-  const memoBuffer = NodeBuffer.from(mbuf.copy(0, mbuf.offset).toBinary(), 'binary')
+  const memoBuffer = Buffer.from(mbuf.copy(0, mbuf.offset).toBinary(), 'binary')
   const { nonce, message, checksum } = Aes.encrypt(
       private_key,
       public_key,
@@ -60,10 +49,7 @@ const encode = (
     to: public_key
   })
   mbuf2.flip()
-  // forceCopy=true: same rationale as transactionDigest in crypto.ts. The
-  // bs58-encoded output must not share memory with the ByteBuffer backing
-  // allocation.
-  const data = mbuf2.toBuffer(true)
+  const data = Buffer.from(mbuf2.toBuffer())
   return '#' + bs58.encode(data)
 }
 
@@ -80,7 +66,7 @@ const decode = (private_key: PrivateKey | string, memo: string): string => {
   checkEncryption()
   private_key = toPrivateObj(private_key)
   memo = bs58.decode(memo)
-  let memoBuffer = types.EncryptedMemoD(NodeBuffer.from(memo, 'binary'))
+  let memoBuffer = types.EncryptedMemoD(Buffer.from(memo, 'binary'))
   const { from, to, nonce, check, encrypted } = memoBuffer
   const pubkey = private_key.createPublic().toString()
   const otherpub =
@@ -98,7 +84,7 @@ const decode = (private_key: PrivateKey | string, memo: string): string => {
   } catch (e) {
     mbuf.reset()
     // Sender did not length-prefix the memo
-    memo = NodeBuffer.from(mbuf.toString('binary'), 'binary').toString('utf-8')
+    memo = Buffer.from(mbuf.toString('binary'), 'binary').toString('utf-8')
     return '#' + memo
   }
 }

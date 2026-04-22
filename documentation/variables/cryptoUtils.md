@@ -8,7 +8,7 @@
 
 > `const` **cryptoUtils**: `object`
 
-Defined in: crypto.ts:502
+Defined in: crypto.ts:472
 
 Misc crypto utility functions.
 
@@ -16,7 +16,7 @@ Misc crypto utility functions.
 
 ### decodePrivate
 
-> **decodePrivate**: (`encodedKey`) => `any`
+> **decodePrivate**: (`encodedKey`) => `BBuffer`
 
 Decode bs58+doubleSha256-checksum encoded private key.
 
@@ -28,11 +28,11 @@ Decode bs58+doubleSha256-checksum encoded private key.
 
 #### Returns
 
-`any`
+`BBuffer`
 
 ### doubleSha256
 
-> **doubleSha256**: (`input`) => `any`
+> **doubleSha256**: (`input`) => `BBuffer`
 
 Return 2-round sha256 hash of input.
 
@@ -40,11 +40,11 @@ Return 2-round sha256 hash of input.
 
 ##### input
 
-`any`
+`string` \| `BBuffer`
 
 #### Returns
 
-`any`
+`BBuffer`
 
 ### encodePrivate
 
@@ -56,7 +56,7 @@ Encode bs58+doubleSha256-checksum private key.
 
 ##### key
 
-`any`
+`BBuffer`
 
 #### Returns
 
@@ -72,7 +72,7 @@ Encode public key with bs58+ripemd160-checksum.
 
 ##### key
 
-`any`
+`BBuffer`
 
 ##### prefix
 
@@ -84,7 +84,7 @@ Encode public key with bs58+ripemd160-checksum.
 
 ### generateTrxId
 
-> **generateTrxId**: (`transaction`) => `any`
+> **generateTrxId**: (`transaction`) => `string`
 
 #### Parameters
 
@@ -94,7 +94,7 @@ Encode public key with bs58+ripemd160-checksum.
 
 #### Returns
 
-`any`
+`string`
 
 ### isCanonicalSignature
 
@@ -106,7 +106,7 @@ Return true if signature is canonical, otherwise false.
 
 ##### signature
 
-`any`
+`BBuffer`
 
 #### Returns
 
@@ -122,7 +122,7 @@ Return true if string is wif, otherwise false.
 
 ##### privWif
 
-`any`
+`string` \| `BBuffer`
 
 #### Returns
 
@@ -130,7 +130,7 @@ Return true if string is wif, otherwise false.
 
 ### ripemd160
 
-> **ripemd160**: (`input`) => `any`
+> **ripemd160**: (`input`) => `BBuffer`
 
 Return ripemd160 hash of input.
 
@@ -138,15 +138,15 @@ Return ripemd160 hash of input.
 
 ##### input
 
-`any`
+`string` \| `BBuffer`
 
 #### Returns
 
-`any`
+`BBuffer`
 
 ### sha256
 
-> **sha256**: (`input`) => `any`
+> **sha256**: (`input`) => `BBuffer`
 
 Return sha256 hash of input.
 
@@ -154,11 +154,11 @@ Return sha256 hash of input.
 
 ##### input
 
-`any`
+`string` \| `BBuffer`
 
 #### Returns
 
-`any`
+`BBuffer`
 
 ### signTransaction
 
@@ -182,7 +182,7 @@ Key(s) to sign transaction with.
 
 ##### chainId?
 
-`Buffer` = `DEFAULT_CHAIN_ID`
+`BBuffer` = `DEFAULT_CHAIN_ID`
 
 #### Returns
 
@@ -190,7 +190,7 @@ Key(s) to sign transaction with.
 
 ### transactionDigest
 
-> **transactionDigest**: (`transaction`, `chainId`) => `any`
+> **transactionDigest**: (`transaction`, `chainId`) => `BBuffer`
 
 Return the sha256 transaction digest.
 
@@ -202,10 +202,10 @@ Return the sha256 transaction digest.
 
 ##### chainId?
 
-`Buffer` = `DEFAULT_CHAIN_ID`
+`BBuffer` = `DEFAULT_CHAIN_ID`
 
 The chain id to use when creating the hash.
 
 #### Returns
 
-`any`
+`BBuffer`

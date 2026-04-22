@@ -8,7 +8,7 @@
 
 > `const` **Types**: `object`
 
-Defined in: chain/serializer.ts:657
+Defined in: chain/serializer.ts:656
 
 ## Type Declaration
 

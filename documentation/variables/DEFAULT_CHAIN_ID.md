@@ -6,8 +6,8 @@
 
 # Variable: DEFAULT\_CHAIN\_ID
 
-> `const` **DEFAULT\_CHAIN\_ID**: `Buffer`\<`ArrayBuffer`\>
+> `const` **DEFAULT\_CHAIN\_ID**: `BBuffer`
 
-Defined in: client.ts:67
+Defined in: client.ts:68
 
 Main Pixa network chain id.

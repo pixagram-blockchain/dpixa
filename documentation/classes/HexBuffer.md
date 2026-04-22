@@ -6,7 +6,7 @@
 
 # Class: HexBuffer
 
-Defined in: chain/misc.ts:50
+Defined in: chain/misc.ts:49
 
 Buffer wrapper that serializes to a hex-encoded string.
 
@@ -16,7 +16,7 @@ Buffer wrapper that serializes to a hex-encoded string.
 
 > **new HexBuffer**(`buffer`): `HexBuffer`
 
-Defined in: chain/misc.ts:52
+Defined in: chain/misc.ts:50
 
 #### Parameters
 
@@ -34,7 +34,7 @@ Defined in: chain/misc.ts:52
 
 > **buffer**: `any`
 
-Defined in: chain/misc.ts:52
+Defined in: chain/misc.ts:50
 
 ## Methods
 
@@ -42,7 +42,7 @@ Defined in: chain/misc.ts:52
 
 > **toJSON**(): `string`
 
-Defined in: chain/misc.ts:76
+Defined in: chain/misc.ts:71
 
 #### Returns
 
@@ -54,13 +54,13 @@ Defined in: chain/misc.ts:76
 
 > **toString**(`encoding?`): `string`
 
-Defined in: chain/misc.ts:71
+Defined in: chain/misc.ts:67
 
 #### Parameters
 
 ##### encoding?
 
-`BufferEncoding` = `'hex'`
+`"utf-8"` \| `"hex"` \| `"binary"` \| `"utf8"` \| `"latin1"`
 
 #### Returns
 
@@ -72,7 +72,7 @@ Defined in: chain/misc.ts:71
 
 > `static` **from**(`value`): `HexBuffer`
 
-Defined in: chain/misc.ts:57
+Defined in: chain/misc.ts:55
 
 Convenience to create a new HexBuffer, does not copy data if value passed is already a buffer.
 
@@ -80,7 +80,7 @@ Convenience to create a new HexBuffer, does not copy data if value passed is alr
 
 ##### value
 
-`string` \| `number`[] \| `HexBuffer` \| `Buffer`\<`ArrayBufferLike`\>
+`string` \| `number`[] \| `BBuffer` \| `HexBuffer`
 
 #### Returns
 

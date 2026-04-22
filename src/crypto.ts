@@ -1,9 +1,8 @@
 /**
- * @file Hive/Pixa crypto helpers.
- * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
+ * @file Hive crypto helpers.
+ * @author Johan Nordberg <code@johan-nordberg.com>
  * @license
  * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
- * Copyright (c) 2025 Matias Affolter. All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -36,44 +35,16 @@
 
 import * as assert from 'assert'
 import { createHash } from 'crypto'
-const bigInteger = require("bigi");
-import * as bs58 from "./base58";
-const ByteBuffer = require("@ecency/bytebuffer");
-// NOTE: Previously this file did `const Buffer = ByteBuffer;` which shadowed
-// the real Buffer with the ByteBuffer constructor. ByteBuffer exposes
-// .concat (with DIFFERENT semantics — it returns a ByteBuffer instance, not
-// a Buffer) but no .from / .alloc. The result was that calls like
-// `Buffer.from(...)` silently resolved to the global Buffer while
-// `Buffer.concat(...)` went to ByteBuffer.concat, producing a ByteBuffer
-// object that was then handed to sha256(...) — which coerces it via
-// toString() (returning a debug string like "ByteBufferNB(offset=X,limit=Y,
-// capacity=Z)"). That string's content depends on ByteBuffer's capacity,
-// and capacity only changes when the serialized transaction outgrows
-// DEFAULT_CAPACITY. Small transactions hash one metadata string, large
-// transactions hash a different one, and neither matches what the node
-// re-serializes — producing the misleading "Missing Posting Authority"
-// error for small comment bodies.
-//
-// Fix: explicitly require the `buffer` package (listed as a direct
-// dependency of dpixa) and use ITS `Buffer` class for all byte
-// manipulation. This works uniformly in:
-//   - node.js builds (`require('buffer')` → Node core, `Buffer.from/alloc/concat` all exist)
-//   - browserify browser builds (resolves to feross/buffer, same API)
-//   - webpack consumers of the built dist/dpixa.js (dpixa is already bundled,
-//     so this require is already resolved before webpack sees anything)
-//
-// DO NOT reintroduce a local `const Buffer = ...` binding — that shadowing
-// is exactly what caused the original bug.
-const bufferModule = require("safe-buffer");
-const NodeBuffer = bufferModule.Buffer;
-const ecurve = require("ecurve");
-const Ripemd160 = require("ripemd160");
-const secp256k1 = require("secp256k1");
-import { WError as  VError } from 'verror'
+import * as bigInteger from 'bigi'
+import * as bs58 from './base58'
+import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
+import * as ecurve from 'ecurve'
+import * as Ripemd160 from 'ripemd160'
+import * as secp256k1 from 'secp256k1'
+import { VError } from 'verror'
 import { Types } from './chain/serializer'
 import { SignedTransaction, Transaction } from './chain/transaction'
 import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
-import {NETWORK_ID_INT} from "./parameters";
 import { copy } from './utils'
 
 /**
@@ -84,12 +55,12 @@ const secp256k1Curve = ecurve.getCurveByName('secp256k1')
 /**
  * Network id used in WIF-encoding.
  */
-export const NETWORK_ID = NodeBuffer.from([NETWORK_ID_INT])
+export const NETWORK_ID = Buffer.from([0x80])
 
 /**
  * Return ripemd160 hash of input.
  */
-function ripemd160(input: any | string): any {
+function ripemd160(input: Buffer | string): Buffer {
   return new Ripemd160()
       .update(input)
       .digest()
@@ -98,7 +69,7 @@ function ripemd160(input: any | string): any {
 /**
  * Return sha256 hash of input.
  */
-function sha256(input: any | string): any {
+function sha256(input: Buffer | string): Buffer {
   return createHash('sha256')
       .update(input)
       .digest()
@@ -107,7 +78,7 @@ function sha256(input: any | string): any {
 /**
  * Return sha512 hash of input
  */
-function sha512(input: any | string): any {
+function sha512(input: Buffer | string): Buffer {
   return createHash('sha512')
       .update(input)
       .digest()
@@ -116,16 +87,16 @@ function sha512(input: any | string): any {
 /**
  * Return 2-round sha256 hash of input.
  */
-function doubleSha256(input: any | string): any {
+function doubleSha256(input: Buffer | string): Buffer {
   return sha256(sha256(input))
 }
 
 /**
  * Encode public key with bs58+ripemd160-checksum.
  */
-function encodePublic(key: any, prefix: string): string {
+function encodePublic(key: Buffer, prefix: string): string {
   const checksum = ripemd160(key)
-  return prefix + bs58.encode(NodeBuffer.concat([key, checksum.slice(0, 4)]))
+  return prefix + bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
 }
 
 /**
@@ -135,7 +106,7 @@ function decodePublic(encodedKey: string): { key: Buffer; prefix: string } {
   const prefix = encodedKey.slice(0, 3)
   assert.equal(prefix.length, 3, 'public key invalid prefix')
   encodedKey = encodedKey.slice(3)
-  const buffer: any = bs58.decode(encodedKey)
+  const buffer: Buffer = bs58.decode(encodedKey)
   const checksum = buffer.slice(-4)
   const key = buffer.slice(0, -4)
   const checksumVerify = ripemd160(key).slice(0, 4)
@@ -146,16 +117,16 @@ function decodePublic(encodedKey: string): { key: Buffer; prefix: string } {
 /**
  * Encode bs58+doubleSha256-checksum private key.
  */
-function encodePrivate(key: any): string {
+function encodePrivate(key: Buffer): string {
   assert.equal(key.readUInt8(0), 0x80, 'private key network id mismatch')
   const checksum = doubleSha256(key)
-  return bs58.encode(NodeBuffer.concat([key, checksum.slice(0, 4)]))
+  return bs58.encode(Buffer.concat([key, checksum.slice(0, 4)]))
 }
 
 /**
  * Decode bs58+doubleSha256-checksum encoded private key.
  */
-function decodePrivate(encodedKey: string): any {
+function decodePrivate(encodedKey: string): Buffer {
   const buffer: Buffer = bs58.decode(encodedKey)
   assert.deepEqual(
       buffer.slice(0, 1),
@@ -172,7 +143,7 @@ function decodePrivate(encodedKey: string): any {
 /**
  * Return true if signature is canonical, otherwise false.
  */
-function isCanonicalSignature(signature: any): boolean {
+function isCanonicalSignature(signature: Buffer): boolean {
   return (
       !(signature[0] & 0x80) &&
       !(signature[0] === 0 && !(signature[1] & 0x80)) &&
@@ -184,9 +155,9 @@ function isCanonicalSignature(signature: any): boolean {
 /**
  * Return true if string is wif, otherwise false.
  */
-function isWif(privWif: string | any): boolean {
+function isWif(privWif: string | Buffer): boolean {
   try {
-    const bufWif = NodeBuffer.from(bs58.decode(privWif))
+    const bufWif = Buffer.from(bs58.decode(privWif as any))
     const privKey = bufWif.slice(0, -4)
     const checksum = bufWif.slice(-4)
     let newChecksum = sha256(privKey)
@@ -203,17 +174,17 @@ function isWif(privWif: string | any): boolean {
  */
 export class PublicKey {
 
-  public readonly uncompressed: any
+  public readonly uncompressed: Buffer
 
   constructor(
       public readonly key: any,
       public readonly prefix = DEFAULT_ADDRESS_PREFIX,
   ) {
     assert(secp256k1.publicKeyVerify(key), 'invalid public key')
-    this.uncompressed = NodeBuffer.from(secp256k1.publicKeyConvert(key, false))
+    this.uncompressed = Buffer.from(secp256k1.publicKeyConvert(key, false))
   }
 
-  public static fromBuffer(key: any) {
+  public static fromBuffer(key: ByteBuffer) {
     assert(secp256k1.publicKeyVerify(key), 'invalid buffer as public key')
     return { key }
   }
@@ -242,7 +213,7 @@ export class PublicKey {
    * @param message 32-byte message to verify.
    * @param signature Signature to verify.
    */
-  public verify(message: any, signature: Signature): boolean {
+  public verify(message: Buffer, signature: Signature): boolean {
     return secp256k1.verify(message, signature.data, this.key)
   }
 
@@ -274,9 +245,9 @@ export type KeyRole = 'owner' | 'active' | 'posting' | 'memo'
  * ECDSA (secp256k1) private key.
  */
 export class PrivateKey {
-  public secret: any
+  public secret: Buffer
 
-  constructor(private key: any) {
+  constructor(private key: Buffer) {
     assert(secp256k1.privateKeyVerify(key), 'invalid private key')
   }
 
@@ -318,7 +289,7 @@ export class PrivateKey {
   }
 
   public multiply(pub: any): Buffer {
-    return NodeBuffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false))
+    return Buffer.from(secp256k1.publicKeyTweakMul(pub.key, this.secret, false))
   }
 
   /**
@@ -330,7 +301,7 @@ export class PrivateKey {
     let attempts = 0
     do {
       const options = {
-        data: sha256(NodeBuffer.concat([message, NodeBuffer.alloc(1, ++attempts)]))
+        data: sha256(Buffer.concat([message, Buffer.alloc(1, ++attempts)]))
       }
       rv = secp256k1.sign(message, this.key, options)
     } while (!isCanonicalSignature(rv.signature))
@@ -348,7 +319,7 @@ export class PrivateKey {
    * Return a WIF-encoded representation of the key.
    */
   public toString() {
-    return encodePrivate(NodeBuffer.concat([NETWORK_ID, this.key]))
+    return encodePrivate(Buffer.concat([NETWORK_ID, this.key]))
   }
 
   /**
@@ -379,8 +350,16 @@ export class PrivateKey {
  * ECDSA (secp256k1) signature.
  */
 export class Signature {
-  constructor(public data: Buffer, public recovery: number) {
+  public data: Buffer
+  public recovery: number
+
+  constructor(data: Uint8Array | Buffer, recovery: number) {
     assert.equal(data.length, 64, 'invalid signature')
+    // Normalise to BBuffer so .copy(), .toString('hex'), etc. always work
+    // regardless of whether the caller passed a Node Buffer, a plain Uint8Array
+    // (e.g. from secp256k1 in browser builds), or our own BBuffer.
+    this.data = data instanceof Buffer ? data : Buffer.from(data)
+    this.recovery = recovery
   }
 
   public static fromBuffer(buffer: Buffer) {
@@ -391,7 +370,7 @@ export class Signature {
   }
 
   public static fromString(string: string) {
-    return Signature.fromBuffer(NodeBuffer.from(string, 'hex'))
+    return Signature.fromBuffer(Buffer.from(string, 'hex'))
   }
 
   /**
@@ -406,7 +385,7 @@ export class Signature {
   }
 
   public toBuffer() {
-    const buffer = NodeBuffer.alloc(65)
+    const buffer = Buffer.alloc(65)
     buffer.writeUInt8(this.recovery + 31, 0)
     this.data.copy(buffer, 1)
     return buffer
@@ -438,14 +417,8 @@ function transactionDigest(
   }
   buffer.flip()
 
-  // forceCopy=true: extract a freshly-allocated Node Buffer instead of a
-  // view into ByteBuffer's backing allocation. A view can be mutated by
-  // subsequent ByteBuffer operations (or share memory with pooled Node
-  // Buffer slabs) between digest computation and broadcast, causing the
-  // node to re-hash different bytes than what was signed — which surfaces
-  // as "Missing Posting Authority" for certain payload sizes.
-  const transactionData = buffer.toBuffer(true)
-  const digest = sha256(NodeBuffer.concat([chainId, transactionData]))
+  const transactionData = Buffer.from(buffer.toBuffer())
+  const digest = sha256(Buffer.concat([chainId, transactionData]))
   return digest
 }
 
@@ -491,10 +464,7 @@ function generateTrxId(transaction: Transaction) {
     )
   }
   buffer.flip()
-  // forceCopy=true: see comment in transactionDigest. Same rationale —
-  // the bytes we hash for the trx id must not share memory with the
-  // ByteBuffer that produced them.
-  const transactionData = buffer.toBuffer(true)
+  const transactionData = Buffer.from(buffer.toBuffer())
   return cryptoUtils.sha256(transactionData).toString('hex').slice(0, 40)
 }
 

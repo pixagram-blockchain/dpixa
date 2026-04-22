@@ -6,7 +6,7 @@
 
 # Interface: WitnessProps
 
-Defined in: utils.ts:208
+Defined in: utils.ts:207
 
 ## Properties
 
@@ -14,7 +14,7 @@ Defined in: utils.ts:208
 
 > `optional` **account\_creation\_fee?**: `string` \| [`Asset`](../../../../classes/Asset.md)
 
-Defined in: utils.ts:209
+Defined in: utils.ts:208
 
 ***
 
@@ -22,7 +22,7 @@ Defined in: utils.ts:209
 
 > `optional` **account\_subsidy\_budget?**: `number`
 
-Defined in: utils.ts:210
+Defined in: utils.ts:209
 
 ***
 
@@ -30,7 +30,7 @@ Defined in: utils.ts:210
 
 > `optional` **account\_subsidy\_decay?**: `number`
 
-Defined in: utils.ts:211
+Defined in: utils.ts:210
 
 ***
 
@@ -38,7 +38,7 @@ Defined in: utils.ts:211
 
 > **key**: `string` \| [`PublicKey`](../../../../classes/PublicKey.md)
 
-Defined in: utils.ts:212
+Defined in: utils.ts:211
 
 ***
 
@@ -46,7 +46,7 @@ Defined in: utils.ts:212
 
 > `optional` **maximum\_block\_size?**: `number`
 
-Defined in: utils.ts:213
+Defined in: utils.ts:212
 
 ***
 
@@ -54,7 +54,7 @@ Defined in: utils.ts:213
 
 > `optional` **new\_signing\_key?**: `string` \| [`PublicKey`](../../../../classes/PublicKey.md) \| `null`
 
-Defined in: utils.ts:214
+Defined in: utils.ts:213
 
 ***
 
@@ -62,7 +62,7 @@ Defined in: utils.ts:214
 
 > `optional` **pxs\_exchange\_rate?**: [`PriceType`](../../../../type-aliases/PriceType.md)
 
-Defined in: utils.ts:215
+Defined in: utils.ts:214
 
 ***
 
@@ -70,7 +70,7 @@ Defined in: utils.ts:215
 
 > `optional` **pxs\_interest\_rate?**: `number`
 
-Defined in: utils.ts:216
+Defined in: utils.ts:215
 
 ***
 
@@ -78,4 +78,4 @@ Defined in: utils.ts:216
 
 > `optional` **url?**: `string`
 
-Defined in: utils.ts:217
+Defined in: utils.ts:216

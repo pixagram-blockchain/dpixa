@@ -6,7 +6,7 @@
 
 # Interface: ClientOptions
 
-Defined in: client.ts:130
+Defined in: client.ts:131
 
 RPC Client options
 ------------------
@@ -17,7 +17,7 @@ RPC Client options
 
 > `optional` **addressPrefix?**: `string`
 
-Defined in: client.ts:142
+Defined in: client.ts:143
 
 Pixa address prefix. Defaults to main network:
 `PIX`
@@ -28,7 +28,7 @@ Pixa address prefix. Defaults to main network:
 
 > `optional` **agent?**: `any`
 
-Defined in: client.ts:174
+Defined in: client.ts:175
 
 Node.js http(s) agent, use if you want http keep-alive.
 Defaults to using https.globalAgent.
@@ -43,7 +43,7 @@ https://nodejs.org/api/http.html#http_new_agent_options.
 
 > `optional` **backoff?**: (`tries`) => `number`
 
-Defined in: client.ts:168
+Defined in: client.ts:169
 
 Retry backoff function, returns milliseconds. Default = defaultBackoff.
 
@@ -63,7 +63,7 @@ Retry backoff function, returns milliseconds. Default = defaultBackoff.
 
 > `optional` **chainId?**: `string`
 
-Defined in: client.ts:137
+Defined in: client.ts:138
 
 Pixa chain id. Defaults to main pixa network:
 need the new id?
@@ -75,7 +75,7 @@ need the new id?
 
 > `optional` **consoleOnFailover?**: `boolean`
 
-Defined in: client.ts:163
+Defined in: client.ts:164
 
 Whether a console.log should be made when RPC failed over to another one
 
@@ -85,7 +85,7 @@ Whether a console.log should be made when RPC failed over to another one
 
 > `optional` **failoverThreshold?**: `number`
 
-Defined in: client.ts:158
+Defined in: client.ts:159
 
 Specifies the amount of times the urls (RPC nodes) should be
 iterated and retried in case of timeout errors.
@@ -98,7 +98,7 @@ Can be set to 0 to iterate and retry forever. Defaults to 3 rounds.
 
 > `optional` **rebrandedApi?**: `boolean`
 
-Defined in: client.ts:178
+Defined in: client.ts:179
 
 Deprecated - don't use
 
@@ -108,7 +108,7 @@ Deprecated - don't use
 
 > `optional` **timeout?**: `number`
 
-Defined in: client.ts:150
+Defined in: client.ts:151
 
 Send timeout, how long to wait in milliseconds before giving
 up on a rpc call. Note that this is not an exact timeout,

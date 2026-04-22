@@ -34,8 +34,7 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+import ByteBuffer, { BBuffer as Buffer } from '../bytebuffer'
 import { PublicKey } from '../crypto'
 import { Asset } from './asset'
 import { HexBuffer } from './misc'

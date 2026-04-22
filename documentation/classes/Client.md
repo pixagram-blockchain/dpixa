@@ -6,7 +6,7 @@
 
 # Class: Client
 
-Defined in: client.ts:186
+Defined in: client.ts:187
 
 RPC Client
 ----------
@@ -18,7 +18,7 @@ Can be used in both node.js and the browser. Also see [ClientOptions](../interfa
 
 > **new Client**(`address`, `options?`): `Client`
 
-Defined in: client.ts:257
+Defined in: client.ts:258
 
 #### Parameters
 
@@ -45,7 +45,7 @@ Client options.
 
 > **address**: `string` \| `string`[]
 
-Defined in: client.ts:196
+Defined in: client.ts:197
 
 Address to Pixa RPC server.
 String or String[] *read-only*
@@ -56,7 +56,7 @@ String or String[] *read-only*
 
 > `readonly` **addressPrefix**: `string`
 
-Defined in: client.ts:241
+Defined in: client.ts:242
 
 Address prefix for current network.
 
@@ -66,7 +66,7 @@ Address prefix for current network.
 
 > `readonly` **blockchain**: [`Blockchain`](Blockchain.md)
 
-Defined in: client.ts:216
+Defined in: client.ts:217
 
 Blockchain helper.
 
@@ -76,7 +76,7 @@ Blockchain helper.
 
 > `readonly` **broadcast**: `BroadcastAPI`
 
-Defined in: client.ts:211
+Defined in: client.ts:212
 
 Broadcast API helper.
 
@@ -84,9 +84,9 @@ Broadcast API helper.
 
 ### chainId
 
-> `readonly` **chainId**: `Buffer`
+> `readonly` **chainId**: `BBuffer`
 
-Defined in: client.ts:236
+Defined in: client.ts:237
 
 Chain ID for current network.
 
@@ -96,7 +96,7 @@ Chain ID for current network.
 
 > **currentAddress**: `string`
 
-Defined in: client.ts:250
+Defined in: client.ts:251
 
 ***
 
@@ -104,7 +104,7 @@ Defined in: client.ts:250
 
 > `readonly` **database**: [`DatabaseAPI`](DatabaseAPI.md)
 
-Defined in: client.ts:201
+Defined in: client.ts:202
 
 Database API helper.
 
@@ -114,7 +114,7 @@ Database API helper.
 
 > `readonly` **keys**: [`AccountByKeyAPI`](AccountByKeyAPI.md)
 
-Defined in: client.ts:226
+Defined in: client.ts:227
 
 Accounts by key API helper.
 
@@ -124,7 +124,7 @@ Accounts by key API helper.
 
 > `readonly` **options**: [`ClientOptions`](../interfaces/ClientOptions.md)
 
-Defined in: client.ts:190
+Defined in: client.ts:191
 
 Client options, *read-only*.
 
@@ -134,7 +134,7 @@ Client options, *read-only*.
 
 > `readonly` **pixamind**: [`PixamindAPI`](PixamindAPI.md)
 
-Defined in: client.ts:221
+Defined in: client.ts:222
 
 Pixamind helper.
 
@@ -144,7 +144,7 @@ Pixamind helper.
 
 > `readonly` **rc**: [`RCAPI`](RCAPI.md)
 
-Defined in: client.ts:206
+Defined in: client.ts:207
 
 RC API helper.
 
@@ -154,7 +154,7 @@ RC API helper.
 
 > `readonly` **transaction**: `TransactionStatusAPI`
 
-Defined in: client.ts:231
+Defined in: client.ts:232
 
 Transaction status API helper.
 
@@ -164,7 +164,7 @@ Transaction status API helper.
 
 > **call**(`api`, `method`, `params?`): `Promise`\<`any`\>
 
-Defined in: client.ts:309
+Defined in: client.ts:310
 
 Make a RPC call to the server.
 
@@ -198,7 +198,7 @@ Array of parameters to pass to the method, optional.
 
 > **updateOperations**(`rebrandedApi`): `void`
 
-Defined in: client.ts:412
+Defined in: client.ts:413
 
 #### Parameters
 
@@ -216,7 +216,7 @@ Defined in: client.ts:412
 
 > `static` **testnet**(`options?`): `Client`
 
-Defined in: client.ts:289
+Defined in: client.ts:290
 
 Create a new client instance configured for the testnet.
 

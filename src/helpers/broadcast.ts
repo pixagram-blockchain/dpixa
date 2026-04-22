@@ -36,6 +36,7 @@
 
 import * as assert from 'assert'
 
+import { BBuffer as Buffer } from '../bytebuffer'
 import { Authority, AuthorityType } from '../chain/account'
 import { Asset } from '../chain/asset'
 import {
@@ -124,9 +125,9 @@ export class BroadcastAPI {
    * @param key Private posting key of comment author.
    */
   public async commentWithOptions(
-    comment: CommentOperation[1],
-    options: CommentOptionsOperation[1],
-    key: PrivateKey
+      comment: CommentOperation[1],
+      options: CommentOptionsOperation[1],
+      key: PrivateKey
   ) {
     const ops: Operation[] = [
       ['comment', comment],
@@ -171,44 +172,44 @@ export class BroadcastAPI {
    * @param key Private active key of account creator.
    */
   public async createTestAccount(
-    options: CreateAccountOptions,
-    key: PrivateKey
+      options: CreateAccountOptions,
+      key: PrivateKey
   ) {
     assert(
-      global.hasOwnProperty('it'),
-      'helper to be used only for mocha tests'
+        global.hasOwnProperty('it'),
+        'helper to be used only for mocha tests'
     )
 
     const { username, metadata, creator } = options
 
     const prefix = this.client.addressPrefix
     let owner: Authority,
-      active: Authority,
-      posting: Authority,
-      memo_key: PublicKey
+        active: Authority,
+        posting: Authority,
+        memo_key: PublicKey
     if (options.password) {
       const ownerKey = PrivateKey.fromLogin(
-        username,
-        options.password,
-        'owner'
+          username,
+          options.password,
+          'owner'
       ).createPublic(prefix)
       owner = Authority.from(ownerKey)
       const activeKey = PrivateKey.fromLogin(
-        username,
-        options.password,
-        'active'
+          username,
+          options.password,
+          'active'
       ).createPublic(prefix)
       active = Authority.from(activeKey)
       const postingKey = PrivateKey.fromLogin(
-        username,
-        options.password,
-        'posting'
+          username,
+          options.password,
+          'posting'
       ).createPublic(prefix)
       posting = Authority.from(postingKey)
       memo_key = PrivateKey.fromLogin(
-        username,
-        options.password,
-        'memo'
+          username,
+          options.password,
+          'memo'
       ).createPublic(prefix)
     } else if (options.auths) {
       owner = Authority.from(options.auths.owner)
@@ -296,8 +297,8 @@ export class BroadcastAPI {
    * @param key Private active key of the delegator.
    */
   public async delegateVestingShares(
-    options: DelegateVestingSharesOperation[1],
-    key: PrivateKey
+      options: DelegateVestingSharesOperation[1],
+      key: PrivateKey
   ) {
     const op: Operation = ['delegate_vesting_shares', options]
     return this.sendOperations([op], key)
@@ -309,21 +310,21 @@ export class BroadcastAPI {
    * @param key Private key(s) used to sign transaction.
    */
   public async sendOperations(
-    operations: Operation[],
-    key: PrivateKey | PrivateKey[]
+      operations: Operation[],
+      key: PrivateKey | PrivateKey[]
   ): Promise<TransactionConfirmation> {
     const props = await this.client.database.getDynamicGlobalProperties()
 
     const ref_block_num = props.head_block_number & 0xffff
     const ref_block_prefix = Buffer.from(
-      props.head_block_id,
-      'hex'
+        props.head_block_id,
+        'hex'
     ).readUInt32LE(4)
     const expiration = new Date(
-      new Date(props.time + 'Z').getTime() + this.expireTime
+        new Date(props.time + 'Z').getTime() + this.expireTime
     )
-      .toISOString()
-      .slice(0, -5)
+        .toISOString()
+        .slice(0, -5)
     const extensions = []
 
     const tx: Transaction = {
@@ -344,8 +345,8 @@ export class BroadcastAPI {
    * Sign a transaction with key(s).
    */
   public sign(
-    transaction: Transaction,
-    key: PrivateKey | PrivateKey[]
+      transaction: Transaction,
+      key: PrivateKey | PrivateKey[]
   ): SignedTransaction {
     return cryptoUtils.signTransaction(transaction, key, this.client.chainId)
   }
@@ -354,7 +355,7 @@ export class BroadcastAPI {
    * Broadcast a signed transaction to the network.
    */
   public async send(
-    transaction: SignedTransaction
+      transaction: SignedTransaction
   ): Promise<TransactionConfirmation> {
     const trxId = cryptoUtils.generateTrxId(transaction)
     const result = await this.call('broadcast_transaction', [transaction])

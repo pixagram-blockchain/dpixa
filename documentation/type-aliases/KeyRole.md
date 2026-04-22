@@ -8,4 +8,4 @@
 
 > **KeyRole** = `"owner"` \| `"active"` \| `"posting"` \| `"memo"`
 
-Defined in: crypto.ts:271
+Defined in: crypto.ts:242

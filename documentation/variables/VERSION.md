@@ -8,6 +8,6 @@
 
 > `const` **VERSION**: `string` = `packageVersion`
 
-Defined in: client.ts:62
+Defined in: client.ts:63
 
 Library version.

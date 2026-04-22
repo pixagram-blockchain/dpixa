@@ -35,9 +35,8 @@
  */
 import { Account } from './account'
 import { Asset, Price } from './asset'
-// 💡 FIX: Explicitly import the Buffer type from Node.js
-const ByteBuffer = require("@ecency/bytebuffer");
-const Buffer = ByteBuffer;
+// Custom Uint8Array-backed Buffer shim (see bytebuffer.ts).
+import { BBuffer as Buffer } from '../bytebuffer'
 
 /**
  * Large number that may be unsafe to represent natively in JavaScript.
@@ -48,7 +47,6 @@ export type Bignum = string
  * Buffer wrapper that serializes to a hex-encoded string.
  */
 export class HexBuffer {
-    // 💡 FIX: Explicitly use the imported Buffer type
     constructor(public buffer: any) {}
 
     /**
@@ -60,16 +58,13 @@ export class HexBuffer {
         } else if (value instanceof Buffer) {
             return new HexBuffer(value)
         } else if (typeof value === 'string') {
-            // 💡 FIX: Use the imported Buffer.from
             return new HexBuffer(Buffer.from(value, 'hex'))
         } else {
-            // 💡 FIX: Use the imported Buffer.from
             return new HexBuffer(Buffer.from(value))
         }
     }
 
-    public toString(encoding: BufferEncoding = 'hex'): string {
-        // This line is now correctly typed as Buffer has .toString() with encoding options
+    public toString(encoding: 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1' = 'hex'): string {
         return this.buffer.toString(encoding)
     }
 
