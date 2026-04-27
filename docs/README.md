@@ -1,1 +1,1 @@
-Served at <https://pixagram.io/dpixa>
+Served at <https://pixagram.com/dpixa>

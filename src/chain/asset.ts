@@ -45,7 +45,7 @@ export interface SMTAsset {
 /**
  * Asset symbol string.
  */
-export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD'
+export type AssetSymbol = 'HIVE' | 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD'
 
 /**
  * Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
@@ -139,10 +139,10 @@ export class Asset {
    */
   public steem_symbols(): Asset {
     switch (this.symbol) {
-      case 'PIXA':
-        return Asset.from(this.amount, 'STEEM')
-      case 'PXS':
-        return Asset.from(this.amount, 'SBD')
+      case 'STEEM':
+        return Asset.from(this.amount, 'PIXA')
+      case 'SBD':
+        return Asset.from(this.amount, 'PXS')
       default:
         return this
     }

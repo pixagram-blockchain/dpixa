@@ -244,7 +244,7 @@ declare module 'dpixa/chain/asset' {
 	/**
 	 * Asset symbol string.
 	 */
-	export type AssetSymbol = 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD';
+	export type AssetSymbol = 'HIVE' | 'PXA' | 'PIXA' | 'TESTS' | 'PXP' | 'VESTS' | 'PXS' | 'TBD' | 'STEEM' | 'TPS' | 'SBD' | 'HBD';
 	/**
 	 * Class representing a pixa asset, e.g. `1.000 PIXA` or `12.112233 VESTS`.
 	 */
