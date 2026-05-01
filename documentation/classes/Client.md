@@ -27,7 +27,7 @@ Defined in: client.ts:258
 `string` \| `string`[]
 
 The address to the Pixa RPC server,
-e.g. `https://api.pixagram.io`. or [`https://api.pixagram.org`, `https://another.api.com`]
+e.g. `https://api.pixagram.com`. or [`https://api.pixagram.com`, `https://another.api.com`]
 
 ##### options?
 

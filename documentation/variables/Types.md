@@ -297,7 +297,7 @@ This looses precision for amounts larger than 2^53-1/10^precision.
 
 ##### data
 
-`string` \| [`PublicKey`](../classes/PublicKey.md)
+`string` \| [`PublicKey`](../classes/PublicKey.md) \| `null`
 
 #### Returns
 

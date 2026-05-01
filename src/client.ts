@@ -36,7 +36,7 @@
 
 import * as assert from 'assert'
 import { VError } from 'verror'
-import {default as packageVersion} from './version'
+import packageVersion from './version'
 import { BBuffer as Buffer } from './bytebuffer'
 import {
     MAINNET_HEX_CHAIN_ID,
@@ -45,7 +45,7 @@ import {
     MAIN_TESTNET_NODE_URL,
     PREFIX_TESTNET_ADDRESS,
     MAIN_MAINNET_NODE_URL
-} from './parameters'
+} from "./parameters";
 
 import { Blockchain } from './helpers/blockchain'
 import { BroadcastAPI } from './helpers/broadcast'
@@ -73,7 +73,7 @@ export const DEFAULT_CHAIN_ID = Buffer.from(
 /**
  * Main Pixa network address prefix.
  */
-export const DEFAULT_ADDRESS_PREFIX = PREFIX_MAINNET_ADDRESS
+export const DEFAULT_ADDRESS_PREFIX = PREFIX_MAINNET_ADDRESS;
 
 interface RPCRequest {
     /**
@@ -252,7 +252,7 @@ export class Client {
 
     /**
      * @param address The address to the Pixa RPC server,
-     * e.g. `https://api.pixagram.io`. or [`https://api.pixagram.org`, `https://another.api.com`]
+     * e.g. `https://api.pixagram.com`. or [`https://api.pixagram.com`, `https://another.api.com`]
      * @param options Client options.
      */
     constructor(address: string | string[], options: ClientOptions = {}) {
@@ -260,8 +260,8 @@ export class Client {
             // tslint:disable-next-line: no-console
             console.log('Warning: rebrandedApi is deprecated and safely can be removed from client options')
         }
-        this.currentAddress = Array.isArray(address) ? address[0] : address
-        this.address = address
+        this.currentAddress = (Array.isArray(address) ? address[0] : address) || MAIN_MAINNET_NODE_URL
+        this.address = address || [MAIN_MAINNET_NODE_URL]
         this.options = options
 
         this.chainId = options.chainId
@@ -294,8 +294,8 @@ export class Client {
             opts.agent = options.agent
         }
 
-        opts.addressPrefix = PREFIX_TESTNET_ADDRESS
-        opts.chainId = TESTNET_HEX_CHAIN_ID
+        opts.addressPrefix = PREFIX_TESTNET_ADDRESS;
+        opts.chainId = TESTNET_HEX_CHAIN_ID;
         return new Client(MAIN_TESTNET_NODE_URL, opts)
     }
 
@@ -330,10 +330,10 @@ export class Client {
             cache: 'no-cache',
             headers: {
                 'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             method: 'POST',
-            mode: 'cors'
+            mode: 'cors',
         }
 
         // Self is not defined within Node environments
@@ -354,7 +354,7 @@ export class Client {
         ) {
             // bit of a hack to work around some nodes high error rates
             // only effective in node.js (until timeout spec lands in browsers)
-            fetchTimeout = tries => (tries + 1) * 500
+            fetchTimeout = (tries) => (tries + 1) * 500
         }
 
         const { response, currentAddress }: { response: RPCResponse; currentAddress: string } =
@@ -398,8 +398,8 @@ export class Client {
                     }
                 )
                 const unformattedData = Object.keys(topData)
-                    .map(key => ({ key, value: formatValue(topData[key]) }))
-                    .map(item => `${item.key}=${item.value}`)
+                    .map((key) => ({ key, value: formatValue(topData[key]) }))
+                    .map((item) => `${item.key}=${item.value}`)
                 if (unformattedData.length > 0) {
                     message += ' ' + unformattedData.join(' ')
                 }

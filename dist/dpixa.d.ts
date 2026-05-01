@@ -1,4 +1,4 @@
-declare module 'dpixa/bytebuffer' {
+declare module 'dpixa/src/bytebuffer' {
 	/**
 	 * @file Custom ByteBuffer / Buffer implementation backed by Uint8Array.
 	 *
@@ -36,7 +36,7 @@ declare module 'dpixa/bytebuffer' {
 	    static from(value: string, encoding?: Encoding): BBuffer;
 	    static from(value: ArrayBuffer | Uint8Array | BBuffer | ArrayLike<number>): BBuffer;
 	    /** Concatenate a list of Uint8Arrays / BBuffers into a single new buffer. */
-	    static concat(list: (Uint8Array | BBuffer)[], totalLength?: number): BBuffer;
+	    static concat(list: Array<Uint8Array | BBuffer>, totalLength?: number): BBuffer;
 	    /** Internal helper: wrap a Uint8Array in a BBuffer with its own memory. */
 	    private static fromUint8Array;
 	    /**
@@ -178,29 +178,29 @@ declare module 'dpixa/bytebuffer' {
 	export default ByteBuffer;
 
 }
-declare module 'dpixa/base58' {
+declare module 'dpixa/src/base58' {
 	/** Encode a Buffer (or Uint8Array / array-like of bytes) to a base58 string. */
 	export function encode(source: any): string;
 	/** Decode a base58 string to a Buffer. Throws on invalid characters. */
 	export function decode(source: string): any;
 
 }
-declare module 'dpixa/version' {
+declare module 'dpixa/src/version' {
 	 const _default: string;
 	export default _default;
 
 }
-declare module 'dpixa/parameters' {
+declare module 'dpixa/src/parameters' {
 	export const MAINNET_HEX_CHAIN_ID = "706978616772616d000000000000000000000000000000000000000000000000";
 	export const TESTNET_HEX_CHAIN_ID = "18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e";
 	export const PREFIX_MAINNET_ADDRESS = "PIX";
 	export const PREFIX_TESTNET_ADDRESS = "TST";
 	export const MAIN_MAINNET_NODE_URL = "https://api.pixagram.com";
-	export const MAIN_TESTNET_NODE_URL = "http://31.220.76.179:7777";
+	export const MAIN_TESTNET_NODE_URL = "https://api.pixagram.com";
 	export const NETWORK_ID_INT = 128;
 
 }
-declare module 'dpixa/chain/asset' {
+declare module 'dpixa/src/chain/asset' {
 	/**
 	 * @file Hive/Pixa asset type definitions and helpers.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -347,7 +347,7 @@ declare module 'dpixa/chain/asset' {
 	}
 
 }
-declare module 'dpixa/chain/account' {
+declare module 'dpixa/src/chain/account' {
 	/**
 	 * @file Hive/Pixa account type definitions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -383,8 +383,8 @@ declare module 'dpixa/chain/account' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { PublicKey } from 'dpixa/crypto';
-	import { Asset } from 'dpixa/chain/asset';
+	import { PublicKey } from 'dpixa/src/crypto';
+	import { Asset } from 'dpixa/src/chain/asset';
 	export interface AuthorityType {
 	    weight_threshold: number;
 	    account_auths: [string, number][];
@@ -496,9 +496,9 @@ declare module 'dpixa/chain/account' {
 	}
 
 }
-declare module 'dpixa/chain/misc' {
-	import { Account } from 'dpixa/chain/account';
-	import { Asset, Price } from 'dpixa/chain/asset';
+declare module 'dpixa/src/chain/misc' {
+	import { Account } from 'dpixa/src/chain/account';
+	import { Asset, Price } from 'dpixa/src/chain/asset';
 	/**
 	 * Large number that may be unsafe to represent natively in JavaScript.
 	 */
@@ -686,7 +686,7 @@ declare module 'dpixa/chain/misc' {
 	export function getVests(account: Account, subtract_delegated?: boolean, add_received?: boolean): number;
 
 }
-declare module 'dpixa/chain/serializer' {
+declare module 'dpixa/src/chain/serializer' {
 	/**
 	 * @file Hive/Pixa protocol serialization.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -722,11 +722,11 @@ declare module 'dpixa/chain/serializer' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
-	import { PublicKey } from 'dpixa/crypto';
-	import { Asset } from 'dpixa/chain/asset';
-	import { HexBuffer } from 'dpixa/chain/misc';
-	import { Operation } from 'dpixa/chain/operation';
+	import { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
+	import { PublicKey } from 'dpixa/src/crypto';
+	import { Asset } from 'dpixa/src/chain/asset';
+	import { HexBuffer } from 'dpixa/src/chain/misc';
+	import { Operation } from 'dpixa/src/chain/operation';
 	export type Serializer = (buffer: any, data: any) => void;
 	export const Types: {
 	    Array: (itemSerializer: Serializer) => (buffer: any, data: any[]) => void;
@@ -767,7 +767,7 @@ declare module 'dpixa/chain/serializer' {
 	};
 
 }
-declare module 'dpixa/chain/transaction' {
+declare module 'dpixa/src/chain/transaction' {
 	/**
 	 * @file Hive/Pixa transaction type definitions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -803,7 +803,7 @@ declare module 'dpixa/chain/transaction' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { Operation } from 'dpixa/chain/operation';
+	import { Operation } from 'dpixa/src/chain/operation';
 	export interface Transaction {
 	    ref_block_num: number;
 	    ref_block_prefix: number;
@@ -822,7 +822,7 @@ declare module 'dpixa/chain/transaction' {
 	}
 
 }
-declare module 'dpixa/crypto' {
+declare module 'dpixa/src/crypto' {
 	/**
 	 * @file Hive crypto helpers.
 	 * @author Johan Nordberg <code@johan-nordberg.com>
@@ -857,8 +857,8 @@ declare module 'dpixa/crypto' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import ByteBuffer, { BBuffer as Buffer } from 'dpixa/bytebuffer';
-	import { SignedTransaction, Transaction } from 'dpixa/chain/transaction'; function ripemd160(input: Uint8Array | Buffer | string): Buffer; function sha256(input: Uint8Array | Buffer | string): Buffer; function doubleSha256(input: Uint8Array | Buffer | string): Buffer;
+	import ByteBuffer, { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
+	import { SignedTransaction, Transaction } from 'dpixa/src/chain/transaction'; function ripemd160(input: Uint8Array | Buffer | string): Buffer; function sha256(input: Uint8Array | Buffer | string): Buffer; function doubleSha256(input: Uint8Array | Buffer | string): Buffer;
 	/**
 	 * Network id used in WIF-encoding.
 	 */
@@ -1022,7 +1022,7 @@ declare module 'dpixa/crypto' {
 	export {};
 
 }
-declare module 'dpixa/chain/block' {
+declare module 'dpixa/src/chain/block' {
 	/**
 	 * @file Hive/Pixa block type definitions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -1058,7 +1058,7 @@ declare module 'dpixa/chain/block' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { Transaction } from 'dpixa/chain/transaction';
+	import { Transaction } from 'dpixa/src/chain/transaction';
 	/**
 	 * Unsigned block header.
 	 */
@@ -1086,7 +1086,7 @@ declare module 'dpixa/chain/block' {
 	}
 
 }
-declare module 'dpixa/chain/comment' {
+declare module 'dpixa/src/chain/comment' {
 	/**
 	 * @file Hive/Pixa type definitions related to comments and posting.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -1122,7 +1122,7 @@ declare module 'dpixa/chain/comment' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { Asset } from 'dpixa/chain/asset';
+	import { Asset } from 'dpixa/src/chain/asset';
 	export interface Comment {
 	    id: number;
 	    category: string;
@@ -1182,7 +1182,7 @@ declare module 'dpixa/chain/comment' {
 	}
 
 }
-declare module 'dpixa/chain/operation' {
+declare module 'dpixa/src/chain/operation' {
 	/**
 	 * @file Hive/Pixa operation type definitions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -1218,12 +1218,12 @@ declare module 'dpixa/chain/operation' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { PublicKey } from 'dpixa/crypto';
-	import { AuthorityType } from 'dpixa/chain/account';
-	import { Asset, PriceType } from 'dpixa/chain/asset';
-	import { SignedBlockHeader } from 'dpixa/chain/block';
-	import { BeneficiaryRoute } from 'dpixa/chain/comment';
-	import { ChainProperties, HexBuffer } from 'dpixa/chain/misc';
+	import { PublicKey } from 'dpixa/src/crypto';
+	import { AuthorityType } from 'dpixa/src/chain/account';
+	import { Asset, PriceType } from 'dpixa/src/chain/asset';
+	import { SignedBlockHeader } from 'dpixa/src/chain/block';
+	import { BeneficiaryRoute } from 'dpixa/src/chain/comment';
+	import { ChainProperties, HexBuffer } from 'dpixa/src/chain/misc';
 	/**
 	 * Operation name.
 	 * Ref: https://gitlab.syncad.com/pixa/pixa/-/blob/master/libraries/protocol/include/pixa/protocol/operations.hpp
@@ -2046,7 +2046,7 @@ declare module 'dpixa/chain/operation' {
 	}
 
 }
-declare module 'dpixa/utils' {
+declare module 'dpixa/src/utils' {
 	/**
 	 * @file Misc utility functions.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -2106,9 +2106,9 @@ declare module 'dpixa/utils' {
 	    response: any;
 	    currentAddress: string;
 	}>;
-	import { Asset, PriceType } from 'dpixa/chain/asset';
-	import { WitnessSetPropertiesOperation } from 'dpixa/chain/operation';
-	import { PublicKey } from 'dpixa/crypto';
+	import { Asset, PriceType } from 'dpixa/src/chain/asset';
+	import { WitnessSetPropertiesOperation } from 'dpixa/src/chain/operation';
+	import { PublicKey } from 'dpixa/src/crypto';
 	export interface WitnessProps {
 	    account_creation_fee?: string | Asset;
 	    account_subsidy_budget?: number;
@@ -2215,7 +2215,7 @@ declare module 'dpixa/utils' {
 	export function makeBitMaskFilter(allowedOperations: number[]): any[];
 
 }
-declare module 'dpixa/helpers/blockchain' {
+declare module 'dpixa/src/helpers/blockchain' {
 	/**
 	 * @file Hive/Pixa blockchain helpers.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -2251,7 +2251,7 @@ declare module 'dpixa/helpers/blockchain' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { Client } from 'dpixa/client';
+	import { Client } from 'dpixa/src/client';
 	export enum BlockchainMode {
 	    /**
 	     * Only get irreversible blocks.
@@ -2320,7 +2320,7 @@ declare module 'dpixa/helpers/blockchain' {
 	}
 
 }
-declare module 'dpixa/helpers/broadcast' {
+declare module 'dpixa/src/helpers/broadcast' {
 	/**
 	 * @file Broadcast API helpers.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -2356,12 +2356,12 @@ declare module 'dpixa/helpers/broadcast' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { AuthorityType } from 'dpixa/chain/account';
-	import { Asset } from 'dpixa/chain/asset';
-	import { AccountUpdateOperation, CommentOperation, CommentOptionsOperation, CustomJsonOperation, DelegateVestingSharesOperation, Operation, TransferOperation, VoteOperation } from 'dpixa/chain/operation';
-	import { SignedTransaction, Transaction, TransactionConfirmation } from 'dpixa/chain/transaction';
-	import { Client } from 'dpixa/client';
-	import { PrivateKey, PublicKey } from 'dpixa/crypto';
+	import { AuthorityType } from 'dpixa/src/chain/account';
+	import { Asset } from 'dpixa/src/chain/asset';
+	import { AccountUpdateOperation, CommentOperation, CommentOptionsOperation, CustomJsonOperation, DelegateVestingSharesOperation, Operation, TransferOperation, VoteOperation } from 'dpixa/src/chain/operation';
+	import { SignedTransaction, Transaction, TransactionConfirmation } from 'dpixa/src/chain/transaction';
+	import { Client } from 'dpixa/src/client';
+	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
 	export interface CreateAccountOptions {
 	    /**
 	     * Username for the new account.
@@ -2489,7 +2489,7 @@ declare module 'dpixa/helpers/broadcast' {
 	}
 
 }
-declare module 'dpixa/helpers/database' {
+declare module 'dpixa/src/helpers/database' {
 	/**
 	 * @file Database API helpers.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -2525,15 +2525,15 @@ declare module 'dpixa/helpers/database' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { ExtendedAccount } from 'dpixa/chain/account';
-	import { Price } from 'dpixa/chain/asset';
-	import { BlockHeader, SignedBlock } from 'dpixa/chain/block';
-	import { Discussion } from 'dpixa/chain/comment';
-	import { DynamicGlobalProperties } from 'dpixa/chain/misc';
-	import { ChainProperties, VestingDelegation } from 'dpixa/chain/misc';
-	import { AppliedOperation } from 'dpixa/chain/operation';
-	import { SignedTransaction } from 'dpixa/chain/transaction';
-	import { Client } from 'dpixa/client';
+	import { ExtendedAccount } from 'dpixa/src/chain/account';
+	import { Price } from 'dpixa/src/chain/asset';
+	import { BlockHeader, SignedBlock } from 'dpixa/src/chain/block';
+	import { Discussion } from 'dpixa/src/chain/comment';
+	import { DynamicGlobalProperties } from 'dpixa/src/chain/misc';
+	import { ChainProperties, VestingDelegation } from 'dpixa/src/chain/misc';
+	import { AppliedOperation } from 'dpixa/src/chain/operation';
+	import { SignedTransaction } from 'dpixa/src/chain/transaction';
+	import { Client } from 'dpixa/src/client';
 	/**
 	 * Possible categories for `get_discussions_by_*`.
 	 */
@@ -2672,7 +2672,7 @@ declare module 'dpixa/helpers/database' {
 	}
 
 }
-declare module 'dpixa/chain/pixamind' {
+declare module 'dpixa/src/chain/pixamind' {
 	export interface CommunityDetail {
 	    id: number;
 	    name: string;
@@ -2704,14 +2704,14 @@ declare module 'dpixa/chain/pixamind' {
 	}
 
 }
-declare module 'dpixa/helpers/pixamind' {
+declare module 'dpixa/src/helpers/pixamind' {
 	/**
 	 * Pixamind database query wrapper
 	 */
-	import { Account } from 'dpixa/chain/account';
-	import { Discussion } from 'dpixa/chain/comment';
-	import { CommunityDetail, Notifications } from 'dpixa/chain/pixamind';
-	import { Client } from 'dpixa/client';
+	import { Account } from 'dpixa/src/chain/account';
+	import { Discussion } from 'dpixa/src/chain/comment';
+	import { CommunityDetail, Notifications } from 'dpixa/src/chain/pixamind';
+	import { Client } from 'dpixa/src/client';
 	interface PostsQuery {
 	    /**
 	     * Number of posts to fetch
@@ -2818,13 +2818,13 @@ declare module 'dpixa/helpers/pixamind' {
 	export {};
 
 }
-declare module 'dpixa/helpers/key' {
+declare module 'dpixa/src/helpers/key' {
 	/**
 	 * @file Account by key API helpers.
 	 * @author Bartłomiej (@engrave) Górnicki
 	 */
-	import { PublicKey } from 'dpixa/crypto';
-	import { Client } from 'dpixa/client';
+	import { PublicKey } from 'dpixa/src/crypto';
+	import { Client } from 'dpixa/src/client';
 	export interface AccountsByKey {
 	    accounts: string[][];
 	}
@@ -2842,9 +2842,9 @@ declare module 'dpixa/helpers/key' {
 	}
 
 }
-declare module 'dpixa/chain/rc' {
-	import { SMTAsset } from 'dpixa/chain/asset';
-	import { Bignum } from 'dpixa/chain/misc';
+declare module 'dpixa/src/chain/rc' {
+	import { SMTAsset } from 'dpixa/src/chain/asset';
+	import { Bignum } from 'dpixa/src/chain/misc';
 	export interface RCParams {
 	    resource_history_bytes: Resource;
 	    resource_new_accounts: Resource;
@@ -2898,10 +2898,10 @@ declare module 'dpixa/chain/rc' {
 	}
 
 }
-declare module 'dpixa/helpers/rc' {
-	import { Account } from 'dpixa/chain/account';
-	import { Manabar, RCAccount, RCParams, RCPool } from 'dpixa/chain/rc';
-	import { Client } from 'dpixa/client';
+declare module 'dpixa/src/helpers/rc' {
+	import { Account } from 'dpixa/src/chain/account';
+	import { Manabar, RCAccount, RCParams, RCPool } from 'dpixa/src/chain/rc';
+	import { Client } from 'dpixa/src/client';
 	export class RCAPI {
 	    readonly client: Client;
 	    constructor(client: Client);
@@ -2944,12 +2944,12 @@ declare module 'dpixa/helpers/rc' {
 	}
 
 }
-declare module 'dpixa/helpers/transaction' {
+declare module 'dpixa/src/helpers/transaction' {
 	/**
 	 * @file Transaction status API helpers.
 	 * @author Bartłomiej (@engrave) Górnicki
 	 */
-	import { Client } from 'dpixa/client';
+	import { Client } from 'dpixa/src/client';
 	export type TransactionStatus = 'unknown' | 'within_mempool' | 'within_reversible_block' | 'within_irreversible_block' | 'expired_reversible' | 'expired_irreversible' | 'too_old';
 	export class TransactionStatusAPI {
 	    readonly client: Client;
@@ -2967,7 +2967,7 @@ declare module 'dpixa/helpers/transaction' {
 	}
 
 }
-declare module 'dpixa/client' {
+declare module 'dpixa/src/client' {
 	/**
 	 * @file Hive/Pixa RPC client implementation.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter / Matias Affolter
@@ -3003,14 +3003,14 @@ declare module 'dpixa/client' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
-	import { Blockchain } from 'dpixa/helpers/blockchain';
-	import { BroadcastAPI } from 'dpixa/helpers/broadcast';
-	import { DatabaseAPI } from 'dpixa/helpers/database';
-	import { PixamindAPI } from 'dpixa/helpers/pixamind';
-	import { AccountByKeyAPI } from 'dpixa/helpers/key';
-	import { RCAPI } from 'dpixa/helpers/rc';
-	import { TransactionStatusAPI } from 'dpixa/helpers/transaction';
+	import { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
+	import { Blockchain } from 'dpixa/src/helpers/blockchain';
+	import { BroadcastAPI } from 'dpixa/src/helpers/broadcast';
+	import { DatabaseAPI } from 'dpixa/src/helpers/database';
+	import { PixamindAPI } from 'dpixa/src/helpers/pixamind';
+	import { AccountByKeyAPI } from 'dpixa/src/helpers/key';
+	import { RCAPI } from 'dpixa/src/helpers/rc';
+	import { TransactionStatusAPI } from 'dpixa/src/helpers/transaction';
 	/**
 	 * Library version.
 	 */
@@ -3132,7 +3132,7 @@ declare module 'dpixa/client' {
 	    currentAddress: string;
 	    /**
 	     * @param address The address to the Pixa RPC server,
-	     * e.g. `https://api.pixagram.io`. or [`https://api.pixagram.org`, `https://another.api.com`]
+	     * e.g. `https://api.pixagram.com`. or [`https://api.pixagram.com`, `https://another.api.com`]
 	     * @param options Client options.
 	     */
 	    constructor(address: string | string[], options?: ClientOptions);
@@ -3153,16 +3153,16 @@ declare module 'dpixa/client' {
 	}
 
 }
-declare module 'dpixa/chain/deserializer' {
+declare module 'dpixa/src/chain/deserializer' {
 	export type Deserializer = (buffer: any) => void;
 	export const types: {
 	    EncryptedMemoD: any;
 	};
 
 }
-declare module 'dpixa/helpers/aes' {
-	import { PrivateKey, PublicKey } from 'dpixa/crypto';
-	import { BBuffer as Buffer } from 'dpixa/bytebuffer';
+declare module 'dpixa/src/helpers/aes' {
+	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
+	import { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
 	export const encrypt: (private_key: PrivateKey, public_key: PublicKey, message: Buffer, nonce?: string) => any;
 	export const decrypt: (private_key: PrivateKey, public_key: PublicKey, nonce: any, message: any, checksum: number) => any;
 	/**
@@ -3179,15 +3179,15 @@ declare module 'dpixa/helpers/aes' {
 	export const cryptoJsEncrypt: (message: Buffer, tag: any, iv: any) => Buffer;
 
 }
-declare module 'dpixa/memo' {
-	import { PrivateKey, PublicKey } from 'dpixa/crypto';
+declare module 'dpixa/src/memo' {
+	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
 	export const Memo: {
 	    decode: (private_key: PrivateKey | string, memo: string) => string;
 	    encode: (private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: string) => string;
 	};
 
 }
-declare module 'dpixa' {
+declare module 'dpixa/src/index' {
 	/**
 	 * @file dpixa exports.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -3223,28 +3223,28 @@ declare module 'dpixa' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import * as utils from 'dpixa/utils';
+	import * as utils from 'dpixa/src/utils';
 	export { utils };
-	export * from 'dpixa/helpers/blockchain';
-	export * from 'dpixa/helpers/database';
-	export * from 'dpixa/helpers/rc';
-	export * from 'dpixa/helpers/key';
-	export * from 'dpixa/helpers/pixamind';
-	export * from 'dpixa/chain/account';
-	export * from 'dpixa/chain/asset';
-	export * from 'dpixa/chain/block';
-	export * from 'dpixa/chain/comment';
-	export * from 'dpixa/chain/misc';
-	export * from 'dpixa/chain/operation';
-	export * from 'dpixa/chain/serializer';
-	export * from 'dpixa/chain/transaction';
-	export * from 'dpixa/chain/pixamind';
-	export * from 'dpixa/client';
-	export * from 'dpixa/crypto';
-	export * from 'dpixa/memo';
+	export * from 'dpixa/src/helpers/blockchain';
+	export * from 'dpixa/src/helpers/database';
+	export * from 'dpixa/src/helpers/rc';
+	export * from 'dpixa/src/helpers/key';
+	export * from 'dpixa/src/helpers/pixamind';
+	export * from 'dpixa/src/chain/account';
+	export * from 'dpixa/src/chain/asset';
+	export * from 'dpixa/src/chain/block';
+	export * from 'dpixa/src/chain/comment';
+	export * from 'dpixa/src/chain/misc';
+	export * from 'dpixa/src/chain/operation';
+	export * from 'dpixa/src/chain/serializer';
+	export * from 'dpixa/src/chain/transaction';
+	export * from 'dpixa/src/chain/pixamind';
+	export * from 'dpixa/src/client';
+	export * from 'dpixa/src/crypto';
+	export * from 'dpixa/src/memo';
 
 }
-declare module 'dpixa/index-browser' {
+declare module 'dpixa/src/index-browser' {
 	/**
 	 * @file dpixa entry point for browsers.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -3288,10 +3288,10 @@ declare module 'dpixa/index-browser' {
 	import 'core-js/features/symbol/async-iterator';
 	import 'regenerator-runtime/runtime';
 	import 'whatwg-fetch';
-	export * from 'dpixa';
+	export * from 'dpixa/src/index';
 
 }
-declare module 'dpixa/index-node' {
+declare module 'dpixa/src/index-node' {
 	/**
 	 * @file dpixa entry point for node.js.
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
@@ -3326,6 +3326,6 @@ declare module 'dpixa/index-node' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	export * from 'dpixa';
+	export * from 'dpixa/src/index';
 
 }

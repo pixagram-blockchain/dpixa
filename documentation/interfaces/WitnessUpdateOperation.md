@@ -47,7 +47,7 @@ Defined in: chain/operation.ts:894
 
 #### block\_signing\_key
 
-> **block\_signing\_key**: `string` \| [`PublicKey`](../classes/PublicKey.md)
+> **block\_signing\_key**: `string` \| [`PublicKey`](../classes/PublicKey.md) \| `null`
 
 #### fee
 

@@ -62,7 +62,7 @@ export class Asset {
   public static fromString(string: string, expectedSymbol?: AssetSymbol) {
     const [amountString, symbol] = string.split(' ')
     if (
-      !['PXA', 'PIXA', 'TESTS', 'PXP', 'VESTS', 'PXS', 'TBD', 'STEEM', 'TPS', 'SBD', 'HBD'].includes(symbol)
+      !['PXA', 'HIVE', 'PIXA', 'TESTS', 'PXP', 'VESTS', 'PXS', 'TBD', 'STEEM', 'TPS', 'SBD', 'HBD'].includes(symbol)
     ) {
       throw new Error(`Invalid asset symbol: ${symbol}`)
     }

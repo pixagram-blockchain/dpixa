@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "declaration": false,
-    "lib": ["dom", "ESNext"],
-    "module": "ES6",
+    "declaration": true,
+    "lib": ["dom", "ES6", "ES7"],
+    "module": "commonjs",
     "moduleResolution": "node",
-    "noImplicitThis": false,
+    "noImplicitThis": true,
     "outDir": "lib",
-    "strictNullChecks": false,
+    "rootDir": "",
+    "strictNullChecks": true,
     "target": "es2020"
   },
   "include": ["src/**/*.ts"]

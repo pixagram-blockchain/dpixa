@@ -52,7 +52,7 @@ Defined in: utils.ts:212
 
 ### new\_signing\_key?
 
-> `optional` **new\_signing\_key?**: `string` \| [`PublicKey`](../../../../classes/PublicKey.md)
+> `optional` **new\_signing\_key?**: `string` \| [`PublicKey`](../../../../classes/PublicKey.md) \| `null`
 
 Defined in: utils.ts:213
 
