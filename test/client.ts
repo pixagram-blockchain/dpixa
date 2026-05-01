@@ -2,7 +2,7 @@ import "mocha";
 import * as assert from "assert";
 import { VError } from "verror";
 
-import { Client } from "./../src";
+import { Client } from "../src";
 
 describe("client", function() {
   this.slow(200);

@@ -54,9 +54,9 @@ function hexToBytes(hex: string): Uint8Array {
 }
 
 function parseHexChar(code: number): number {
-  if (code >= 48 && code <= 57) return code - 48       // 0-9
-  if (code >= 97 && code <= 102) return code - 87      // a-f
-  if (code >= 65 && code <= 70) return code - 55       // A-F
+  if (code >= 48 && code <= 57) {return code - 48}       // 0-9
+  if (code >= 97 && code <= 102) {return code - 87}      // a-f
+  if (code >= 65 && code <= 70) {return code - 55}       // A-F
   return -1
 }
 
@@ -75,7 +75,7 @@ function bytesToBinary(bytes: Uint8Array, start = 0, end = bytes.length): string
   const CHUNK = 0x8000
   for (let i = start; i < end; i += CHUNK) {
     const slice = bytes.subarray(i, Math.min(i + CHUNK, end))
-    out += String.fromCharCode.apply(null, slice as unknown as number[])
+    out += String.fromCharCode.apply(null, slice)
   }
   return out
 }
@@ -146,7 +146,7 @@ export class BBuffer extends Uint8Array {
    */
   public static alloc(size: number, fill: number = 0): BBuffer {
     const buf = new BBuffer(size)
-    if (fill !== 0) buf.fill(fill)
+    if (fill !== 0) {buf.fill(fill)}
     return buf
   }
 
@@ -185,15 +185,15 @@ export class BBuffer extends Uint8Array {
     // ArrayLike<number> (plain number[])
     const arr = value as ArrayLike<number>
     const out = new BBuffer(arr.length)
-    for (let i = 0; i < arr.length; i++) out[i] = arr[i] & 0xff
+    for (let i = 0; i < arr.length; i++) {out[i] = arr[i] & 0xff}
     return out
   }
 
   /** Concatenate a list of Uint8Arrays / BBuffers into a single new buffer. */
-  public static concat(list: Array<Uint8Array | BBuffer>, totalLength?: number): BBuffer {
+  public static concat(list: (Uint8Array | BBuffer)[], totalLength?: number): BBuffer {
     if (totalLength === undefined) {
       totalLength = 0
-      for (const item of list) totalLength += item.length
+      for (const item of list) {totalLength += item.length}
     }
     const out = new BBuffer(totalLength)
     let offset = 0
@@ -233,9 +233,9 @@ export class BBuffer extends Uint8Array {
   public slice(begin = 0, end: number = this.length): BBuffer {
     // Normalise negative indices the way Array.prototype.slice does.
     const len = this.length
-    let s = begin < 0 ? Math.max(len + begin, 0) : Math.min(begin, len)
+    const s = begin < 0 ? Math.max(len + begin, 0) : Math.min(begin, len)
     let e = end < 0 ? Math.max(len + end, 0) : Math.min(end, len)
-    if (e < s) e = s
+    if (e < s) {e = s}
     const out = new BBuffer(e - s)
     out.set(super.subarray(s, e))
     return out
@@ -310,13 +310,13 @@ export class BBuffer extends Uint8Array {
       sourceStart: number = 0,
       sourceEnd: number = this.length
   ): number {
-    if (sourceEnd > this.length) sourceEnd = this.length
-    if (sourceStart < 0) sourceStart = 0
-    if (sourceEnd <= sourceStart) return 0
+    if (sourceEnd > this.length) {sourceEnd = this.length}
+    if (sourceStart < 0) {sourceStart = 0}
+    if (sourceEnd <= sourceStart) {return 0}
     const available = target.length - targetStart
     const want = sourceEnd - sourceStart
     const n = Math.min(available, want)
-    if (n <= 0) return 0
+    if (n <= 0) {return 0}
     target.set(super.subarray(sourceStart, sourceStart + n), targetStart)
     return n
   }
@@ -336,21 +336,21 @@ export class Long {
   }
 
   public static fromNumber(n: number): Long {
-    if (!Number.isFinite(n)) throw new Error('Long.fromNumber: non-finite')
+    if (!Number.isFinite(n)) {throw new Error('Long.fromNumber: non-finite')}
     return new Long(BigInt(Math.trunc(n)))
   }
 
   public static fromString(s: string, unsigned = true, radix = 10): Long {
-    if (!s || s.length === 0) throw new Error('Long.fromString: empty')
+    if (!s || s.length === 0) {throw new Error('Long.fromString: empty')}
     // BigInt() accepts decimal/0x-prefixed strings; for non-10 radix we parse manually.
-    if (radix === 10) return new Long(BigInt(s))
-    if (radix === 16) return new Long(BigInt(s.startsWith('0x') ? s : '0x' + s))
+    if (radix === 10) {return new Long(BigInt(s))}
+    if (radix === 16) {return new Long(BigInt(s.startsWith('0x') ? s : '0x' + s))}
     // Generic radix parse.
     let v = 0n
     const big = BigInt(radix)
     for (const ch of s) {
       const digit = parseInt(ch, radix)
-      if (isNaN(digit)) throw new Error(`Invalid digit for radix ${radix}: ${ch}`)
+      if (isNaN(digit)) {throw new Error(`Invalid digit for radix ${radix}: ${ch}`)}
       v = v * big + BigInt(digit)
     }
     return new Long(v)
@@ -470,9 +470,9 @@ export class ByteBuffer {
 
   private ensure(n: number): void {
     const needed = this._offset + n
-    if (needed <= this.data.length) return
+    if (needed <= this.data.length) {return}
     let cap = this.data.length
-    while (cap < needed) cap *= 2
+    while (cap < needed) {cap *= 2}
     const next = new Uint8Array(cap)
     next.set(this.data)
     this.data = next
@@ -585,10 +585,10 @@ export class ByteBuffer {
     } else if (data instanceof ArrayBuffer) {
       bytes = new Uint8Array(data)
     } else if (Array.isArray(data)) {
-      bytes = new Uint8Array(data)
-    } else if (data && (data as { buffer: Uint8Array }).buffer instanceof Uint8Array) {
+      bytes = Uint8Array.from(data)
+    } else if (data && (data).buffer instanceof Uint8Array) {
       // HexBuffer-like wrappers.
-      bytes = (data as { buffer: Uint8Array }).buffer
+      bytes = (data).buffer
     } else {
       throw new Error('ByteBuffer.append: unsupported data type')
     }
@@ -659,7 +659,7 @@ export class ByteBuffer {
     for (let i = 0; i < 5; i++) {
       const b = this.readUint8()
       result |= (b & 0x7f) << shift
-      if ((b & 0x80) === 0) return result >>> 0
+      if ((b & 0x80) === 0) {return result >>> 0}
       shift += 7
     }
     throw new Error('readVarint32: value too large')
@@ -713,9 +713,9 @@ export class ByteBuffer {
    * this buffer's memory through the returned one.
    */
   public copy(start: number = 0, end: number = this._offset): ByteBuffer {
-    if (start < 0) start = 0
-    if (end > this.data.length) end = this.data.length
-    if (end < start) end = start
+    if (start < 0) {start = 0}
+    if (end > this.data.length) {end = this.data.length}
+    if (end < start) {end = start}
     const len = end - start
     const out = new ByteBuffer(Math.max(len, 1))
     out.data.set(this.data.subarray(start, end), 0)
@@ -777,24 +777,24 @@ export class ByteBuffer {
 
 function toBigInt64(v: Long | bigint | number | string): bigint {
   let big: bigint
-  if (Long.isLong(v)) big = v.toBigInt()
-  else if (typeof v === 'bigint') big = v
-  else if (typeof v === 'number') big = BigInt(Math.trunc(v))
-  else big = BigInt(v)
+  if (Long.isLong(v)) {big = v.toBigInt()}
+  else if (typeof v === 'bigint') {big = v}
+  else if (typeof v === 'number') {big = BigInt(Math.trunc(v))}
+  else {big = BigInt(v)}
   // DataView.setBigInt64 expects a value in [-2^63, 2^63).
   // Normalise through two's-complement on 64 bits.
   const mask = 0xffffffffffffffffn
   big &= mask
-  if (big >= 0x8000000000000000n) big -= 0x10000000000000000n
+  if (big >= 0x8000000000000000n) {big -= 0x10000000000000000n}
   return big
 }
 
 function toBigUint64(v: Long | bigint | number | string): bigint {
   let big: bigint
-  if (Long.isLong(v)) big = v.toBigInt()
-  else if (typeof v === 'bigint') big = v
-  else if (typeof v === 'number') big = BigInt(Math.trunc(v))
-  else big = BigInt(v)
+  if (Long.isLong(v)) {big = v.toBigInt()}
+  else if (typeof v === 'bigint') {big = v}
+  else if (typeof v === 'number') {big = BigInt(Math.trunc(v))}
+  else {big = BigInt(v)}
   return big & 0xffffffffffffffffn
 }
 

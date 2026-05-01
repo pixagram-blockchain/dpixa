@@ -36,7 +36,7 @@ declare module 'dpixa/bytebuffer' {
 	    static from(value: string, encoding?: Encoding): BBuffer;
 	    static from(value: ArrayBuffer | Uint8Array | BBuffer | ArrayLike<number>): BBuffer;
 	    /** Concatenate a list of Uint8Arrays / BBuffers into a single new buffer. */
-	    static concat(list: Array<Uint8Array | BBuffer>, totalLength?: number): BBuffer;
+	    static concat(list: (Uint8Array | BBuffer)[], totalLength?: number): BBuffer;
 	    /** Internal helper: wrap a Uint8Array in a BBuffer with its own memory. */
 	    private static fromUint8Array;
 	    /**
@@ -195,7 +195,7 @@ declare module 'dpixa/parameters' {
 	export const TESTNET_HEX_CHAIN_ID = "18dcf0a285365fc58b71f18b3d3fec954aa0c141c44e4e5cb4cf777b9eab274e";
 	export const PREFIX_MAINNET_ADDRESS = "PIX";
 	export const PREFIX_TESTNET_ADDRESS = "TST";
-	export const MAIN_MAINNET_NODE_URL = "https://34.118.51.13";
+	export const MAIN_MAINNET_NODE_URL = "https://api.pixagram.com";
 	export const MAIN_TESTNET_NODE_URL = "http://31.220.76.179:7777";
 	export const NETWORK_ID_INT = 128;
 

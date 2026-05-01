@@ -34,9 +34,9 @@
  */
 
 import * as assert from 'assert'
-import { hmac } from '@noble/hashes/hmac.js'
-import { sha256 as nobleSha256, sha512 as nobleSha512 } from '@noble/hashes/sha2.js'
-import * as secp256k1 from '@noble/secp256k1'
+import { hmac } from '@noble/hashes/hmac.js';
+import { sha256 as nobleSha256, sha512 as nobleSha512 } from '@noble/hashes/sha2.js';
+import * as secp256k1 from '@noble/secp256k1/index.js'
 import { RIPEMD160 } from 'ripemd160-min'
 import { VError } from 'verror'
 import * as bs58 from './base58'

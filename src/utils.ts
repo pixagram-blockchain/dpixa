@@ -34,9 +34,9 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import fetch from 'cross-fetch'
 import { EventEmitter } from 'events'
 import { PassThrough } from 'stream'
+import fetch from 'cross-fetch'
 
 // TODO: Add more errors that should trigger a failover
 const timeoutErrors = ['timeout', 'ENOTFOUND', 'ECONNREFUSED', 'database lock', 'CERT_HAS_EXPIRED', 'EHOSTUNREACH', 'ECONNRESET', 'ERR_TLS_CERT_ALTNAME_INVALID', 'EAI_AGAIN']
@@ -57,7 +57,7 @@ export function waitForEvent<T>(
  * Sleep for N milliseconds.
  */
 export function sleep(ms: number): Promise<void> {
-  return new Promise<void>((resolve) => {
+  return new Promise<void>(resolve => {
     setTimeout(resolve, ms)
   })
 }
@@ -80,7 +80,7 @@ export function iteratorStream<T>(
     .then(() => {
       stream.end()
     })
-    .catch((error) => {
+    .catch(error => {
       stream.emit('error', error)
       stream.end()
     })
@@ -118,8 +118,8 @@ export async function retryingFetch(
       const response = await fetch(currentAddress, opts)
       if (!response.ok) {
         if (response.status === 500){ // Support for Drone
-          const resJson = await response.json();
-          if (resJson.jsonrpc === "2.0"){
+          const resJson = await response.json()
+          if (resJson.jsonrpc === '2.0'){
             return { response: resJson, currentAddress }
           }
         }
@@ -139,7 +139,7 @@ export async function retryingFetch(
         } else {
           const isFailoverError =
             timeoutErrors.filter(
-              (fe) => error && error.code && error.code.includes(fe)
+              fe => error && error.code && error.code.includes(fe)
             ).length > 0
           if (
             isFailoverError &&
@@ -368,7 +368,7 @@ export const operationOrders = {
 export function makeBitMaskFilter(allowedOperations: number[]) {
   return allowedOperations
     .reduce(redFunction, [JSBI.BigInt(0), JSBI.BigInt(0)])
-    .map((value) =>
+    .map(value =>
       JSBI.notEqual(value, JSBI.BigInt(0)) ? value.toString() : null
     )
 }
