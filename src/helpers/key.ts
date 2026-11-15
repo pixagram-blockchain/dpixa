@@ -3,7 +3,7 @@
  * @author Bartłomiej (@engrave) Górnicki
  */
 
-import {PublicKey} from '../crypto'
+import type { PublicKey } from '../crypto'
 import { Client } from '../client'
 
 export interface AccountsByKey {

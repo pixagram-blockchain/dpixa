@@ -30,9 +30,9 @@ npm install @pixagram/dpixa
 
 ## Bundling
 
-The easiest way to bundle dpixa (with browserify, webpack etc.) is to just `npm install @pixagram/dpixa` and `require('@pixagram/dpixa')` which will give you well-tested (see browser compatibility matrix above) pre-bundled code guaranteed to JustWork™. However, that is not always desirable since it will not allow your bundler to de-duplicate any shared dependencies dpixa and your app might have.
+Bundlers that understand the `exports` field (webpack 5, Vite, Rollup, esbuild, Parcel 2) get ES modules from `@pixagram/dpixa`, so they can tree-shake dpixa and share its `@noble/*` dependencies with your app. No Node polyfills (`buffer`, `crypto`, `stream`, `assert`, …) are needed, and none of the old `core-js` / `whatwg-fetch` polyfills are bundled any more: dpixa runs on any browser with `BigInt` and on Node.js ≥ 20.19.
 
-To allow for deduplication you can `require('@pixagram/dpixa/lib/index-browser')`, or if you plan to provide your own polyfills: `require('@pixagram/dpixa/lib/index')`. See `src/index-browser.ts` for a list of polyfills expected.
+The library is split in two halves that can be loaded separately; see [Lite and crypto entry points](#lite-and-crypto-entry-points).
 
 ---
 
@@ -459,6 +459,7 @@ autoVoter(["favorite-author1", "favorite-author2"]);
 ## Table of Contents
 
 - [[Installation](#installation)](#installation)
+    - [Lite and crypto entry points](#lite-and-crypto-entry-points)
 - [[Quick Start](#quick-start)](#quick-start)
     - [[Browser Usage](#browser-usage)](#browser-usage)
     - [[Node.js with ES Modules](#nodejs-with-es-modules)](#nodejs-with-es-modules)
@@ -618,6 +619,41 @@ Download `dist/dpixa.js` from the repository and include it in your HTML:
 ```html
 <script src="dpixa.js"></script>
 ```
+
+### Lite and crypto entry points
+
+Reading from the chain only needs the JSON-RPC client. Keys, signatures, transaction serialization and memo encryption (secp256k1, SHA-2, RIPEMD-160, AES) are about two thirds of the library, so they live in a separate entry point that you can load when the user first needs to sign:
+
+| Import | Contains |
+| --- | --- |
+| `@pixagram/dpixa/lite` | `Client` (database, rc, pixamind, blockchain, keys, transaction, broadcast), `Asset`, `Price`, `Authority`, `HexBuffer`, `utils`, chain types — no cryptography |
+| `@pixagram/dpixa/crypto` | `PrivateKey`, `PublicKey`, `Signature`, `cryptoUtils`, `Memo`, `Types`, `NETWORK_ID` |
+| `@pixagram/dpixa` | everything (lite + crypto), same API as before |
+
+```js
+import { Client } from "@pixagram/dpixa/lite";
+
+const client = new Client("https://api.pixagram.com");
+const [account] = await client.database.getAccounts(["primerz"]);
+
+// later, e.g. when the user clicks "vote": fetch the crypto chunk on demand
+const { PrivateKey } = await import("@pixagram/dpixa/crypto");
+await client.broadcast.vote(
+  { voter: "primerz", author: "pixagram", permlink: "hello", weight: 10000 },
+  PrivateKey.fromString(wif)
+);
+```
+
+Loading `@pixagram/dpixa/crypto` anywhere enables signing on every client, including ones created earlier from the lite entry point. Until then, `client.broadcast.sign/send/sendOperations/…` and `utils.buildWitnessUpdateOp` throw an error telling you to load it, before any request is sent. All three entry points share the same classes, so mixing them is safe.
+
+Prebuilt standalone bundles (global `dpixa`, no dependencies) are in `dist/`:
+
+| File | Size (min / gzip) |
+| --- | --- |
+| `dist/dpixa-lite.js` | ~24 kB / ~9 kB — lite only |
+| `dist/dpixa.js` | ~75 kB / ~28 kB — full (1.5.x was ~1.1 MB / ~240 kB) |
+
+`utils.iteratorStream()` and the `get*Stream()` methods return real Node.js streams under Node. In browsers they now return a small built-in stream (`on('data' | 'end' | 'error')`, `pipe`, `pause`/`resume`, `for await`) instead of bundling the `stream` polyfill; prefer the async iterators (`getBlocks()`, `getOperations()`, …) in new browser code.
 
 ---
 

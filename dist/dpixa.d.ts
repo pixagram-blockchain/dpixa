@@ -1,24 +1,51 @@
-declare module 'dpixa/src/bytebuffer' {
+declare module 'dpixa/src/assert' {
 	/**
-	 * @file Custom ByteBuffer / Buffer implementation backed by Uint8Array.
+	 * @file Minimal assertion helpers.
 	 *
-	 * Replaces `@ecency/bytebuffer`. The previous library suffered from copy /
-	 * allocation bugs (affecting `memo.ts` and `crypto.ts` in particular) because
-	 * it shared underlying ArrayBuffers between views in surprising ways. This
-	 * implementation is allocation-explicit: every `copy()`, `slice()`, and
-	 * `toBuffer()` produces an independent buffer.
-	 *
-	 * Exports:
-	 *   - BBuffer       Node-Buffer shim (from/alloc/concat/slice/toString/…)
-	 *   - ByteBuffer    Stream-style writer/reader (writeVString, flip, …)
-	 *   - Long          Minimal 64-bit integer helper (only methods used by aes.ts)
-	 *
-	 * The module default export mirrors the historical `require("@ecency/bytebuffer")`
-	 * call-site shape: calling `new ByteBuffer(cap, le)` builds a stream buffer,
-	 * and static helpers like `ByteBuffer.DEFAULT_CAPACITY`, `ByteBuffer.LITTLE_ENDIAN`,
-	 * `ByteBuffer.fromBinary`, and `ByteBuffer.Long` are all available.
+	 * Replaces Node's `assert` module. Browser bundlers had to polyfill it with
+	 * the `assert` package, which drags in `util`, `object.assign`, `is-nan`,
+	 * `call-bind`, … Only the three forms dpixa uses are implemented. Failures
+	 * still throw an error named `AssertionError` with Node's `ERR_ASSERTION`
+	 * code and the same messages as before.
 	 */
-	type Encoding = 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1';
+	export class AssertionError extends Error {
+	    readonly code = "ERR_ASSERTION";
+	    constructor(message: string);
+	}
+	interface Assert {
+	    /** Throw an AssertionError unless `value` is truthy. */
+	    (value: unknown, message?: string): asserts value;
+	    /** Loose (`==`) equality, like Node's `assert.equal`. */
+	    equal(actual: unknown, expected: unknown, message?: string): void;
+	    /**
+	     * Element-wise equality of two byte arrays (Uint8Array, BBuffer, number[]).
+	     * dpixa only ever deep-compares checksums and network ids.
+	     */
+	    deepEqual(actual: ArrayLike<number>, expected: ArrayLike<number>, message?: string): void;
+	} const assert: Assert;
+	export default assert;
+
+}
+declare module 'dpixa/src/bbuffer' {
+	/**
+	 * @file Node-Buffer shim (`BBuffer`) and byte/string encoding helpers.
+	 *
+	 * Split out of bytebuffer.ts so the fetch-only "lite" build can use `BBuffer`
+	 * (chain ids, HexBuffer, ref_block_prefix) without also pulling in the
+	 * stream-style `ByteBuffer` serializer, which only the crypto side needs.
+	 *
+	 * No Node `Buffer` is used anywhere: everything is a plain Uint8Array.
+	 */
+	export function bytesToHex(bytes: Uint8Array, start?: number, end?: number): string;
+	export function hexToBytes(hex: string): Uint8Array;
+	/** "binary" encoding: one-byte-per-char Latin-1, matching Node's legacy mode. */
+	export function binaryToBytes(str: string): Uint8Array;
+	export function bytesToBinary(bytes: Uint8Array, start?: number, end?: number): string;
+	export function utf8ToBytes(str: string): Uint8Array;
+	export function bytesToUtf8(bytes: Uint8Array, start?: number, end?: number): string;
+	export type Encoding = 'hex' | 'binary' | 'utf-8' | 'utf8' | 'latin1';
+	export function encodeString(str: string, encoding: Encoding): Uint8Array;
+	export function decodeBytes(bytes: Uint8Array, encoding: Encoding, start?: number, end?: number): string;
 	export class BBuffer extends Uint8Array {
 	    /**
 	     * Allocate a new zero-filled buffer of the given size.
@@ -70,6 +97,37 @@ declare module 'dpixa/src/bytebuffer' {
 	     */
 	    copy(target: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number): number;
 	}
+
+}
+declare module 'dpixa/src/base58' {
+	/** Encode a Buffer (or Uint8Array / array-like of bytes) to a base58 string. */
+	export function encode(source: any): string;
+	/** Decode a base58 string to a Buffer. Throws on invalid characters. */
+	export function decode(source: string): any;
+
+}
+declare module 'dpixa/src/bytebuffer' {
+	/**
+	 * @file Stream-style ByteBuffer (serializer backend) and a minimal Long.
+	 *
+	 * Replaces `@ecency/bytebuffer`. The previous library suffered from copy /
+	 * allocation bugs (affecting `memo.ts` and `crypto.ts` in particular) because
+	 * it shared underlying ArrayBuffers between views in surprising ways. This
+	 * implementation is allocation-explicit: every `copy()`, `slice()`, and
+	 * `toBuffer()` produces an independent buffer.
+	 *
+	 * Exports:
+	 *   - ByteBuffer    Stream-style writer/reader (writeVString, flip, …)
+	 *   - Long          Minimal 64-bit integer helper (only methods used by aes.ts)
+	 *   - BBuffer       Re-exported from ./bbuffer (Node-Buffer shim)
+	 *
+	 * The module default export mirrors the historical `require("@ecency/bytebuffer")`
+	 * call-site shape: calling `new ByteBuffer(cap, le)` builds a stream buffer,
+	 * and static helpers like `ByteBuffer.DEFAULT_CAPACITY`, `ByteBuffer.LITTLE_ENDIAN`,
+	 * `ByteBuffer.fromBinary`, and `ByteBuffer.Long` are all available.
+	 */
+	import { BBuffer, Encoding } from 'dpixa/src/bbuffer';
+	export { BBuffer };
 	export class Long {
 	    static isLong(value: unknown): value is Long;
 	    static fromNumber(n: number): Long;
@@ -178,11 +236,47 @@ declare module 'dpixa/src/bytebuffer' {
 	export default ByteBuffer;
 
 }
-declare module 'dpixa/src/base58' {
-	/** Encode a Buffer (or Uint8Array / array-like of bytes) to a base58 string. */
-	export function encode(source: any): string;
-	/** Decode a base58 string to a Buffer. Throws on invalid characters. */
-	export function decode(source: string): any;
+declare module 'dpixa/src/errors' {
+	/**
+	 * @file Minimal stand-in for the `verror` package.
+	 *
+	 * dpixa only used `new VError({ name, cause?, info? }, message)`. This class
+	 * keeps the fields callers inspect — `name`, `message`, `jse_shortmsg`,
+	 * `jse_info`, `jse_cause` and the `cause()` method — so code that checks
+	 * `error.name === 'RPCError'` or reads `error.jse_info` (or passes the error
+	 * to `VError.info()` from the real package) keeps working, without verror's
+	 * dependency tree (`extsprintf`, `assert-plus`, `core-util-is`, Node `util`).
+	 *
+	 * One deliberate difference: the message is used verbatim instead of being
+	 * run through printf. With verror, an RPC error message such as
+	 * "50% done" made the constructor itself throw "too few args to sprintf",
+	 * hiding the real node error.
+	 */
+	export interface VErrorOptions {
+	    /** Error name, e.g. `RPCError` or `SerializationError`. */
+	    name?: string;
+	    /** Underlying error; its message is appended after a colon. */
+	    cause?: Error;
+	    /** Extra data, copied (shallowly) to `jse_info`. */
+	    info?: {
+	        [key: string]: any;
+	    };
+	}
+	export class VError extends Error {
+	    /** The message as given, without the cause's message appended. */
+	    jse_shortmsg: string;
+	    /** The underlying error, when one was given. */
+	    jse_cause?: Error;
+	    /** Extra data attached to the error (e.g. the RPC error `data`). */
+	    jse_info: {
+	        [key: string]: any;
+	    };
+	    constructor(options: VErrorOptions, message: string);
+	    /**
+	     * Return the underlying error, if any (same as verror's `cause()`).
+	     */
+	    cause(): Error | undefined;
+	}
 
 }
 declare module 'dpixa/src/version' {
@@ -347,6 +441,68 @@ declare module 'dpixa/src/chain/asset' {
 	}
 
 }
+declare module 'dpixa/src/witness' {
+	/**
+	 * @file witness_set_properties builder.
+	 *
+	 * Moved here from utils.ts: it needs the binary serializer (and therefore
+	 * secp256k1 for public keys), so it belongs to the crypto side of the
+	 * library. `utils.buildWitnessUpdateOp` forwards to it.
+	 */
+	import type { Asset, PriceType } from 'dpixa/src/chain/asset';
+	import type { WitnessSetPropertiesOperation } from 'dpixa/src/chain/operation';
+	import type { PublicKey } from 'dpixa/src/crypto';
+	export interface WitnessProps {
+	    account_creation_fee?: string | Asset;
+	    account_subsidy_budget?: number;
+	    account_subsidy_decay?: number;
+	    key: PublicKey | string;
+	    maximum_block_size?: number;
+	    new_signing_key?: PublicKey | string | null;
+	    pxs_exchange_rate?: PriceType;
+	    pxs_interest_rate?: number;
+	    url?: string;
+	}
+	export const buildWitnessUpdateOp: (owner: string, props: WitnessProps) => WitnessSetPropertiesOperation;
+
+}
+declare module 'dpixa/src/crypto-registry' {
+	/**
+	 * @file Late binding between the fetch-only client and the crypto module.
+	 *
+	 * The lite entry point (Client, BroadcastAPI, utils, Authority, …) must not
+	 * import secp256k1, the hash functions or AES, or bundlers would pull them
+	 * into the first download. The few lite features that need crypto — signing
+	 * and broadcasting, `utils.buildWitnessUpdateOp`, `Authority.from(PublicKey)`
+	 * — look the implementation up here instead. `./crypto` registers itself as
+	 * soon as it is evaluated, so loading `@pixagram/dpixa/crypto` (or the full
+	 * `@pixagram/dpixa`) anywhere in the app is enough to enable them.
+	 */
+	import type { cryptoUtils, PrivateKey, PublicKey } from 'dpixa/src/crypto';
+	import type { buildWitnessUpdateOp } from 'dpixa/src/witness';
+	export interface CryptoProvider {
+	    PrivateKey: typeof PrivateKey;
+	    PublicKey: typeof PublicKey;
+	    signTransaction: typeof cryptoUtils.signTransaction;
+	    generateTrxId: typeof cryptoUtils.generateTrxId;
+	    buildWitnessUpdateOp: typeof buildWitnessUpdateOp;
+	}
+	/**
+	 * Called by ./crypto when it is loaded.
+	 */
+	export const registerCrypto: (implementation: CryptoProvider) => void;
+	/**
+	 * The crypto implementation, or undefined if it has not been loaded.
+	 */
+	export const peekCrypto: () => CryptoProvider | undefined;
+	/**
+	 * The crypto implementation; throws a descriptive error if it has not been
+	 * loaded yet.
+	 * @param feature What the caller was trying to do, for the error message.
+	 */
+	export const requireCrypto: (feature: string) => CryptoProvider;
+
+}
 declare module 'dpixa/src/chain/account' {
 	/**
 	 * @file Hive/Pixa account type definitions.
@@ -383,7 +539,7 @@ declare module 'dpixa/src/chain/account' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { PublicKey } from 'dpixa/src/crypto';
+	import type { PublicKey } from 'dpixa/src/crypto';
 	import { Asset } from 'dpixa/src/chain/asset';
 	export interface AuthorityType {
 	    weight_threshold: number;
@@ -857,7 +1013,8 @@ declare module 'dpixa/src/crypto' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import ByteBuffer, { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
+	import { BBuffer as Buffer } from 'dpixa/src/bbuffer';
+	import ByteBuffer from 'dpixa/src/bytebuffer';
 	import { SignedTransaction, Transaction } from 'dpixa/src/chain/transaction'; function ripemd160(input: Uint8Array | Buffer | string): Buffer; function sha256(input: Uint8Array | Buffer | string): Buffer; function doubleSha256(input: Uint8Array | Buffer | string): Buffer;
 	/**
 	 * Network id used in WIF-encoding.
@@ -1218,7 +1375,7 @@ declare module 'dpixa/src/chain/operation' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { PublicKey } from 'dpixa/src/crypto';
+	import type { PublicKey } from 'dpixa/src/crypto';
 	import { AuthorityType } from 'dpixa/src/chain/account';
 	import { Asset, PriceType } from 'dpixa/src/chain/asset';
 	import { SignedBlockHeader } from 'dpixa/src/chain/block';
@@ -2046,6 +2203,66 @@ declare module 'dpixa/src/chain/operation' {
 	}
 
 }
+declare module 'dpixa/src/iterator-stream' {
+	/**
+	 * @file Small object-mode readable stream for environments without Node's
+	 * `stream` module (browsers, web workers).
+	 *
+	 * `utils.iteratorStream()` returns a real `stream.PassThrough` under Node.
+	 * Elsewhere it used to need the `stream-browserify` polyfill, which brings
+	 * readable-stream, events, buffer, process, util and string_decoder into the
+	 * bundle. This class covers what callers of the block/operation streams use:
+	 *
+	 *   - on / addListener / once / off / removeListener / removeAllListeners / emit
+	 *   - 'data', 'end', 'error' and 'close' events
+	 *   - pause() / resume() / isPaused()
+	 *   - pipe(destination) with backpressure (waits for 'drain' when write()
+	 *     returns false) and destroy()
+	 *   - async iteration (`for await (const item of stream)`)
+	 *
+	 * Like a Node Readable it starts paused and begins pulling from the iterator
+	 * once a 'data' listener is added, or on resume() / pipe().
+	 */
+	type Listener = (...args: any[]) => void;
+	/** What pipe() needs from a destination (a Node Writable fits). */
+	interface PipeDestination {
+	    write(chunk: any): boolean | void;
+	    end?(): void;
+	    once?(event: string, listener: Listener): unknown;
+	}
+	export class IteratorStream<T = any> {
+	    private readonly iterator;
+	    readable: boolean;
+	    destroyed: boolean;
+	    private readonly listeners;
+	    private flowing;
+	    private pausedByUser;
+	    private started;
+	    private wake;
+	    constructor(iterator: AsyncIterator<T>);
+	    on(event: string | symbol, listener: Listener): this;
+	    addListener(event: string | symbol, listener: Listener): this;
+	    once(event: string | symbol, listener: Listener): this;
+	    off(event: string | symbol, listener: Listener): this;
+	    removeListener(event: string | symbol, listener: Listener): this;
+	    removeAllListeners(event?: string | symbol): this;
+	    listenerCount(event: string | symbol): number;
+	    emit(event: string | symbol, ...args: any[]): boolean;
+	    pause(): this;
+	    resume(): this;
+	    isPaused(): boolean;
+	    pipe<W extends PipeDestination>(destination: W, options?: {
+	        end?: boolean;
+	    }): W;
+	    destroy(error?: Error): this;
+	    [Symbol.asyncIterator](): AsyncIterator<T>;
+	    private signal;
+	    private waitUntilFlowing;
+	    private pump;
+	}
+	export {};
+
+}
 declare module 'dpixa/src/utils' {
 	/**
 	 * @file Misc utility functions.
@@ -2082,17 +2299,30 @@ declare module 'dpixa/src/utils' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { EventEmitter } from 'events';
+	import type { WitnessSetPropertiesOperation } from 'dpixa/src/chain/operation';
+	import type { WitnessProps } from 'dpixa/src/witness';
+	export type { WitnessProps } from 'dpixa/src/witness';
+	/**
+	 * Anything with an EventEmitter-style `once()`.
+	 */
+	export interface EventEmitterLike {
+	    once(eventName: string | symbol, listener: (...args: any[]) => void): unknown;
+	}
 	/**
 	 * Return a promise that will resove when a specific event is emitted.
 	 */
-	export function waitForEvent<T>(emitter: EventEmitter, eventName: string | symbol): Promise<T>;
+	export function waitForEvent<T>(emitter: EventEmitterLike, eventName: string | symbol): Promise<T>;
 	/**
 	 * Sleep for N milliseconds.
 	 */
 	export function sleep(ms: number): Promise<void>;
 	/**
 	 * Return a stream that emits iterator values.
+	 *
+	 * Under Node.js this is an object-mode `stream.PassThrough`, as before. In
+	 * browsers it is a lightweight `IteratorStream` (src/iterator-stream.ts) with the same
+	 * on('data' | 'end' | 'error') / pipe() / pause() / resume() surface; for
+	 * new browser code prefer the async iterators (`getBlocks()` etc.) directly.
 	 */
 	export function iteratorStream<T>(iterator: AsyncIterableIterator<T>): NodeJS.ReadableStream;
 	/**
@@ -2101,25 +2331,21 @@ declare module 'dpixa/src/utils' {
 	export function copy<T>(object: T): T;
 	/**
 	 * Fetch API wrapper that retries until timeout is reached.
+	 *
+	 * Uses the platform `fetch` (browsers, Node.js, workers) — no
+	 * cross-fetch / node-fetch / whatwg-fetch polyfills.
 	 */
 	export function retryingFetch(currentAddress: string, allAddresses: string | string[], opts: any, timeout: number, failoverThreshold: number, consoleOnFailover: boolean, backoff: (tries: number) => number, fetchTimeout?: (tries: number) => number): Promise<{
 	    response: any;
 	    currentAddress: string;
 	}>;
-	import { Asset, PriceType } from 'dpixa/src/chain/asset';
-	import { WitnessSetPropertiesOperation } from 'dpixa/src/chain/operation';
-	import { PublicKey } from 'dpixa/src/crypto';
-	export interface WitnessProps {
-	    account_creation_fee?: string | Asset;
-	    account_subsidy_budget?: number;
-	    account_subsidy_decay?: number;
-	    key: PublicKey | string;
-	    maximum_block_size?: number;
-	    new_signing_key?: PublicKey | string | null;
-	    pxs_exchange_rate?: PriceType;
-	    pxs_interest_rate?: number;
-	    url?: string;
-	}
+	/**
+	 * Build a `witness_set_properties` operation with hex-serialized props.
+	 *
+	 * Needs the serializer, so it lives with the crypto code (see witness.ts);
+	 * this wrapper keeps it on `utils` for the lite entry point and works as soon
+	 * as `@pixagram/dpixa/crypto` (or the full build) has been loaded.
+	 */
 	export const buildWitnessUpdateOp: (owner: string, props: WitnessProps) => WitnessSetPropertiesOperation;
 	export const operationOrders: {
 	    vote: number;
@@ -2212,7 +2438,7 @@ declare module 'dpixa/src/utils' {
 	 * Make bitmask filter to be used with getAccountHistory call
 	 * @param allowedOperations Array of operations index numbers
 	 */
-	export function makeBitMaskFilter(allowedOperations: number[]): any[];
+	export function makeBitMaskFilter(allowedOperations: number[]): (string | null)[];
 
 }
 declare module 'dpixa/src/helpers/blockchain' {
@@ -2360,8 +2586,8 @@ declare module 'dpixa/src/helpers/broadcast' {
 	import { Asset } from 'dpixa/src/chain/asset';
 	import { AccountUpdateOperation, CommentOperation, CommentOptionsOperation, CustomJsonOperation, DelegateVestingSharesOperation, Operation, TransferOperation, VoteOperation } from 'dpixa/src/chain/operation';
 	import { SignedTransaction, Transaction, TransactionConfirmation } from 'dpixa/src/chain/transaction';
-	import { Client } from 'dpixa/src/client';
-	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
+	import type { Client } from 'dpixa/src/client';
+	import type { PrivateKey, PublicKey } from 'dpixa/src/crypto';
 	export interface CreateAccountOptions {
 	    /**
 	     * Username for the new account.
@@ -2403,6 +2629,14 @@ declare module 'dpixa/src/helpers/broadcast' {
 	        [key: string]: any;
 	    };
 	}
+	/**
+	 * Broadcast API helper.
+	 *
+	 * Part of the lite (fetch-only) client: the signing it needs comes from the
+	 * crypto module through crypto-registry.ts, so `client.broadcast` exists even
+	 * before `@pixagram/dpixa/crypto` has been loaded. Methods that sign or
+	 * compute transaction ids throw a descriptive error until it is.
+	 */
 	export class BroadcastAPI {
 	    readonly client: Client;
 	    /**
@@ -2823,7 +3057,7 @@ declare module 'dpixa/src/helpers/key' {
 	 * @file Account by key API helpers.
 	 * @author Bartłomiej (@engrave) Górnicki
 	 */
-	import { PublicKey } from 'dpixa/src/crypto';
+	import type { PublicKey } from 'dpixa/src/crypto';
 	import { Client } from 'dpixa/src/client';
 	export interface AccountsByKey {
 	    accounts: string[][];
@@ -3003,7 +3237,7 @@ declare module 'dpixa/src/client' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
+	import { BBuffer as Buffer } from 'dpixa/src/bbuffer';
 	import { Blockchain } from 'dpixa/src/helpers/blockchain';
 	import { BroadcastAPI } from 'dpixa/src/helpers/broadcast';
 	import { DatabaseAPI } from 'dpixa/src/helpers/database';
@@ -3153,43 +3387,16 @@ declare module 'dpixa/src/client' {
 	}
 
 }
-declare module 'dpixa/src/chain/deserializer' {
-	export type Deserializer = (buffer: any) => void;
-	export const types: {
-	    EncryptedMemoD: any;
-	};
-
-}
-declare module 'dpixa/src/helpers/aes' {
-	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
-	import { BBuffer as Buffer } from 'dpixa/src/bytebuffer';
-	export const encrypt: (private_key: PrivateKey, public_key: PublicKey, message: Buffer, nonce?: string) => any;
-	export const decrypt: (private_key: PrivateKey, public_key: PublicKey, nonce: any, message: any, checksum: number) => any;
+declare module 'dpixa/src/index-lite' {
 	/**
-	 * This method does not use a checksum, the returned data must be validated some other way.
-	 * @arg {string|Buffer} ciphertext - binary format
-	 * @return {Buffer} the decrypted message
-	 */
-	export const cryptoJsDecrypt: (message: Buffer, tag: any, iv: any) => Buffer;
-	/**
-	 * This method does not use a checksum, the returned data must be validated some other way.
-	 * @arg {string|Buffer} plaintext - binary format
-	 * @return {Buffer} binary
-	 */
-	export const cryptoJsEncrypt: (message: Buffer, tag: any, iv: any) => Buffer;
-
-}
-declare module 'dpixa/src/memo' {
-	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
-	export const Memo: {
-	    decode: (private_key: PrivateKey | string, memo: string) => string;
-	    encode: (private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: string) => string;
-	};
-
-}
-declare module 'dpixa/src/index' {
-	/**
-	 * @file dpixa exports.
+	 * @file dpixa lite entry point: RPC client and chain helpers, no cryptography.
+	 *
+	 * `import { Client } from '@pixagram/dpixa/lite'` gives the JSON-RPC client
+	 * (database, rc, pixamind, blockchain, keys, transaction status), assets,
+	 * prices and utils without loading secp256k1, the hash functions or AES.
+	 * `client.broadcast` and `utils.buildWitnessUpdateOp` become usable as soon
+	 * as `@pixagram/dpixa/crypto` is loaded (e.g. with a dynamic import when the
+	 * user first needs to sign).
 	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
 	 * @license
 	 * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
@@ -3236,12 +3443,133 @@ declare module 'dpixa/src/index' {
 	export * from 'dpixa/src/chain/comment';
 	export * from 'dpixa/src/chain/misc';
 	export * from 'dpixa/src/chain/operation';
-	export * from 'dpixa/src/chain/serializer';
 	export * from 'dpixa/src/chain/transaction';
 	export * from 'dpixa/src/chain/pixamind';
 	export * from 'dpixa/src/client';
+
+}
+declare module 'dpixa/src/chain/deserializer' {
+	export type Deserializer = (buffer: any) => void;
+	export const types: {
+	    EncryptedMemoD: any;
+	};
+
+}
+declare module 'dpixa/src/helpers/aes' {
+	import { BBuffer as Buffer } from 'dpixa/src/bbuffer';
+	import type { PrivateKey, PublicKey } from 'dpixa/src/crypto';
+	export const encrypt: (private_key: PrivateKey, public_key: PublicKey, message: Buffer, nonce?: string) => any;
+	export const decrypt: (private_key: PrivateKey, public_key: PublicKey, nonce: any, message: any, checksum: number) => any;
+	/**
+	 * This method does not use a checksum, the returned data must be validated some other way.
+	 * @arg {string|Buffer} ciphertext - binary format
+	 * @return {Buffer} the decrypted message
+	 */
+	export const cryptoJsDecrypt: (message: Buffer, tag: any, iv: any) => Buffer;
+	/**
+	 * This method does not use a checksum, the returned data must be validated some other way.
+	 * @arg {string|Buffer} plaintext - binary format
+	 * @return {Buffer} binary
+	 */
+	export const cryptoJsEncrypt: (message: Buffer, tag: any, iv: any) => Buffer;
+
+}
+declare module 'dpixa/src/memo' {
+	import { PrivateKey, PublicKey } from 'dpixa/src/crypto';
+	export const Memo: {
+	    decode: (private_key: PrivateKey | string, memo: string) => string;
+	    encode: (private_key: PrivateKey | string, public_key: PublicKey | string, memo: string, testNonce?: string) => string;
+	};
+
+}
+declare module 'dpixa/src/index-crypto' {
+	/**
+	 * @file dpixa crypto entry point: keys, signatures, serialization, memos.
+	 *
+	 * `import { PrivateKey, cryptoUtils, Memo, Types } from '@pixagram/dpixa/crypto'`.
+	 * Loading this module also enables signing and broadcasting on clients
+	 * created from the lite entry point.
+	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
+	 * @license
+	 * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
+	 * Copyright (c) 2025 Matias Affolter. All Rights Reserved.
+	 *
+	 * Redistribution and use in source and binary forms, with or without modification,
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  1. Redistribution of source code must retain the above copyright notice, this
+	 *     list of conditions and the following disclaimer.
+	 *
+	 *  2. Redistribution in binary form must reproduce the above copyright notice,
+	 *     this list of conditions and the following disclaimer in the documentation
+	 *     and/or other materials provided with the distribution.
+	 *
+	 *  3. Neither the name of the copyright holder nor the names of its contributors
+	 *     may be used to endorse or promote products derived from this software without
+	 *     specific prior written permission.
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+	 * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+	 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+	 * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	 * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	 * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+	 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+	 * OF THE POSSIBILITY OF SUCH DAMAGE.
+	 *
+	 * You acknowledge that this software is not designed, licensed or intended for use
+	 * in the design, construction, operation or maintenance of any military facility.
+	 */
 	export * from 'dpixa/src/crypto';
 	export * from 'dpixa/src/memo';
+	export * from 'dpixa/src/chain/serializer';
+
+}
+declare module 'dpixa' {
+	/**
+	 * @file dpixa exports.
+	 *
+	 * The full API is the union of the two halves, which can also be loaded
+	 * separately to keep the first download small:
+	 *   - ./index-lite   (`@pixagram/dpixa/lite`)   RPC client, no cryptography
+	 *   - ./index-crypto (`@pixagram/dpixa/crypto`) keys, signing, memos
+	 * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
+	 * @license
+	 * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
+	 * Copyright (c) 2025 Matias Affolter. All Rights Reserved.
+	 *
+	 * Redistribution and use in source and binary forms, with or without modification,
+	 * are permitted provided that the following conditions are met:
+	 *
+	 *  1. Redistribution of source code must retain the above copyright notice, this
+	 *     list of conditions and the following disclaimer.
+	 *
+	 *  2. Redistribution in binary form must reproduce the above copyright notice,
+	 *     this list of conditions and the following disclaimer in the documentation
+	 *     and/or other materials provided with the distribution.
+	 *
+	 *  3. Neither the name of the copyright holder nor the names of its contributors
+	 *     may be used to endorse or promote products derived from this software without
+	 *     specific prior written permission.
+	 *
+	 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+	 * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+	 * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+	 * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+	 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+	 * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+	 * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+	 * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+	 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+	 * OF THE POSSIBILITY OF SUCH DAMAGE.
+	 *
+	 * You acknowledge that this software is not designed, licensed or intended for use
+	 * in the design, construction, operation or maintenance of any military facility.
+	 */
+	export * from 'dpixa/src/index-lite';
+	export * from 'dpixa/src/index-crypto';
 
 }
 declare module 'dpixa/src/index-browser' {
@@ -3280,15 +3608,7 @@ declare module 'dpixa/src/index-browser' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	import 'core-js/features/array/from';
-	import 'core-js/features/map';
-	import 'core-js/features/number';
-	import 'core-js/features/promise';
-	import 'core-js/features/symbol';
-	import 'core-js/features/symbol/async-iterator';
-	import 'regenerator-runtime/runtime';
-	import 'whatwg-fetch';
-	export * from 'dpixa/src/index';
+	export * from 'dpixa';
 
 }
 declare module 'dpixa/src/index-node' {
@@ -3326,6 +3646,6 @@ declare module 'dpixa/src/index-node' {
 	 * You acknowledge that this software is not designed, licensed or intended for use
 	 * in the design, construction, operation or maintenance of any military facility.
 	 */
-	export * from 'dpixa/src/index';
+	export * from 'dpixa';
 
 }

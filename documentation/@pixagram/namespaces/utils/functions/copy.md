@@ -8,7 +8,7 @@
 
 > **copy**\<`T`\>(`object`): `T`
 
-Defined in: utils.ts:92
+Defined in: utils.ts:130
 
 Return a deep copy of a JSON-serializable object.
 

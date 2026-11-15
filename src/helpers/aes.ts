@@ -1,12 +1,16 @@
-import * as assert from 'assert'
-import {
-  createCipheriv,
-  createDecipheriv,
-  createHash,
-  randomBytes
-} from 'crypto'
-import { PrivateKey, PublicKey } from '../crypto'
-import ByteBuffer, { BBuffer as Buffer, Long } from '../bytebuffer'
+import { cbc } from '@noble/ciphers/aes.js'
+import { sha256, sha512 } from '@noble/hashes/sha2.js'
+import { randomBytes } from '@noble/hashes/utils.js'
+import assert from '../assert'
+import { BBuffer as Buffer } from '../bbuffer'
+import ByteBuffer, { Long } from '../bytebuffer'
+import type { PrivateKey, PublicKey } from '../crypto'
+
+// AES-256-CBC (PKCS#7 padding), SHA-256/512 and the random nonce come from
+// @noble/ciphers and @noble/hashes. Previously this file imported Node's
+// `crypto` module, which browser bundles replaced with crypto-browserify —
+// the single largest part of the old bundle (elliptic, bn.js, asn1.js,
+// browserify-sign, des.js, … plus the `buffer` polyfill).
 
 export const encrypt = (
   private_key: PrivateKey,
@@ -39,7 +43,6 @@ const crypt = (
   checksum: number
 } => {
   const nonceL = toLongObj(nonce)
-//   const bufferMessage = Buffer.from(messageString, 'binary')
   const S = private_key.get_shared_secret(public_key)
   let ebuf: any = new ByteBuffer(
     ByteBuffer.DEFAULT_CAPACITY,
@@ -48,18 +51,13 @@ const crypt = (
   ebuf.writeUint64(nonceL)
   ebuf.append(S.toString('binary'), 'binary')
   ebuf = Buffer.from(ebuf.copy(0, ebuf.offset).toBinary(), 'binary')
-  const encryption_key = createHash('sha512').update(ebuf).digest()
+  const encryption_key = Buffer.from(sha512(ebuf))
   const iv = encryption_key.slice(32, 48)
   const tag = encryption_key.slice(0, 32)
 
   // check if first 64 bit of sha256 hash treated as uint64_t truncated to 32 bits.
-  const check = createHash('sha256').update(encryption_key).digest().slice(0, 4)
+  const check = Buffer.from(sha256(encryption_key)).slice(0, 4)
   const cbuf: any = ByteBuffer.fromBinary(
-    check.toString('binary'),
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
-  )
-  ByteBuffer.fromBinary(
     check.toString('binary'),
     ByteBuffer.DEFAULT_CAPACITY,
     ByteBuffer.LITTLE_ENDIAN
@@ -84,10 +82,7 @@ const crypt = (
  */
 export const cryptoJsDecrypt = (message: Buffer, tag, iv): Buffer => {
   assert(message, 'Missing cipher text')
-  let messageBuffer = message
-  const decipher = createDecipheriv('aes-256-cbc', tag, iv)
-  messageBuffer = Buffer.concat([decipher.update(messageBuffer), decipher.final()])
-  return messageBuffer
+  return Buffer.from(cbc(tag, iv).decrypt(message))
 }
 
 /**
@@ -97,10 +92,7 @@ export const cryptoJsDecrypt = (message: Buffer, tag, iv): Buffer => {
  */
 export const cryptoJsEncrypt = (message: Buffer, tag, iv): Buffer => {
   assert(message, 'Missing plain text')
-  let messageBuffer = message
-  const cipher = createCipheriv('aes-256-cbc', tag, iv)
-  messageBuffer = Buffer.concat([cipher.update(messageBuffer), cipher.final()])
-  return messageBuffer
+  return Buffer.from(cbc(tag, iv).encrypt(message))
 }
 
 /** @return {string} unique 64 bit unsigned number string.  Being time based,
@@ -111,10 +103,7 @@ let unique_nonce_entropy: any = null
 
 const uniqueNonce = (): string => {
   if (unique_nonce_entropy === null) {
-    const uint8randomArr = new Uint8Array(2)
-    for (let i = 0; i < 2; ++i) {
-      uint8randomArr[i] = randomBytes(2).readUInt8(i)
-    }
+    const uint8randomArr = randomBytes(2)
     unique_nonce_entropy = Math.round((uint8randomArr[0] << 8) | uint8randomArr[1])
   }
   let long = Long.fromNumber(Date.now())

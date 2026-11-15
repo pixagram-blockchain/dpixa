@@ -34,18 +34,28 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import fetch from 'cross-fetch'
-import { EventEmitter } from 'events'
-import { PassThrough } from 'stream'
+import type { WitnessSetPropertiesOperation } from './chain/operation'
+import { requireCrypto } from './crypto-registry'
+import { IteratorStream } from './iterator-stream'
+import type { WitnessProps } from './witness'
+
+export type { WitnessProps } from './witness'
 
 // TODO: Add more errors that should trigger a failover
 const timeoutErrors = ['timeout', 'ENOTFOUND', 'ECONNREFUSED', 'database lock', 'CERT_HAS_EXPIRED', 'EHOSTUNREACH', 'ECONNRESET', 'ERR_TLS_CERT_ALTNAME_INVALID', 'EAI_AGAIN']
 
 /**
+ * Anything with an EventEmitter-style `once()`.
+ */
+export interface EventEmitterLike {
+  once(eventName: string | symbol, listener: (...args: any[]) => void): unknown
+}
+
+/**
  * Return a promise that will resove when a specific event is emitted.
  */
 export function waitForEvent<T>(
-  emitter: EventEmitter,
+  emitter: EventEmitterLike,
   eventName: string | symbol
 ): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -63,12 +73,40 @@ export function sleep(ms: number): Promise<void> {
 }
 
 /**
+ * Node's `stream` module when running under Node.js, otherwise undefined.
+ *
+ * Looked up at runtime through `process.getBuiltinModule` (Node >= 20.16)
+ * instead of `import 'stream'`, so browser bundlers never see a dependency
+ * on `stream` and don't pull in the stream-browserify polyfill.
+ */
+const nodeStreamModule = (): any => {
+  const proc = (globalThis as any).process
+  if (proc && typeof proc.getBuiltinModule === 'function') {
+    try {
+      return proc.getBuiltinModule('stream')
+    } catch (_error) {
+      return undefined
+    }
+  }
+  return undefined
+}
+
+/**
  * Return a stream that emits iterator values.
+ *
+ * Under Node.js this is an object-mode `stream.PassThrough`, as before. In
+ * browsers it is a lightweight `IteratorStream` (src/iterator-stream.ts) with the same
+ * on('data' | 'end' | 'error') / pipe() / pause() / resume() surface; for
+ * new browser code prefer the async iterators (`getBlocks()` etc.) directly.
  */
 export function iteratorStream<T>(
   iterator: AsyncIterableIterator<T>
 ): NodeJS.ReadableStream {
-  const stream = new PassThrough({ objectMode: true })
+  const nodeStream = nodeStreamModule()
+  if (!nodeStream) {
+    return new IteratorStream<T>(iterator) as unknown as NodeJS.ReadableStream
+  }
+  const stream = new nodeStream.PassThrough({ objectMode: true })
   const iterate = async () => {
     for await (const item of iterator) {
       if (!stream.write(item)) {
@@ -94,7 +132,74 @@ export function copy<T>(object: T): T {
 }
 
 /**
+ * True under Node.js (and runtimes that emulate it). The per-attempt fetch
+ * timeout below is only applied there: node-fetch honoured it, browsers
+ * never did, and browser callers rely on requests not being cut short.
+ */
+const IS_NODE = (() => {
+  const proc = (globalThis as any).process
+  return !!(proc && proc.versions && proc.versions.node)
+})()
+
+/**
+ * Per-attempt timeout for Node's native fetch, matching node-fetch's
+ * `timeout` option: the limit applies to receiving the response headers and
+ * then, separately, to reading the body.
+ */
+class AttemptTimer {
+  public readonly controller = new AbortController()
+  public error: Error | undefined
+  private timer: ReturnType<typeof setTimeout> | undefined
+
+  public constructor(private readonly url: string, private readonly ms: number) {
+    this.arm(`network timeout at: ${url}`, 'request-timeout')
+  }
+
+  /** Response headers arrived: start the separate body timeout. */
+  public bodyPhase() {
+    this.clear()
+    this.arm(`Response timeout while trying to fetch ${this.url} (over ${this.ms}ms)`, 'body-timeout')
+  }
+
+  public clear() {
+    if (this.timer !== undefined) {
+      clearTimeout(this.timer)
+      this.timer = undefined
+    }
+  }
+
+  private arm(message: string, type: string) {
+    this.timer = setTimeout(() => {
+      const error: any = new Error(message)
+      error.name = 'FetchError'
+      error.type = type
+      this.error = error
+      this.controller.abort()
+    }, this.ms)
+  }
+}
+
+/**
+ * Node's fetch reports network failures as `TypeError: fetch failed` with
+ * the system error code on `error.cause.code`; node-fetch put it on
+ * `error.code`, which the failover logic below looks at. Copy it over.
+ */
+const withErrorCode = (error: any) => {
+  if (error && error.code === undefined && error.cause && typeof error.cause.code === 'string') {
+    try {
+      error.code = error.cause.code
+    } catch (_error) {
+      // frozen error object; leave it as is
+    }
+  }
+  return error
+}
+
+/**
  * Fetch API wrapper that retries until timeout is reached.
+ *
+ * Uses the platform `fetch` (browsers, Node.js, workers) — no
+ * cross-fetch / node-fetch / whatwg-fetch polyfills.
  */
 export async function retryingFetch(
   currentAddress: string,
@@ -115,17 +220,32 @@ export async function retryingFetch(
       if (fetchTimeout) {
         opts.timeout = fetchTimeout(tries)
       }
-      const response = await fetch(currentAddress, opts)
-      if (!response.ok) {
-        if (response.status === 500){ // Support for Drone
-          const resJson = await response.json();
-          if (resJson.jsonrpc === "2.0"){
-            return { response: resJson, currentAddress }
-          }
+      const timer = IS_NODE && opts.timeout > 0 ? new AttemptTimer(currentAddress, opts.timeout) : undefined
+      try {
+        const response = await (globalThis as any).fetch(
+          currentAddress,
+          timer ? { ...opts, signal: timer.controller.signal } : opts
+        )
+        if (timer) {
+          timer.bodyPhase()
         }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        if (!response.ok) {
+          if (response.status === 500) { // Support for Drone
+            const resJson = await response.json()
+            if (resJson.jsonrpc === '2.0') {
+              return { response: resJson, currentAddress }
+            }
+          }
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        }
+        return { response: await response.json(), currentAddress }
+      } catch (error) {
+        throw timer && timer.error ? timer.error : withErrorCode(error)
+      } finally {
+        if (timer) {
+          timer.clear()
+        }
       }
-      return { response: await response.json(), currentAddress }
     } catch (error) {
       if (timeout !== 0 && Date.now() - start > timeout) {
         if ((!error || !error.code) && Array.isArray(allAddresses)) {
@@ -139,7 +259,7 @@ export async function retryingFetch(
         } else {
           const isFailoverError =
             timeoutErrors.filter(
-              (fe) => error && error.code && error.code.includes(fe)
+              (fe) => error && typeof error.code === 'string' && error.code.includes(fe)
             ).length > 0
           if (
             isFailoverError &&
@@ -197,80 +317,19 @@ const failover = (
   return targetUrl
 }
 
-// Hack to be able to generate a valid witness_set_properties op
-// Can hopefully be removed when pixad's JSON representation is fixed
-import ByteBuffer from './bytebuffer'
-import { Asset, PriceType } from './chain/asset'
-import { WitnessSetPropertiesOperation } from './chain/operation'
-import { Serializer, Types } from './chain/serializer'
-import { PublicKey } from './crypto'
-export interface WitnessProps {
-  account_creation_fee?: string | Asset
-  account_subsidy_budget?: number // uint32_t
-  account_subsidy_decay?: number // uint32_t
-  key: PublicKey | string
-  maximum_block_size?: number // uint32_t
-  new_signing_key?: PublicKey | string | null
-  pxs_exchange_rate?: PriceType
-  pxs_interest_rate?: number // uint16_t
-  url?: string
-}
-
-const serialize = (serializer: Serializer, data: any) => {
-  const buffer = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN
-  )
-  serializer(buffer, data)
-  buffer.flip()
-  // `props` values must be hex
-  return buffer.toString('hex')
-  // return Buffer.from(buffer.toBuffer());
-}
-
+/**
+ * Build a `witness_set_properties` operation with hex-serialized props.
+ *
+ * Needs the serializer, so it lives with the crypto code (see witness.ts);
+ * this wrapper keeps it on `utils` for the lite entry point and works as soon
+ * as `@pixagram/dpixa/crypto` (or the full build) has been loaded.
+ */
 export const buildWitnessUpdateOp = (
   owner: string,
   props: WitnessProps
-): WitnessSetPropertiesOperation => {
-  const data: WitnessSetPropertiesOperation[1] = {
-    extensions: [],
-    owner,
-    props: []
-  }
-  for (const key of Object.keys(props)) {
-    let type: Serializer
-    switch (key) {
-      case 'key':
-      case 'new_signing_key':
-        type = Types.PublicKey
-        break
-      case 'account_subsidy_budget':
-      case 'account_subsidy_decay':
-      case 'maximum_block_size':
-        type = Types.UInt32
-        break
-      case 'pxs_interest_rate':
-        type = Types.UInt16
-        break
-      case 'url':
-        type = Types.String
-        break
-      case 'pxs_exchange_rate':
-        type = Types.Price
-        break
-      case 'account_creation_fee':
-        type = Types.Asset
-        break
-      default:
-        throw new Error(`Unknown witness prop: ${key}`)
-    }
-    data.props.push([key, serialize(type, props[key])])
-  }
-  data.props.sort((a, b) => a[0].localeCompare(b[0]))
-  return ['witness_set_properties', data]
-}
+): WitnessSetPropertiesOperation =>
+  requireCrypto('utils.buildWitnessUpdateOp').buildWitnessUpdateOp(owner, props)
 
-const JSBI = require('jsbi')
 export const operationOrders = {
   vote: 0,
   // tslint:disable-next-line: object-literal-sort-keys
@@ -365,30 +424,16 @@ export const operationOrders = {
  * Make bitmask filter to be used with getAccountHistory call
  * @param allowedOperations Array of operations index numbers
  */
-export function makeBitMaskFilter(allowedOperations: number[]) {
+export function makeBitMaskFilter(allowedOperations: number[]): (string | null)[] {
   return allowedOperations
-    .reduce(redFunction, [JSBI.BigInt(0), JSBI.BigInt(0)])
-    .map((value) =>
-      JSBI.notEqual(value, JSBI.BigInt(0)) ? value.toString() : null
-    )
+    .reduce(redFunction, [0n, 0n])
+    .map(value => (value !== 0n ? value.toString() : null))
 }
 
-const redFunction = ([low, high], allowedOperation) => {
+const redFunction = ([low, high]: bigint[], allowedOperation: number): bigint[] => {
   if (allowedOperation < 64) {
-    return [
-      JSBI.bitwiseOr(
-        low,
-        JSBI.leftShift(JSBI.BigInt(1), JSBI.BigInt(allowedOperation))
-      ),
-      high
-    ]
+    return [low | (1n << BigInt(allowedOperation)), high]
   } else {
-    return [
-      low,
-      JSBI.bitwiseOr(
-        high,
-        JSBI.leftShift(JSBI.BigInt(1), JSBI.BigInt(allowedOperation - 64))
-      )
-    ]
+    return [low, high | (1n << BigInt(allowedOperation - 64))]
   }
 }

@@ -8,7 +8,7 @@
 
 > `const` **cryptoUtils**: `object`
 
-Defined in: crypto.ts:583
+Defined in: crypto.ts:579
 
 Misc crypto utility functions.
 
@@ -135,14 +135,9 @@ Return true if string is wif, otherwise false.
 
 Return ripemd160 hash of input.
 
-Switched from the `ripemd160` package (which exposed a default class) to
-`ripemd160-min`. Key differences:
-  - Use the named import `{ RIPEMD160 }` — the package's default export
-    isn't callable as a constructor under ESM interop.
-  - `.update()` only accepts bytes (Uint8Array or number[]), so strings
-    must be encoded first (handled by `toBytes`).
-  - `.digest()` returns a Uint8Array, not a Node Buffer — we wrap it in
-    `Buffer.from(...)` so callers can still use `.slice()` / `.toString('hex')`.
+Uses `@noble/hashes/legacy.js` (already a dependency for sha2/hmac) instead
+of the separate `ripemd160-min` package. Returns a BBuffer so callers can
+still use `.slice()` / `.toString('hex')`.
 
 #### Parameters
 

@@ -8,6 +8,6 @@
 
 > `const` **NETWORK\_ID**: `BBuffer`
 
-Defined in: crypto.ts:139
+Defined in: crypto.ts:135
 
 Network id used in WIF-encoding.

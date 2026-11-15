@@ -33,8 +33,8 @@
  * You acknowledge that this software is not designed, licensed or intended for use
  * in the design, construction, operation or maintenance of any military facility.
  */
-// Custom Uint8Array-backed Buffer shim (see bytebuffer.ts).
-import { BBuffer as Buffer } from '../bytebuffer'
+// Custom Uint8Array-backed Buffer shim (see bbuffer.ts).
+import { BBuffer as Buffer } from '../bbuffer'
 import { Account } from './account'
 import { Asset, Price } from './asset'
 

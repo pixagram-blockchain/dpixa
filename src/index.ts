@@ -1,5 +1,10 @@
 /**
  * @file dpixa exports.
+ *
+ * The full API is the union of the two halves, which can also be loaded
+ * separately to keep the first download small:
+ *   - ./index-lite   (`@pixagram/dpixa/lite`)   RPC client, no cryptography
+ *   - ./index-crypto (`@pixagram/dpixa/crypto`) keys, signing, memos
  * @author Johan Nordberg <code@johan-nordberg.com> / Matias Affolter
  * @license
  * Copyright (c) 2017 Johan Nordberg. All Rights Reserved.
@@ -34,25 +39,5 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import * as utils from './utils'
-export { utils }
-
-export * from './helpers/blockchain'
-export * from './helpers/database'
-export * from './helpers/rc'
-export * from './helpers/key'
-export * from './helpers/pixamind'
-
-export * from './chain/account'
-export * from './chain/asset'
-export * from './chain/block'
-export * from './chain/comment'
-export * from './chain/misc'
-export * from './chain/operation'
-export * from './chain/serializer'
-export * from './chain/transaction'
-export * from './chain/pixamind'
-
-export * from './client'
-export * from './crypto'
-export * from './memo'
+export * from './index-lite'
+export * from './index-crypto'

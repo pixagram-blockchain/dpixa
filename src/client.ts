@@ -34,10 +34,10 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import * as assert from 'assert'
-import { VError } from 'verror'
+import assert from './assert'
+import { BBuffer as Buffer } from './bbuffer'
+import { VError } from './errors'
 import packageVersion from './version'
-import { BBuffer as Buffer } from './bytebuffer'
 import {
     MAINNET_HEX_CHAIN_ID,
     TESTNET_HEX_CHAIN_ID,

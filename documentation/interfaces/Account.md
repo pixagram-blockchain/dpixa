@@ -6,7 +6,7 @@
 
 # Interface: Account
 
-Defined in: chain/account.ts:75
+Defined in: chain/account.ts:82
 
 ## Extended by
 
@@ -18,7 +18,7 @@ Defined in: chain/account.ts:75
 
 > **active**: [`Authority`](../classes/Authority.md)
 
-Defined in: chain/account.ts:79
+Defined in: chain/account.ts:86
 
 ***
 
@@ -26,7 +26,7 @@ Defined in: chain/account.ts:79
 
 > **active\_challenged**: `boolean`
 
-Defined in: chain/account.ts:90
+Defined in: chain/account.ts:97
 
 ***
 
@@ -34,7 +34,7 @@ Defined in: chain/account.ts:90
 
 > **average\_bandwidth**: `string` \| `number`
 
-Defined in: chain/account.ts:133
+Defined in: chain/account.ts:140
 
 ***
 
@@ -42,7 +42,7 @@ Defined in: chain/account.ts:133
 
 > **average\_market\_bandwidth**: `string` \| `number`
 
-Defined in: chain/account.ts:136
+Defined in: chain/account.ts:143
 
 ***
 
@@ -50,7 +50,7 @@ Defined in: chain/account.ts:136
 
 > **balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:106
+Defined in: chain/account.ts:113
 
 ***
 
@@ -58,7 +58,7 @@ Defined in: chain/account.ts:106
 
 > **can\_vote**: `boolean`
 
-Defined in: chain/account.ts:99
+Defined in: chain/account.ts:106
 
 ***
 
@@ -66,7 +66,7 @@ Defined in: chain/account.ts:99
 
 > **comment\_count**: `number`
 
-Defined in: chain/account.ts:96
+Defined in: chain/account.ts:103
 
 ***
 
@@ -74,7 +74,7 @@ Defined in: chain/account.ts:96
 
 > **created**: `string`
 
-Defined in: chain/account.ts:87
+Defined in: chain/account.ts:94
 
 ***
 
@@ -82,7 +82,7 @@ Defined in: chain/account.ts:87
 
 > **curation\_rewards**: `string` \| `number`
 
-Defined in: chain/account.ts:121
+Defined in: chain/account.ts:128
 
 ***
 
@@ -90,7 +90,7 @@ Defined in: chain/account.ts:121
 
 > **delegated\_vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:124
+Defined in: chain/account.ts:131
 
 ***
 
@@ -98,7 +98,7 @@ Defined in: chain/account.ts:124
 
 > **id**: `number`
 
-Defined in: chain/account.ts:76
+Defined in: chain/account.ts:83
 
 ***
 
@@ -106,7 +106,7 @@ Defined in: chain/account.ts:76
 
 > **json\_metadata**: `string`
 
-Defined in: chain/account.ts:82
+Defined in: chain/account.ts:89
 
 ***
 
@@ -114,7 +114,7 @@ Defined in: chain/account.ts:82
 
 > **last\_account\_recovery**: `string`
 
-Defined in: chain/account.ts:95
+Defined in: chain/account.ts:102
 
 ***
 
@@ -122,7 +122,7 @@ Defined in: chain/account.ts:95
 
 > **last\_account\_update**: `string`
 
-Defined in: chain/account.ts:86
+Defined in: chain/account.ts:93
 
 ***
 
@@ -130,7 +130,7 @@ Defined in: chain/account.ts:86
 
 > **last\_active\_proved**: `string`
 
-Defined in: chain/account.ts:92
+Defined in: chain/account.ts:99
 
 ***
 
@@ -138,7 +138,7 @@ Defined in: chain/account.ts:92
 
 > **last\_bandwidth\_update**: `string`
 
-Defined in: chain/account.ts:135
+Defined in: chain/account.ts:142
 
 ***
 
@@ -146,7 +146,7 @@ Defined in: chain/account.ts:135
 
 > **last\_market\_bandwidth\_update**: `string`
 
-Defined in: chain/account.ts:138
+Defined in: chain/account.ts:145
 
 ***
 
@@ -154,7 +154,7 @@ Defined in: chain/account.ts:138
 
 > **last\_owner\_proved**: `string`
 
-Defined in: chain/account.ts:91
+Defined in: chain/account.ts:98
 
 ***
 
@@ -162,7 +162,7 @@ Defined in: chain/account.ts:91
 
 > **last\_owner\_update**: `string`
 
-Defined in: chain/account.ts:85
+Defined in: chain/account.ts:92
 
 ***
 
@@ -170,7 +170,7 @@ Defined in: chain/account.ts:85
 
 > **last\_post**: `string`
 
-Defined in: chain/account.ts:139
+Defined in: chain/account.ts:146
 
 ***
 
@@ -178,7 +178,7 @@ Defined in: chain/account.ts:139
 
 > **last\_root\_post**: `string`
 
-Defined in: chain/account.ts:140
+Defined in: chain/account.ts:147
 
 ***
 
@@ -186,7 +186,7 @@ Defined in: chain/account.ts:140
 
 > **last\_vote\_time**: `string`
 
-Defined in: chain/account.ts:101
+Defined in: chain/account.ts:108
 
 ***
 
@@ -194,7 +194,7 @@ Defined in: chain/account.ts:101
 
 > **lifetime\_bandwidth**: `string` \| `number`
 
-Defined in: chain/account.ts:134
+Defined in: chain/account.ts:141
 
 ***
 
@@ -202,7 +202,7 @@ Defined in: chain/account.ts:134
 
 > **lifetime\_market\_bandwidth**: `string` \| `number`
 
-Defined in: chain/account.ts:137
+Defined in: chain/account.ts:144
 
 ***
 
@@ -210,7 +210,7 @@ Defined in: chain/account.ts:137
 
 > **lifetime\_vote\_count**: `number`
 
-Defined in: chain/account.ts:97
+Defined in: chain/account.ts:104
 
 ***
 
@@ -218,7 +218,7 @@ Defined in: chain/account.ts:97
 
 > **memo\_key**: `string`
 
-Defined in: chain/account.ts:81
+Defined in: chain/account.ts:88
 
 ***
 
@@ -226,7 +226,7 @@ Defined in: chain/account.ts:81
 
 > **mined**: `boolean`
 
-Defined in: chain/account.ts:88
+Defined in: chain/account.ts:95
 
 ***
 
@@ -234,7 +234,7 @@ Defined in: chain/account.ts:88
 
 > **name**: `string`
 
-Defined in: chain/account.ts:77
+Defined in: chain/account.ts:84
 
 ***
 
@@ -242,7 +242,7 @@ Defined in: chain/account.ts:77
 
 > **next\_vesting\_withdrawal**: `string`
 
-Defined in: chain/account.ts:127
+Defined in: chain/account.ts:134
 
 ***
 
@@ -250,7 +250,7 @@ Defined in: chain/account.ts:127
 
 > **owner**: [`Authority`](../classes/Authority.md)
 
-Defined in: chain/account.ts:78
+Defined in: chain/account.ts:85
 
 ***
 
@@ -258,7 +258,7 @@ Defined in: chain/account.ts:78
 
 > **owner\_challenged**: `boolean`
 
-Defined in: chain/account.ts:89
+Defined in: chain/account.ts:96
 
 ***
 
@@ -266,7 +266,7 @@ Defined in: chain/account.ts:89
 
 > **post\_count**: `number`
 
-Defined in: chain/account.ts:98
+Defined in: chain/account.ts:105
 
 ***
 
@@ -274,7 +274,7 @@ Defined in: chain/account.ts:98
 
 > **posting**: [`Authority`](../classes/Authority.md)
 
-Defined in: chain/account.ts:80
+Defined in: chain/account.ts:87
 
 ***
 
@@ -282,7 +282,7 @@ Defined in: chain/account.ts:80
 
 > **posting\_json\_metadata**: `string`
 
-Defined in: chain/account.ts:83
+Defined in: chain/account.ts:90
 
 ***
 
@@ -290,7 +290,7 @@ Defined in: chain/account.ts:83
 
 > **posting\_rewards**: `string` \| `number`
 
-Defined in: chain/account.ts:122
+Defined in: chain/account.ts:129
 
 ***
 
@@ -298,7 +298,7 @@ Defined in: chain/account.ts:122
 
 > **proxied\_vsf\_votes**: `number`[]
 
-Defined in: chain/account.ts:131
+Defined in: chain/account.ts:138
 
 ***
 
@@ -306,7 +306,7 @@ Defined in: chain/account.ts:131
 
 > **proxy**: `string`
 
-Defined in: chain/account.ts:84
+Defined in: chain/account.ts:91
 
 ***
 
@@ -314,7 +314,7 @@ Defined in: chain/account.ts:84
 
 > **pxs\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:108
+Defined in: chain/account.ts:115
 
 ***
 
@@ -322,7 +322,7 @@ Defined in: chain/account.ts:108
 
 > **pxs\_last\_interest\_payment**: `string`
 
-Defined in: chain/account.ts:111
+Defined in: chain/account.ts:118
 
 ***
 
@@ -330,7 +330,7 @@ Defined in: chain/account.ts:111
 
 > **pxs\_seconds**: `string`
 
-Defined in: chain/account.ts:109
+Defined in: chain/account.ts:116
 
 ***
 
@@ -338,7 +338,7 @@ Defined in: chain/account.ts:109
 
 > **pxs\_seconds\_last\_update**: `string`
 
-Defined in: chain/account.ts:110
+Defined in: chain/account.ts:117
 
 ***
 
@@ -346,7 +346,7 @@ Defined in: chain/account.ts:110
 
 > **received\_vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:125
+Defined in: chain/account.ts:132
 
 ***
 
@@ -354,7 +354,7 @@ Defined in: chain/account.ts:125
 
 > **recovery\_account**: `string`
 
-Defined in: chain/account.ts:93
+Defined in: chain/account.ts:100
 
 ***
 
@@ -362,7 +362,7 @@ Defined in: chain/account.ts:93
 
 > **reset\_account**: `string`
 
-Defined in: chain/account.ts:94
+Defined in: chain/account.ts:101
 
 ***
 
@@ -370,7 +370,7 @@ Defined in: chain/account.ts:94
 
 > **reward\_pixa\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:118
+Defined in: chain/account.ts:125
 
 ***
 
@@ -378,7 +378,7 @@ Defined in: chain/account.ts:118
 
 > **reward\_pxs\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:117
+Defined in: chain/account.ts:124
 
 ***
 
@@ -386,7 +386,7 @@ Defined in: chain/account.ts:117
 
 > **reward\_vesting\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:119
+Defined in: chain/account.ts:126
 
 ***
 
@@ -394,7 +394,7 @@ Defined in: chain/account.ts:119
 
 > **reward\_vesting\_pixa**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:120
+Defined in: chain/account.ts:127
 
 ***
 
@@ -402,7 +402,7 @@ Defined in: chain/account.ts:120
 
 > **savings\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:107
+Defined in: chain/account.ts:114
 
 ***
 
@@ -410,7 +410,7 @@ Defined in: chain/account.ts:107
 
 > **savings\_pxs\_balance**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:112
+Defined in: chain/account.ts:119
 
 ***
 
@@ -418,7 +418,7 @@ Defined in: chain/account.ts:112
 
 > **savings\_pxs\_last\_interest\_payment**: `string`
 
-Defined in: chain/account.ts:115
+Defined in: chain/account.ts:122
 
 ***
 
@@ -426,7 +426,7 @@ Defined in: chain/account.ts:115
 
 > **savings\_pxs\_seconds**: `string`
 
-Defined in: chain/account.ts:113
+Defined in: chain/account.ts:120
 
 ***
 
@@ -434,7 +434,7 @@ Defined in: chain/account.ts:113
 
 > **savings\_pxs\_seconds\_last\_update**: `string`
 
-Defined in: chain/account.ts:114
+Defined in: chain/account.ts:121
 
 ***
 
@@ -442,7 +442,7 @@ Defined in: chain/account.ts:114
 
 > **savings\_withdraw\_requests**: `number`
 
-Defined in: chain/account.ts:116
+Defined in: chain/account.ts:123
 
 ***
 
@@ -450,7 +450,7 @@ Defined in: chain/account.ts:116
 
 > **to\_withdraw**: `string` \| `number`
 
-Defined in: chain/account.ts:129
+Defined in: chain/account.ts:136
 
 ***
 
@@ -458,7 +458,7 @@ Defined in: chain/account.ts:129
 
 > **vesting\_shares**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:123
+Defined in: chain/account.ts:130
 
 ***
 
@@ -466,7 +466,7 @@ Defined in: chain/account.ts:123
 
 > **vesting\_withdraw\_rate**: `string` \| [`Asset`](../classes/Asset.md)
 
-Defined in: chain/account.ts:126
+Defined in: chain/account.ts:133
 
 ***
 
@@ -474,7 +474,7 @@ Defined in: chain/account.ts:126
 
 > **voting\_manabar**: `object`
 
-Defined in: chain/account.ts:102
+Defined in: chain/account.ts:109
 
 #### current\_mana
 
@@ -490,7 +490,7 @@ Defined in: chain/account.ts:102
 
 > **voting\_power**: `number`
 
-Defined in: chain/account.ts:100
+Defined in: chain/account.ts:107
 
 ***
 
@@ -498,7 +498,7 @@ Defined in: chain/account.ts:100
 
 > **withdraw\_routes**: `number`
 
-Defined in: chain/account.ts:130
+Defined in: chain/account.ts:137
 
 ***
 
@@ -506,7 +506,7 @@ Defined in: chain/account.ts:130
 
 > **withdrawn**: `string` \| `number`
 
-Defined in: chain/account.ts:128
+Defined in: chain/account.ts:135
 
 ***
 
@@ -514,4 +514,4 @@ Defined in: chain/account.ts:128
 
 > **witnesses\_voted\_for**: `number`
 
-Defined in: chain/account.ts:132
+Defined in: chain/account.ts:139

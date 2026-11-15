@@ -3,7 +3,7 @@
 // Uint8Array lookup tables for O(1) char <-> index conversion.
 // I/O uses the custom Uint8Array-backed Buffer shim.
 
-import { BBuffer as Buffer } from './bytebuffer'
+import { BBuffer as Buffer } from './bbuffer'
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 

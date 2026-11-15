@@ -6,9 +6,9 @@
 
 # Function: makeBitMaskFilter()
 
-> **makeBitMaskFilter**(`allowedOperations`): `any`[]
+> **makeBitMaskFilter**(`allowedOperations`): (`string` \| `null`)[]
 
-Defined in: utils.ts:368
+Defined in: utils.ts:427
 
 Make bitmask filter to be used with getAccountHistory call
 
@@ -22,4 +22,4 @@ Array of operations index numbers
 
 ## Returns
 
-`any`[]
+(`string` \| `null`)[]

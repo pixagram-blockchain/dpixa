@@ -8,7 +8,7 @@
 
 > **sleep**(`ms`): `Promise`\<`void`\>
 
-Defined in: utils.ts:59
+Defined in: utils.ts:69
 
 Sleep for N milliseconds.
 

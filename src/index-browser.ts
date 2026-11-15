@@ -34,13 +34,7 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import 'core-js/features/array/from'
-import 'core-js/features/map'
-import 'core-js/features/number'
-import 'core-js/features/promise'
-import 'core-js/features/symbol'
-import 'core-js/features/symbol/async-iterator'
-import 'regenerator-runtime/runtime'
-import 'whatwg-fetch'
-
+// The core-js / regenerator-runtime / whatwg-fetch polyfills that used to be
+// imported here are gone: every browser with BigInt (required by secp256k1)
+// already has Map, Symbol, Promise, async iteration and fetch natively.
 export * from './index'

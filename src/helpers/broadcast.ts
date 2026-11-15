@@ -34,9 +34,8 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import * as assert from 'assert'
-
-import { BBuffer as Buffer } from '../bytebuffer'
+import assert from '../assert'
+import { BBuffer as Buffer } from '../bbuffer'
 import { Authority, AuthorityType } from '../chain/account'
 import { Asset } from '../chain/asset'
 import {
@@ -56,8 +55,9 @@ import {
   Transaction,
   TransactionConfirmation
 } from '../chain/transaction'
-import { Client } from '../client'
-import { cryptoUtils, PrivateKey, PublicKey } from '../crypto'
+import type { Client } from '../client'
+import type { PrivateKey, PublicKey } from '../crypto'
+import { requireCrypto } from '../crypto-registry'
 
 export interface CreateAccountOptions {
   /**
@@ -99,6 +99,14 @@ export interface CreateAccountOptions {
   metadata?: { [key: string]: any }
 }
 
+/**
+ * Broadcast API helper.
+ *
+ * Part of the lite (fetch-only) client: the signing it needs comes from the
+ * crypto module through crypto-registry.ts, so `client.broadcast` exists even
+ * before `@pixagram/dpixa/crypto` has been loaded. Methods that sign or
+ * compute transaction ids throw a descriptive error until it is.
+ */
 export class BroadcastAPI {
   /**
    * How many milliseconds in the future to set the expiry time to when
@@ -176,10 +184,11 @@ export class BroadcastAPI {
       key: PrivateKey
   ) {
     assert(
-        global.hasOwnProperty('it'),
+        Object.prototype.hasOwnProperty.call(globalThis, 'it'),
         'helper to be used only for mocha tests'
     )
 
+    const cryptoImpl = requireCrypto('client.broadcast.createTestAccount')
     const { username, metadata, creator } = options
 
     const prefix = this.client.addressPrefix
@@ -188,25 +197,25 @@ export class BroadcastAPI {
         posting: Authority,
         memo_key: PublicKey
     if (options.password) {
-      const ownerKey = PrivateKey.fromLogin(
+      const ownerKey = cryptoImpl.PrivateKey.fromLogin(
           username,
           options.password,
           'owner'
       ).createPublic(prefix)
       owner = Authority.from(ownerKey)
-      const activeKey = PrivateKey.fromLogin(
+      const activeKey = cryptoImpl.PrivateKey.fromLogin(
           username,
           options.password,
           'active'
       ).createPublic(prefix)
       active = Authority.from(activeKey)
-      const postingKey = PrivateKey.fromLogin(
+      const postingKey = cryptoImpl.PrivateKey.fromLogin(
           username,
           options.password,
           'posting'
       ).createPublic(prefix)
       posting = Authority.from(postingKey)
-      memo_key = PrivateKey.fromLogin(
+      memo_key = cryptoImpl.PrivateKey.fromLogin(
           username,
           options.password,
           'memo'
@@ -215,7 +224,7 @@ export class BroadcastAPI {
       owner = Authority.from(options.auths.owner)
       active = Authority.from(options.auths.active)
       posting = Authority.from(options.auths.posting)
-      memo_key = PublicKey.from(options.auths.memoKey)
+      memo_key = cryptoImpl.PublicKey.from(options.auths.memoKey)
     } else {
       throw new Error('Must specify either password or auths')
     }
@@ -313,6 +322,8 @@ export class BroadcastAPI {
       operations: Operation[],
       key: PrivateKey | PrivateKey[]
   ): Promise<TransactionConfirmation> {
+    // Fail before any network round-trip if signing is unavailable.
+    requireCrypto('client.broadcast.sendOperations')
     const props = await this.client.database.getDynamicGlobalProperties()
 
     const ref_block_num = props.head_block_number & 0xffff
@@ -348,7 +359,7 @@ export class BroadcastAPI {
       transaction: Transaction,
       key: PrivateKey | PrivateKey[]
   ): SignedTransaction {
-    return cryptoUtils.signTransaction(transaction, key, this.client.chainId)
+    return requireCrypto('client.broadcast.sign').signTransaction(transaction, key, this.client.chainId)
   }
 
   /**
@@ -357,7 +368,7 @@ export class BroadcastAPI {
   public async send(
       transaction: SignedTransaction
   ): Promise<TransactionConfirmation> {
-    const trxId = cryptoUtils.generateTrxId(transaction)
+    const trxId = requireCrypto('client.broadcast.send').generateTrxId(transaction)
     const result = await this.call('broadcast_transaction', [transaction])
     return Object.assign({ id: trxId }, result)
   }

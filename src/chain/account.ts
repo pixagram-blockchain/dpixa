@@ -34,7 +34,8 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import { PublicKey } from '../crypto'
+import type { PublicKey } from '../crypto'
+import { peekCrypto } from '../crypto-registry'
 import { Asset } from './asset'
 
 export interface AuthorityType {
@@ -58,16 +59,22 @@ export class Authority implements AuthorityType {
    * Convenience to create a new instance from PublicKey or authority object.
    */
   public static from(value: string | PublicKey | AuthorityType) {
+    // PublicKey lives in the crypto module; when that is not loaded no
+    // PublicKey instance can exist, so only strings take the key path.
+    const PublicKeyClass = peekCrypto()?.PublicKey
     if (value instanceof Authority) {
       return value
-    } else if (typeof value === 'string' || value instanceof PublicKey) {
+    } else if (
+      typeof value === 'string' ||
+      (PublicKeyClass !== undefined && value instanceof PublicKeyClass)
+    ) {
       return new Authority({
         account_auths: [],
         key_auths: [[value, 1]],
         weight_threshold: 1
       })
     } else {
-      return new Authority(value)
+      return new Authority(value as AuthorityType)
     }
   }
 }

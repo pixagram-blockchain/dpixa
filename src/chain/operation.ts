@@ -34,7 +34,7 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import { PublicKey } from '../crypto'
+import type { PublicKey } from '../crypto'
 import { AuthorityType } from './account'
 import { Asset, PriceType } from './asset'
 import { SignedBlockHeader } from './block'

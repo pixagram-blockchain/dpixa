@@ -8,9 +8,12 @@
 
 > **retryingFetch**(`currentAddress`, `allAddresses`, `opts`, `timeout`, `failoverThreshold`, `consoleOnFailover`, `backoff`, `fetchTimeout?`): `Promise`\<\{ `currentAddress`: `string`; `response`: `any`; \}\>
 
-Defined in: utils.ts:99
+Defined in: utils.ts:204
 
 Fetch API wrapper that retries until timeout is reached.
+
+Uses the platform `fetch` (browsers, Node.js, workers) — no
+cross-fetch / node-fetch / whatwg-fetch polyfills.
 
 ## Parameters
 

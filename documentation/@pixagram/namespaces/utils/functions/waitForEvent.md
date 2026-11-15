@@ -8,7 +8,7 @@
 
 > **waitForEvent**\<`T`\>(`emitter`, `eventName`): `Promise`\<`T`\>
 
-Defined in: utils.ts:47
+Defined in: utils.ts:57
 
 Return a promise that will resove when a specific event is emitted.
 
@@ -22,7 +22,7 @@ Return a promise that will resove when a specific event is emitted.
 
 ### emitter
 
-`EventEmitter`
+[`EventEmitterLike`](../interfaces/EventEmitterLike.md)
 
 ### eventName
 

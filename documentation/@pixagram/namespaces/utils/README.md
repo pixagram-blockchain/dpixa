@@ -8,6 +8,7 @@
 
 ## Interfaces
 
+- [EventEmitterLike](interfaces/EventEmitterLike.md)
 - [WitnessProps](interfaces/WitnessProps.md)
 
 ## Variables

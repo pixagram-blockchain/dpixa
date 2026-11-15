@@ -6,7 +6,7 @@
 
 # Class: Authority
 
-Defined in: chain/account.ts:46
+Defined in: chain/account.ts:47
 
 ## Implements
 
@@ -18,7 +18,7 @@ Defined in: chain/account.ts:46
 
 > **new Authority**(`__namedParameters`): `Authority`
 
-Defined in: chain/account.ts:51
+Defined in: chain/account.ts:52
 
 #### Parameters
 
@@ -36,7 +36,7 @@ Defined in: chain/account.ts:51
 
 > **account\_auths**: \[`string`, `number`\][]
 
-Defined in: chain/account.ts:48
+Defined in: chain/account.ts:49
 
 #### Implementation of
 
@@ -48,7 +48,7 @@ Defined in: chain/account.ts:48
 
 > **key\_auths**: \[`string` \| [`PublicKey`](PublicKey.md), `number`\][]
 
-Defined in: chain/account.ts:49
+Defined in: chain/account.ts:50
 
 #### Implementation of
 
@@ -60,7 +60,7 @@ Defined in: chain/account.ts:49
 
 > **weight\_threshold**: `number`
 
-Defined in: chain/account.ts:47
+Defined in: chain/account.ts:48
 
 #### Implementation of
 
@@ -72,7 +72,7 @@ Defined in: chain/account.ts:47
 
 > `static` **from**(`value`): `Authority`
 
-Defined in: chain/account.ts:60
+Defined in: chain/account.ts:61
 
 Convenience to create a new instance from PublicKey or authority object.
 
@@ -80,7 +80,7 @@ Convenience to create a new instance from PublicKey or authority object.
 
 ##### value
 
-`string` \| [`AuthorityType`](../interfaces/AuthorityType.md) \| [`PublicKey`](PublicKey.md)
+`string` \| [`PublicKey`](PublicKey.md) \| [`AuthorityType`](../interfaces/AuthorityType.md)
 
 #### Returns
 

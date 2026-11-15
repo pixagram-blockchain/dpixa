@@ -33,18 +33,21 @@
  * in the design, construction, operation or maintenance of any military facility.
  */
 
-import * as assert from 'assert'
 import { hmac } from '@noble/hashes/hmac.js'
+import { ripemd160 as nobleRipemd160 } from '@noble/hashes/legacy.js'
 import { sha256 as nobleSha256, sha512 as nobleSha512 } from '@noble/hashes/sha2.js'
 import * as secp256k1 from '@noble/secp256k1'
-import { RIPEMD160 } from 'ripemd160-min'
-import { VError } from 'verror'
+import assert from './assert'
 import * as bs58 from './base58'
-import ByteBuffer, { BBuffer as Buffer } from './bytebuffer'
+import { BBuffer as Buffer } from './bbuffer'
+import ByteBuffer from './bytebuffer'
 import { Types } from './chain/serializer'
 import { SignedTransaction, Transaction } from './chain/transaction'
 import { DEFAULT_ADDRESS_PREFIX, DEFAULT_CHAIN_ID } from './client'
+import { registerCrypto } from './crypto-registry'
+import { VError } from './errors'
 import { copy } from './utils'
+import { buildWitnessUpdateOp } from './witness'
 
 /**
  * Wire up the synchronous hash providers that `@noble/secp256k1` v3 needs
@@ -66,8 +69,8 @@ const utf8 = new TextEncoder()
 /**
  * Normalise a hash helper's input to a Uint8Array.
  *
- * `@noble/hashes` and `ripemd160-min` both require byte inputs — neither
- * accepts strings. Node's `createHash(...).update(str)` did the UTF-8
+ * `@noble/hashes` requires byte inputs — it does not accept strings.
+ * Node's `createHash(...).update(str)` did the UTF-8
  * encoding for us, so to keep call sites like `sha256(seed)` working with
  * a plain string, we do the encoding here.
  */
@@ -78,19 +81,12 @@ function toBytes(input: Uint8Array | Buffer | string): Uint8Array {
 /**
  * Return ripemd160 hash of input.
  *
- * Switched from the `ripemd160` package (which exposed a default class) to
- * `ripemd160-min`. Key differences:
- *   - Use the named import `{ RIPEMD160 }` — the package's default export
- *     isn't callable as a constructor under ESM interop.
- *   - `.update()` only accepts bytes (Uint8Array or number[]), so strings
- *     must be encoded first (handled by `toBytes`).
- *   - `.digest()` returns a Uint8Array, not a Node Buffer — we wrap it in
- *     `Buffer.from(...)` so callers can still use `.slice()` / `.toString('hex')`.
+ * Uses `@noble/hashes/legacy.js` (already a dependency for sha2/hmac) instead
+ * of the separate `ripemd160-min` package. Returns a BBuffer so callers can
+ * still use `.slice()` / `.toString('hex')`.
  */
 function ripemd160(input: Uint8Array | Buffer | string): Buffer {
-  const h = new RIPEMD160()
-  h.update(toBytes(input))
-  return Buffer.from(h.digest() as Uint8Array)
+  return Buffer.from(nobleRipemd160(toBytes(input)))
 }
 
 /**
@@ -593,3 +589,14 @@ export const cryptoUtils = {
   signTransaction,
   transactionDigest
 }
+
+// Make signing/broadcasting and utils.buildWitnessUpdateOp available to the
+// lite client (see crypto-registry.ts). The closure defers the lookup of
+// buildWitnessUpdateOp, which may not be initialised yet in a circular load.
+registerCrypto({
+  PrivateKey,
+  PublicKey,
+  buildWitnessUpdateOp: (owner, props) => buildWitnessUpdateOp(owner, props),
+  generateTrxId,
+  signTransaction
+})
